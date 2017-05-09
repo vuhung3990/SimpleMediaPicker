@@ -11,7 +11,7 @@ public class CameraPresenter implements CameraContract.Presenter {
     private static final int STATE_VIDEO = 1;
     private int flashMode = CameraContract.View.FLASH_MODE_AUTO;
     private CameraContract.View view;
-    private int state_camera = STATE_PHOTO;
+    private int state_camera = STATE_VIDEO;
     private boolean isFrontCamera = false;
 
     public CameraPresenter(CameraContract.View view) {

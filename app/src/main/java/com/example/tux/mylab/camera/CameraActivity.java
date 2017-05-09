@@ -61,10 +61,17 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+        // case when user close without stop record
+        releaseMediaRecorder();
+    }
+
+    @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == REQUEST_PERMISSION_CAMERA) {
             // If request is cancelled, the result arrays are empty.
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
                 presenter.grantedCameraPermission();
             } else {
                 presenter.cameraPermissionDenied();
@@ -235,7 +242,7 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
         mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
 
         // Step 3: Set a CamcorderProfile (requires API Level 8 or higher)
-        mMediaRecorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH));
+        mMediaRecorder.setProfile(CamcorderProfile.get(Camera.CameraInfo.CAMERA_FACING_BACK, CamcorderProfile.QUALITY_HIGH));
 
         // Step 4: Set output file
         mMediaRecorder.setOutputFile(getOutputMediaFile(MEDIA_TYPE_VIDEO).toString());
@@ -246,6 +253,7 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
         // Step 6: Prepare configured MediaRecorder
         try {
             mMediaRecorder.prepare();
+            Log.d("camera", "prepare");
         } catch (IllegalStateException e) {
             Log.d("camera", "IllegalStateException preparing MediaRecorder: " + e.getMessage());
             releaseMediaRecorder();
@@ -308,7 +316,7 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
 
     @Override
     public void requestCameraPermission() {
-        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, REQUEST_PERMISSION_CAMERA);
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO}, REQUEST_PERMISSION_CAMERA);
     }
 
     /**
