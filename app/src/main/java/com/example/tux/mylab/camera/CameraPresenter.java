@@ -8,7 +8,8 @@ public class CameraPresenter implements CameraContract.Presenter {
     private static final int STATE_PHOTO = 0;
     private static final int STATE_VIDEO = 1;
     private CameraContract.View view;
-    private int state_camera = STATE_VIDEO;
+    private int state_camera = STATE_PHOTO;
+    private boolean isFrontCamera = false;
 
     public CameraPresenter(CameraContract.View view) {
         this.view = view;
@@ -17,7 +18,7 @@ public class CameraPresenter implements CameraContract.Presenter {
             if (!view.isHaveCameraPermission()) {
                 view.requestCameraPermission();
             } else {
-                view.initial();
+                view.showCamera(isFrontCamera);
             }
         }
     }
@@ -25,7 +26,7 @@ public class CameraPresenter implements CameraContract.Presenter {
 
     @Override
     public void grantedCameraPermission() {
-        view.initial();
+        view.showCamera(isFrontCamera);
     }
 
     @Override
@@ -60,5 +61,11 @@ public class CameraPresenter implements CameraContract.Presenter {
     @Override
     public void writeExternalPermissionDenied() {
 
+    }
+
+    @Override
+    public void switchCamera() {
+        isFrontCamera = !isFrontCamera;
+        view.showCamera(isFrontCamera);
     }
 }

@@ -17,7 +17,7 @@ public interface CameraContract {
          */
         void requestCameraPermission();
 
-        void initial();
+        void showCamera(boolean isFrontCamera);
 
         /**
          * @return true: if this device has a camera, else otherwise
@@ -49,5 +49,7 @@ public interface CameraContract {
         void grantedWriteExternalPermission();
 
         void writeExternalPermissionDenied();
+
+        void switchCamera();
     }
 }

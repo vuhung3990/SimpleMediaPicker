@@ -36,6 +36,7 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
     private CameraPresenter presenter;
     private MediaRecorder mMediaRecorder;
     private boolean isRecording = false;
+    private boolean current;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +45,15 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
 
         presenter = new CameraPresenter(this);
         setCancelFlag();
+
+        //btn to close the application
+        findViewById(R.id.imgClose).setOnClickListener(this);
+
+        // btn take/record photo
+        findViewById(R.id.take_record).setOnClickListener(this);
+
+        // btn switch camera
+        findViewById(R.id.switch_camera).setOnClickListener(this);
     }
 
     @Override
@@ -78,12 +88,14 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
     }
 
     /**
-     * init view and camera
+     * show camera
+     *
+     * @param isFrontCamera true show front camera, else show back camera
      */
     @Override
-    public void initial() {
+    public void showCamera(boolean isFrontCamera) {
         try {
-            mCamera = Camera.open();//you can use open(int) to use different cameras
+            mCamera = Camera.open(isFrontCamera ? Camera.CameraInfo.CAMERA_FACING_FRONT : Camera.CameraInfo.CAMERA_FACING_BACK);//you can use open(int) to use different cameras
             Camera.Parameters params = mCamera.getParameters();
 
             // Check what resolutions are supported by your camera
@@ -115,14 +127,9 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
         if (mCamera != null) {
             mCameraView = new CameraView(this, mCamera);//create a SurfaceView to show camera data
             FrameLayout camera_view = (FrameLayout) findViewById(R.id.camera_view);
+            camera_view.removeAllViews();
             camera_view.addView(mCameraView);//add the SurfaceView to the layout
         }
-
-        //btn to close the application
-        findViewById(R.id.imgClose).setOnClickListener(this);
-
-        // btn take/record photo
-        findViewById(R.id.take_record).setOnClickListener(this);
     }
 
     @Override
@@ -257,6 +264,9 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
                 break;
             case R.id.take_record:
                 presenter.saveMedia();
+                break;
+            case R.id.switch_camera:
+                presenter.switchCamera();
                 break;
             default:
                 break;
