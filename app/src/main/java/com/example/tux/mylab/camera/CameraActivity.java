@@ -38,6 +38,7 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
     private MediaRecorder mMediaRecorder;
     private boolean isRecording = false;
     private ImageButton btnFlashMode;
+    private ImageButton btnTakeRecord;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,7 +52,8 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
         findViewById(R.id.imgClose).setOnClickListener(this);
 
         // btn take/record photo
-        findViewById(R.id.take_record).setOnClickListener(this);
+        btnTakeRecord = (ImageButton) findViewById(R.id.take_record);
+        btnTakeRecord.setOnClickListener(this);
 
         // btn switch camera
         findViewById(R.id.switch_camera).setOnClickListener(this);
@@ -253,6 +255,7 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
         // Step 6: Prepare configured MediaRecorder
         try {
             mMediaRecorder.prepare();
+            btnTakeRecord.setImageResource(R.drawable.ic_stop_white_24dp);
             Log.d("camera", "prepare");
         } catch (IllegalStateException e) {
             Log.d("camera", "IllegalStateException preparing MediaRecorder: " + e.getMessage());
@@ -276,6 +279,8 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
             mMediaRecorder = null;
             mCamera.lock();           // lock camera for later use
         }
+
+        btnTakeRecord.setImageResource(R.drawable.ic_camera_roll_white_24dp);
     }
 
 
