@@ -2,19 +2,13 @@ package com.example.tux.mylab.camera;
 
 import android.util.Log;
 
-/**
- * Created by dev22 on 5/8/17.
- */
-
-public class CameraPresenter implements CameraContract.Presenter {
-    private static final int STATE_PHOTO = 0;
-    private static final int STATE_VIDEO = 1;
+class CameraPresenter implements CameraContract.Presenter {
     private int flashMode = CameraContract.View.FLASH_MODE_AUTO;
     private CameraContract.View view;
-    private int state_camera = STATE_VIDEO;
+    private int state_camera = CameraContract.View.STATE_PHOTO;
     private boolean isFrontCamera = false;
 
-    public CameraPresenter(CameraContract.View view) {
+    CameraPresenter(CameraContract.View view) {
         this.view = view;
 
         if (view.isHaveCamera()) {
@@ -41,12 +35,12 @@ public class CameraPresenter implements CameraContract.Presenter {
     public void saveMedia() {
         if (view.isHaveWriteExternalStorage()) {
             switch (state_camera) {
-                case STATE_PHOTO:
+                case CameraContract.View.STATE_PHOTO:
                     view.captureImage();
                     break;
 
                 // TODO: 5/8/17
-                case STATE_VIDEO:
+                case CameraContract.View.STATE_VIDEO:
                     view.recordVideo();
                     break;
             }
@@ -89,5 +83,12 @@ public class CameraPresenter implements CameraContract.Presenter {
 
         view.showCamera(isFrontCamera, flashMode);
         view.setFlashModeIcon(flashMode);
+    }
+
+    @Override
+    public void toggleVideoPhoto() {
+        // photo -> video and back
+        state_camera = state_camera == CameraContract.View.STATE_PHOTO ? CameraContract.View.STATE_VIDEO : CameraContract.View.STATE_PHOTO;
+        view.changeIconPhotoVideo(state_camera);
     }
 }

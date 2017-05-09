@@ -32,6 +32,7 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
     public static final int MEDIA_TYPE_VIDEO = 2;
     private static final int REQUEST_PERMISSION_CAMERA = 77;
     private static final int REQUEST_PERMISSION_WRITE_EXTERNAL = 89;
+    @SuppressWarnings("deprecation")
     private Camera mCamera;
     private CameraView mCameraView;
     private CameraPresenter presenter;
@@ -39,6 +40,7 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
     private boolean isRecording = false;
     private ImageButton btnFlashMode;
     private ImageButton btnTakeRecord;
+    private ImageButton btnTogglePhotoVideo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,8 +60,13 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
         // btn switch camera
         findViewById(R.id.switch_camera).setOnClickListener(this);
 
+        // btn flash mode
         btnFlashMode = (ImageButton) findViewById(R.id.flash_mode);
         btnFlashMode.setOnClickListener(this);
+
+        // btn change photo -> video
+        btnTogglePhotoVideo = (ImageButton) findViewById(R.id.toggle_video_photo);
+        btnTogglePhotoVideo.setOnClickListener(this);
     }
 
     @Override
@@ -100,6 +107,7 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
         isCancelIntermediate = getIntent().getBooleanExtra(flagCancelIntermediate, true);
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public void showCamera(boolean isFrontCamera, int flashMode) {
         try {
@@ -165,6 +173,7 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
 
     @Override
     public void captureImage() {
+        //noinspection deprecation
         mCamera.takePicture(null, null, new Camera.PictureCallback() {
             @Override
             public void onPictureTaken(byte[] data, Camera camera) {
@@ -227,6 +236,17 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
         btnFlashMode.setImageResource(icon);
     }
 
+    @Override
+    public void changeIconPhotoVideo(int state_camera) {
+        if (state_camera == STATE_PHOTO) {
+            btnTakeRecord.setImageResource(R.drawable.ic_photo_camera_white_24dp);
+            btnTogglePhotoVideo.setImageResource(R.drawable.ic_camera_roll_white_24dp);
+        } else {
+            btnTakeRecord.setImageResource(R.drawable.ic_camera_roll_white_24dp);
+            btnTogglePhotoVideo.setImageResource(R.drawable.ic_photo_camera_white_24dp);
+        }
+    }
+
     /**
      * prepare media recorder for record video
      *
@@ -237,6 +257,7 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
 
         // Step 1: Unlock and set camera to MediaRecorder
         mCamera.unlock();
+        //noinspection deprecation
         mMediaRecorder.setCamera(mCamera);
 
         // Step 2: Set sources
@@ -244,6 +265,7 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
         mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
 
         // Step 3: Set a CamcorderProfile (requires API Level 8 or higher)
+        //noinspection deprecation
         mMediaRecorder.setProfile(CamcorderProfile.get(Camera.CameraInfo.CAMERA_FACING_BACK, CamcorderProfile.QUALITY_HIGH));
 
         // Step 4: Set output file
@@ -298,6 +320,9 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
                 break;
             case R.id.flash_mode:
                 presenter.changeFlashMode();
+                break;
+            case R.id.toggle_video_photo:
+                presenter.toggleVideoPhoto();
                 break;
             default:
                 break;
@@ -356,7 +381,7 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
         } else {
             return null;
         }
-
+        Log.d("camera", "save file: " + mediaFile.getAbsolutePath());
         return mediaFile;
     }
 }
