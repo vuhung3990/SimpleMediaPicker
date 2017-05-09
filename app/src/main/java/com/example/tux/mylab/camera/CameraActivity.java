@@ -87,11 +87,6 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
         isCancelIntermediate = getIntent().getBooleanExtra(flagCancelIntermediate, true);
     }
 
-    /**
-     * show camera
-     *
-     * @param isFrontCamera true show front camera, else show back camera
-     */
     @Override
     public void showCamera(boolean isFrontCamera) {
         try {
