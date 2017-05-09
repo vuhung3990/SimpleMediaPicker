@@ -112,11 +112,13 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
                 }
             }
 
-            // set flash mode
-            String fm = Camera.Parameters.FLASH_MODE_AUTO;
-            if (flashMode == FLASH_MODE_ON) fm = Camera.Parameters.FLASH_MODE_ON;
-            if (flashMode == FLASH_MODE_OFF) fm = Camera.Parameters.FLASH_MODE_OFF;
-            params.setFlashMode(fm);
+            // set flash mode, check if device has flash led
+            if (getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH)) {
+                String fm = Camera.Parameters.FLASH_MODE_AUTO;
+                if (flashMode == FLASH_MODE_ON) fm = Camera.Parameters.FLASH_MODE_ON;
+                if (flashMode == FLASH_MODE_OFF) fm = Camera.Parameters.FLASH_MODE_OFF;
+                params.setFlashMode(fm);
+            }
 
             // see getSupportedPictureSizes: a list of supported picture sizes. This method will always return a list with at least one element.
             if (mSize != null) {
