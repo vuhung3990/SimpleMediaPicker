@@ -6,6 +6,9 @@ package com.example.tux.mylab.camera;
 
 public interface CameraContract {
     interface View {
+        int FLASH_MODE_AUTO = 0;
+        int FLASH_MODE_ON = 1;
+        int FLASH_MODE_OFF = 2;
 
         /**
          * @return true: granted, false: denied
@@ -21,8 +24,9 @@ public interface CameraContract {
          * show camera
          *
          * @param isFrontCamera true: show front, false show back camera
+         * @param flashMode     FLASH_MODE_AUTO (default), FLASH_MODE_ON ,FLASH_MODE_OFF
          */
-        void showCamera(boolean isFrontCamera);
+        void showCamera(boolean isFrontCamera, int flashMode);
 
         /**
          * @return true: if this device has a camera, else otherwise
@@ -48,6 +52,13 @@ public interface CameraContract {
          * record video
          */
         void recordVideo();
+
+        /**
+         * set icon when change flash mode
+         *
+         * @param flashMode FLASH_MODE_AUTO (default), FLASH_MODE_ON ,FLASH_MODE_OFF
+         */
+        void setFlashModeIcon(int flashMode);
     }
 
     interface Presenter {
@@ -62,7 +73,7 @@ public interface CameraContract {
         void cameraPermissionDenied();
 
         /**
-         * save video
+         * save photo or video when have permission
          */
         void saveMedia();
 
@@ -80,5 +91,10 @@ public interface CameraContract {
          * switch camera font/back
          */
         void switchCamera();
+
+        /**
+         * change flash mode: (1) AUTO -> (2) ON -> (3) OFF -> (1)....
+         */
+        void changeFlashMode();
     }
 }

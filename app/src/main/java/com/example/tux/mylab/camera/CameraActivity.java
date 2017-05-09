@@ -12,6 +12,7 @@ import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 
 import com.example.tux.mylab.MediaPickerBaseActivity;
 import com.example.tux.mylab.R;
@@ -36,7 +37,7 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
     private CameraPresenter presenter;
     private MediaRecorder mMediaRecorder;
     private boolean isRecording = false;
-    private boolean current;
+    private ImageButton btnFlashMode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +55,9 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
 
         // btn switch camera
         findViewById(R.id.switch_camera).setOnClickListener(this);
+
+        btnFlashMode = (ImageButton) findViewById(R.id.flash_mode);
+        btnFlashMode.setOnClickListener(this);
     }
 
     @Override
@@ -88,7 +92,7 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
     }
 
     @Override
-    public void showCamera(boolean isFrontCamera) {
+    public void showCamera(boolean isFrontCamera, int flashMode) {
         try {
             mCamera = Camera.open(isFrontCamera ? Camera.CameraInfo.CAMERA_FACING_FRONT : Camera.CameraInfo.CAMERA_FACING_BACK);//you can use open(int) to use different cameras
             Camera.Parameters params = mCamera.getParameters();
@@ -107,6 +111,12 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
                     mSize = size;
                 }
             }
+
+            // set flash mode
+            String fm = Camera.Parameters.FLASH_MODE_AUTO;
+            if (flashMode == FLASH_MODE_ON) fm = Camera.Parameters.FLASH_MODE_ON;
+            if (flashMode == FLASH_MODE_OFF) fm = Camera.Parameters.FLASH_MODE_OFF;
+            params.setFlashMode(fm);
 
             // see getSupportedPictureSizes: a list of supported picture sizes. This method will always return a list with at least one element.
             if (mSize != null) {
@@ -198,6 +208,14 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
         }
     }
 
+    @Override
+    public void setFlashModeIcon(int flashMode) {
+        int icon = R.drawable.ic_flash_auto_white_24dp;
+        if (flashMode == FLASH_MODE_ON) icon = R.drawable.ic_flash_on_white_24dp;
+        if (flashMode == FLASH_MODE_OFF) icon = R.drawable.ic_flash_off_white_24dp;
+        btnFlashMode.setImageResource(icon);
+    }
+
     /**
      * prepare media recorder for record video
      *
@@ -262,6 +280,9 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
                 break;
             case R.id.switch_camera:
                 presenter.switchCamera();
+                break;
+            case R.id.flash_mode:
+                presenter.changeFlashMode();
                 break;
             default:
                 break;
