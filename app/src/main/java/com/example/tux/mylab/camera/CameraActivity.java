@@ -7,6 +7,8 @@ import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
@@ -18,13 +20,14 @@ import com.example.tux.mylab.MediaPickerBaseActivity;
 import com.example.tux.mylab.R;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
+
+import cameraview.CameraView;
 
 public class CameraActivity extends MediaPickerBaseActivity implements View.OnClickListener, CameraContract.View {
 
@@ -34,21 +37,20 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
     private static final int REQUEST_PERMISSION_WRITE_EXTERNAL = 89;
     @SuppressWarnings("deprecation")
     private Camera mCamera;
-    private CameraView mCameraView;
     private CameraPresenter presenter;
     private MediaRecorder mMediaRecorder;
     private boolean isRecording = false;
     private ImageButton btnFlashMode;
     private ImageButton btnTakeRecord;
     private ImageButton btnTogglePhotoVideo;
+    private CameraView mCameraView1;
+    private FrameLayout cameraContainer;
+    private Handler mBackgroundHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
-
-        presenter = new CameraPresenter(this);
-        setCancelFlag();
 
         //btn to close the application
         findViewById(R.id.imgClose).setOnClickListener(this);
@@ -67,6 +69,65 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
         // btn change photo -> video
         btnTogglePhotoVideo = (ImageButton) findViewById(R.id.toggle_video_photo);
         btnTogglePhotoVideo.setOnClickListener(this);
+
+        cameraContainer = (FrameLayout) findViewById(R.id.camera_view);
+
+        presenter = new CameraPresenter(this);
+        setCancelFlag();
+    }
+
+    private Handler getBackgroundHandler() {
+        if (mBackgroundHandler == null) {
+            HandlerThread thread = new HandlerThread("background");
+            thread.start();
+            mBackgroundHandler = new Handler(thread.getLooper());
+        }
+        return mBackgroundHandler;
+    }
+
+    /**
+     * add camera view into container
+     * reason: refresh camera view for avoid flash issue
+     */
+    @Override
+    public void refreshCameraView() {
+        mCameraView1 = new CameraView(this);
+        mCameraView1.setAutoFocus(true);
+        mCameraView1.setFlash(CameraView.FLASH_ON);
+        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
+        mCameraView1.setLayoutParams(lp);
+        mCameraView1.addCallback(new CameraView.Callback() {
+            @Override
+            public void onPictureTaken(CameraView cameraView, final byte[] data) {
+                getBackgroundHandler().post(new Runnable() {
+                    @Override
+                    public void run() {
+                        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "IMG_" + new SimpleDateFormat("ddMMyyyyHHmmss", Locale.US).format(new Date()) + ".jpg");
+                        OutputStream os = null;
+                        try {
+                            os = new FileOutputStream(file);
+                            os.write(data);
+                            os.close();
+                        } catch (IOException e) {
+                            Log.w("camera", "Cannot write to " + file, e);
+                        } finally {
+                            if (os != null) {
+                                try {
+                                    os.close();
+                                } catch (IOException e) {
+                                    // Ignore
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        });
+
+        cameraContainer.removeAllViews();
+        cameraContainer.addView(mCameraView1);
+        mCameraView1.start();
     }
 
     @Override
@@ -74,6 +135,13 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
         super.onPause();
         // case when user close without stop record
         releaseMediaRecorder();
+        mCameraView1.stop();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        refreshCameraView();
     }
 
     @Override
@@ -107,55 +175,6 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
         isCancelIntermediate = getIntent().getBooleanExtra(flagCancelIntermediate, true);
     }
 
-    @SuppressWarnings("deprecation")
-    @Override
-    public void showCamera(boolean isFrontCamera, int flashMode) {
-        try {
-            mCamera = Camera.open(isFrontCamera ? Camera.CameraInfo.CAMERA_FACING_FRONT : Camera.CameraInfo.CAMERA_FACING_BACK);//you can use open(int) to use different cameras
-            Camera.Parameters params = mCamera.getParameters();
-
-            // Check what resolutions are supported by your camera
-            List<Camera.Size> sizes = params.getSupportedPictureSizes();
-
-            Camera.Size mSize = null;
-            int currentWidth = 0;
-            for (Camera.Size size : sizes) {
-                Log.i("camera", "Available resolution: " + size.width + " " + size.height);
-
-                // make sure best quality
-                if (size.width > currentWidth) {
-                    currentWidth = size.width;
-                    mSize = size;
-                }
-            }
-
-            // set flash mode, check if device has flash led
-            if (getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH)) {
-                String fm = Camera.Parameters.FLASH_MODE_AUTO;
-                if (flashMode == FLASH_MODE_ON) fm = Camera.Parameters.FLASH_MODE_ON;
-                if (flashMode == FLASH_MODE_OFF) fm = Camera.Parameters.FLASH_MODE_OFF;
-                params.setFlashMode(fm);
-            }
-
-            // see getSupportedPictureSizes: a list of supported picture sizes. This method will always return a list with at least one element.
-            if (mSize != null) {
-                Log.i("camera", "SET: " + mSize.width + " " + mSize.height);
-                params.setPictureSize(mSize.width, mSize.height);
-                mCamera.setParameters(params);
-            }
-        } catch (Exception e) {
-            Log.d("ERROR", "Failed to get camera: " + e.getMessage());
-        }
-
-        // set preview
-        if (mCamera != null) {
-            mCameraView = new CameraView(this, mCamera);//create a SurfaceView to show camera data
-            FrameLayout camera_view = (FrameLayout) findViewById(R.id.camera_view);
-            camera_view.removeAllViews();
-            camera_view.addView(mCameraView);//add the SurfaceView to the layout
-        }
-    }
-
     @Override
     public boolean isHaveCamera() {
         return getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA);
@@ -174,29 +193,7 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
     @Override
     public void captureImage() {
         //noinspection deprecation
-        mCamera.takePicture(null, null, new Camera.PictureCallback() {
-            @Override
-            public void onPictureTaken(byte[] data, Camera camera) {
-                File pictureFile = getOutputMediaFile(MEDIA_TYPE_IMAGE);
-                if (pictureFile == null) {
-                    return;
-                }
-
-                try {
-                    FileOutputStream fos = new FileOutputStream(pictureFile);
-                    fos.write(data);
-                    fos.close();
-
-                    // After a picture is taken, you must restart the preview before the user can take another picture
-                    mCamera.startPreview();
-                    Log.d("camera", "done");
-                } catch (FileNotFoundException e) {
-                    Log.d("camera", "File not found: " + e.getMessage());
-                } catch (IOException e) {
-                    Log.d("camera", "Error accessing file: " + e.getMessage());
-                }
-            }
-        });
+        mCameraView1.takePicture();
     }
 
     @Override
@@ -229,11 +226,13 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
     }
 
     @Override
-    public void setFlashModeIcon(int flashMode) {
+    public void setFlashMode(int flashMode) {
         int icon = R.drawable.ic_flash_auto_white_24dp;
-        if (flashMode == FLASH_MODE_ON) icon = R.drawable.ic_flash_on_white_24dp;
-        if (flashMode == FLASH_MODE_OFF) icon = R.drawable.ic_flash_off_white_24dp;
+        if (flashMode == CameraView.FLASH_ON) icon = R.drawable.ic_flash_on_white_24dp;
+        if (flashMode == CameraView.FLASH_OFF) icon = R.drawable.ic_flash_off_white_24dp;
         btnFlashMode.setImageResource(icon);
+
+        mCameraView1.setFlash(flashMode);
     }
 
     @Override
@@ -245,6 +244,16 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
             btnTakeRecord.setImageResource(R.drawable.ic_camera_roll_white_24dp);
             btnTogglePhotoVideo.setImageResource(R.drawable.ic_photo_camera_white_24dp);
         }
+    }
+
+    @Override
+    public void showFrontCamera() {
+        mCameraView1.setFacing(CameraView.FACING_FRONT);
+    }
+
+    @Override
+    public void showBackCamera() {
+        mCameraView1.setFacing(CameraView.FACING_BACK);
     }
 
     /**
@@ -272,7 +281,7 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
         mMediaRecorder.setOutputFile(getOutputMediaFile(MEDIA_TYPE_VIDEO).toString());
 
         // Step 5: Set the preview output
-        mMediaRecorder.setPreviewDisplay(mCameraView.getHolder().getSurface());
+        mMediaRecorder.setPreviewDisplay(mCameraView1.getPreviewSurface());
 
         // Step 6: Prepare configured MediaRecorder
         try {

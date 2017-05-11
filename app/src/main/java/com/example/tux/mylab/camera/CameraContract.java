@@ -7,18 +7,6 @@ package com.example.tux.mylab.camera;
 interface CameraContract {
     interface View {
         /**
-         * only flash on night
-         */
-        int FLASH_MODE_AUTO = 0;
-        /**
-         * always flash when take photo
-         */
-        int FLASH_MODE_ON = 1;
-        /**
-         * always off flash
-         */
-        int FLASH_MODE_OFF = 2;
-        /**
          * @see #changeIconPhotoVideo(int)
          */
         int STATE_PHOTO = 0;
@@ -43,7 +31,6 @@ interface CameraContract {
          * @param isFrontCamera true: show front, false show back camera
          * @param flashMode     FLASH_MODE_AUTO (default), FLASH_MODE_ON ,FLASH_MODE_OFF
          */
-        void showCamera(boolean isFrontCamera, int flashMode);
 
         /**
          * @return true: if this device has a camera, else otherwise
@@ -71,13 +58,19 @@ interface CameraContract {
         void recordVideo();
 
         /**
-         * set icon when change flash mode
+         * set icon and camera when change flash mode
          *
          * @param flashMode FLASH_MODE_AUTO (default), FLASH_MODE_ON ,FLASH_MODE_OFF
          */
-        void setFlashModeIcon(int flashMode);
+        void setFlashMode(int flashMode);
 
         void changeIconPhotoVideo(int state_camera);
+
+        void showFrontCamera();
+
+        void showBackCamera();
+
+        void refreshCameraView();
     }
 
     interface Presenter {

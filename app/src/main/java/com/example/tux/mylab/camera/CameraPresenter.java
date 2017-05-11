@@ -2,8 +2,10 @@ package com.example.tux.mylab.camera;
 
 import android.util.Log;
 
+import cameraview.CameraView;
+
 class CameraPresenter implements CameraContract.Presenter {
-    private int flashMode = CameraContract.View.FLASH_MODE_AUTO;
+    private int flashMode = CameraView.FLASH_AUTO;
     private CameraContract.View view;
     private int state_camera = CameraContract.View.STATE_PHOTO;
     private boolean isFrontCamera = false;
@@ -15,7 +17,7 @@ class CameraPresenter implements CameraContract.Presenter {
             if (!view.isHaveCameraPermission()) {
                 view.requestCameraPermission();
             } else {
-                view.showCamera(isFrontCamera, flashMode);
+//                view.showCamera(isFrontCamera, flashMode);
             }
         }
     }
@@ -23,7 +25,7 @@ class CameraPresenter implements CameraContract.Presenter {
 
     @Override
     public void grantedCameraPermission() {
-        view.showCamera(isFrontCamera, flashMode);
+        view.refreshCameraView();
     }
 
     @Override
@@ -62,27 +64,31 @@ class CameraPresenter implements CameraContract.Presenter {
 
     @Override
     public void switchCamera() {
+//        isFrontCamera = !isFrontCamera;
+//        view.showCamera(isFrontCamera, flashMode);
         isFrontCamera = !isFrontCamera;
-        view.showCamera(isFrontCamera, flashMode);
+        if (isFrontCamera) {
+            view.showFrontCamera();
+        } else {
+            view.showBackCamera();
+        }
     }
 
     @Override
     public void changeFlashMode() {
         switch (flashMode) {
-            case CameraContract.View.FLASH_MODE_AUTO:
-                flashMode = CameraContract.View.FLASH_MODE_ON;
+            case CameraView.FLASH_AUTO:
+                flashMode = CameraView.FLASH_ON;
                 break;
-            case CameraContract.View.FLASH_MODE_ON:
-                flashMode = CameraContract.View.FLASH_MODE_OFF;
+            case CameraView.FLASH_ON:
+                flashMode = CameraView.FLASH_OFF;
                 break;
             default:
-                flashMode = CameraContract.View.FLASH_MODE_AUTO;
+                flashMode = CameraView.FLASH_AUTO;
                 break;
         }
         Log.d("camera", "current flash mode: " + flashMode);
-
-        view.showCamera(isFrontCamera, flashMode);
-        view.setFlashModeIcon(flashMode);
+        view.setFlashMode(flashMode);
     }
 
     @Override
