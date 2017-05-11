@@ -1,11 +1,6 @@
 package com.example.tux.mylab.camera;
 
-import android.util.Log;
-
-import cameraview.CameraView;
-
 class CameraPresenter implements CameraContract.Presenter {
-    private int flashMode = CameraView.FLASH_AUTO;
     private CameraContract.View view;
     private int state_camera = CameraContract.View.STATE_PHOTO;
     private boolean isFrontCamera = false;
@@ -72,23 +67,6 @@ class CameraPresenter implements CameraContract.Presenter {
         } else {
             view.showBackCamera();
         }
-    }
-
-    @Override
-    public void changeFlashMode() {
-        switch (flashMode) {
-            case CameraView.FLASH_AUTO:
-                flashMode = CameraView.FLASH_ON;
-                break;
-            case CameraView.FLASH_ON:
-                flashMode = CameraView.FLASH_OFF;
-                break;
-            default:
-                flashMode = CameraView.FLASH_AUTO;
-                break;
-        }
-        Log.d("camera", "current flash mode: " + flashMode);
-        view.setFlashMode(flashMode);
     }
 
     @Override

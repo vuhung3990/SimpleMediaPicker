@@ -57,13 +57,6 @@ interface CameraContract {
          */
         void recordVideo();
 
-        /**
-         * set icon and camera when change flash mode
-         *
-         * @param flashMode FLASH_MODE_AUTO (default), FLASH_MODE_ON ,FLASH_MODE_OFF
-         */
-        void setFlashMode(int flashMode);
-
         void changeIconPhotoVideo(int state_camera);
 
         void showFrontCamera();
@@ -71,6 +64,8 @@ interface CameraContract {
         void showBackCamera();
 
         void refreshCameraView();
+
+        int getFlashMode();
     }
 
     interface Presenter {
@@ -103,11 +98,6 @@ interface CameraContract {
          * switch camera font/back
          */
         void switchCamera();
-
-        /**
-         * change flash mode: (1) AUTO -> (2) ON -> (3) OFF -> (1)....
-         */
-        void changeFlashMode();
 
         /**
          * handle when click change camera mode : video | photo

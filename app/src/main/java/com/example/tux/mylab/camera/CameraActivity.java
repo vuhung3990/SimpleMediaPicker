@@ -46,6 +46,7 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
     private CameraView mCameraView1;
     private FrameLayout cameraContainer;
     private Handler mBackgroundHandler;
+    private int flashMode = CameraView.FLASH_AUTO;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,7 +94,7 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
     public void refreshCameraView() {
         mCameraView1 = new CameraView(this);
         mCameraView1.setAutoFocus(true);
-        mCameraView1.setFlash(CameraView.FLASH_ON);
+        mCameraView1.setFlash(flashMode);
         FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
         mCameraView1.setLayoutParams(lp);
@@ -128,6 +129,11 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
         cameraContainer.removeAllViews();
         cameraContainer.addView(mCameraView1);
         mCameraView1.start();
+    }
+
+    @Override
+    public int getFlashMode() {
+        return flashMode;
     }
 
     @Override
@@ -225,13 +231,17 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
         }
     }
 
-    @Override
-    public void setFlashMode(int flashMode) {
+    /**
+     * set icon and camera when change flash mode
+     *
+     * @param flashMode FLASH_MODE_AUTO (default), FLASH_MODE_ON ,FLASH_MODE_OFF
+     */
+    private void setFlashMode(int flashMode) {
         int icon = R.drawable.ic_flash_auto_white_24dp;
         if (flashMode == CameraView.FLASH_ON) icon = R.drawable.ic_flash_on_white_24dp;
         if (flashMode == CameraView.FLASH_OFF) icon = R.drawable.ic_flash_off_white_24dp;
         btnFlashMode.setImageResource(icon);
-
+        
         mCameraView1.setFlash(flashMode);
     }
 
@@ -287,7 +297,6 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
         // Step 6: Prepare configured MediaRecorder
         try {
             mMediaRecorder.prepare();
-            btnTakeRecord.setImageResource(R.drawable.ic_stop_white_24dp);
             Log.d("camera", "prepare");
         } catch (IllegalStateException e) {
             Log.d("camera", "IllegalStateException preparing MediaRecorder: " + e.getMessage());
@@ -311,8 +320,6 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
             mMediaRecorder = null;
             mCamera.lock();           // lock camera for later use
         }
-
-        btnTakeRecord.setImageResource(R.drawable.ic_camera_roll_white_24dp);
     }
 
 
@@ -329,7 +336,7 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
                 presenter.switchCamera();
                 break;
             case R.id.flash_mode:
-                presenter.changeFlashMode();
+                changeFlashMode();
                 break;
             case R.id.toggle_video_photo:
                 presenter.toggleVideoPhoto();
@@ -337,6 +344,24 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
             default:
                 break;
         }
+    }
+
+    /**
+     * change flash mode: (1) AUTO -> (2) ON -> (3) OFF -> (1)....
+     */
+    private void changeFlashMode() {
+        switch (flashMode) {
+            case CameraView.FLASH_AUTO:
+                flashMode = CameraView.FLASH_ON;
+                break;
+            case CameraView.FLASH_ON:
+                flashMode = CameraView.FLASH_OFF;
+                break;
+            default:
+                flashMode = CameraView.FLASH_AUTO;
+                break;
+        }
+        setFlashMode(flashMode);
     }
 
     @Override
