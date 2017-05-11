@@ -253,7 +253,8 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
 
     @Override
     public void showBackCamera() {
-        mCameraView1.setFacing(CameraView.FACING_BACK);
+        mCameraView1.stop();
+        refreshCameraView();
     }
 
     /**
