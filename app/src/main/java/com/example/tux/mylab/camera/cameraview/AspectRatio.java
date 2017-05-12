@@ -28,9 +28,28 @@ public class AspectRatio implements Comparable<AspectRatio>, Parcelable {
 
     private final static SparseArrayCompat<SparseArrayCompat<AspectRatio>> sCache
             = new SparseArrayCompat<>(16);
+    public static final Creator<AspectRatio> CREATOR
+            = new Creator<AspectRatio>() {
 
+        @Override
+        public AspectRatio createFromParcel(Parcel source) {
+            int x = source.readInt();
+            int y = source.readInt();
+            return AspectRatio.of(x, y);
+        }
+
+        @Override
+        public AspectRatio[] newArray(int size) {
+            return new AspectRatio[size];
+        }
+    };
     private final int mX;
     private final int mY;
+
+    private AspectRatio(int x, int y) {
+        mX = x;
+        mY = y;
+    }
 
     /**
      * Returns an instance of {@link AspectRatio} specified by {@code x} and {@code y} values.
@@ -82,9 +101,13 @@ public class AspectRatio implements Comparable<AspectRatio>, Parcelable {
         }
     }
 
-    private AspectRatio(int x, int y) {
-        mX = x;
-        mY = y;
+    private static int gcd(int a, int b) {
+        while (b != 0) {
+            int c = b;
+            b = a % b;
+            a = c;
+        }
+        return a;
     }
 
     public int getX() {
@@ -150,15 +173,6 @@ public class AspectRatio implements Comparable<AspectRatio>, Parcelable {
         return AspectRatio.of(mY, mX);
     }
 
-    private static int gcd(int a, int b) {
-        while (b != 0) {
-            int c = b;
-            b = a % b;
-            a = c;
-        }
-        return a;
-    }
-
     @Override
     public int describeContents() {
         return 0;
@@ -169,21 +183,5 @@ public class AspectRatio implements Comparable<AspectRatio>, Parcelable {
         dest.writeInt(mX);
         dest.writeInt(mY);
     }
-
-    public static final Creator<AspectRatio> CREATOR
-            = new Creator<AspectRatio>() {
-
-        @Override
-        public AspectRatio createFromParcel(Parcel source) {
-            int x = source.readInt();
-            int y = source.readInt();
-            return AspectRatio.of(x, y);
-        }
-
-        @Override
-        public AspectRatio[] newArray(int size) {
-            return new AspectRatio[size];
-        }
-    };
 
 }

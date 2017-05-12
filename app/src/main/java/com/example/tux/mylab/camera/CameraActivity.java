@@ -2,8 +2,6 @@ package com.example.tux.mylab.camera;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
-import android.hardware.Camera;
-import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.Environment;
@@ -130,6 +128,20 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
         return flashMode;
     }
 
+    /**
+     * set icon and camera when change flash mode
+     *
+     * @param flashMode FLASH_MODE_AUTO (default), FLASH_MODE_ON ,FLASH_MODE_OFF
+     */
+    private void setFlashMode(int flashMode) {
+        int icon = R.drawable.ic_flash_auto_white_24dp;
+        if (flashMode == CameraView.FLASH_ON) icon = R.drawable.ic_flash_on_white_24dp;
+        if (flashMode == CameraView.FLASH_OFF) icon = R.drawable.ic_flash_off_white_24dp;
+        btnFlashMode.setImageResource(icon);
+
+        mCameraView1.setFlash(flashMode);
+    }
+
     @Override
     protected void onPause() {
         super.onPause();
@@ -197,20 +209,6 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
     @Override
     public void recordVideo() {
         mCameraView1.toggleRecordVideo();
-    }
-
-    /**
-     * set icon and camera when change flash mode
-     *
-     * @param flashMode FLASH_MODE_AUTO (default), FLASH_MODE_ON ,FLASH_MODE_OFF
-     */
-    private void setFlashMode(int flashMode) {
-        int icon = R.drawable.ic_flash_auto_white_24dp;
-        if (flashMode == CameraView.FLASH_ON) icon = R.drawable.ic_flash_on_white_24dp;
-        if (flashMode == CameraView.FLASH_OFF) icon = R.drawable.ic_flash_off_white_24dp;
-        btnFlashMode.setImageResource(icon);
-
-        mCameraView1.setFlash(flashMode);
     }
 
     @Override

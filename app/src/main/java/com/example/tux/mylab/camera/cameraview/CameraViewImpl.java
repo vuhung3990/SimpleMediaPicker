@@ -21,13 +21,12 @@ import android.view.View;
 import java.util.Set;
 
 abstract class CameraViewImpl {
+    protected final Callback mCallback;
+    protected final PreviewImpl mPreview;
     /**
      * @see #isRecordingVideo()
      */
     protected boolean isRecordingVideo = false;
-    protected final Callback mCallback;
-
-    protected final PreviewImpl mPreview;
 
     CameraViewImpl(Callback callback, PreviewImpl preview) {
         mCallback = callback;
@@ -54,9 +53,9 @@ abstract class CameraViewImpl {
 
     abstract boolean isCameraOpened();
 
-    abstract void setFacing(int facing);
-
     abstract int getFacing();
+
+    abstract void setFacing(int facing);
 
     abstract Set<AspectRatio> getSupportedAspectRatios();
 
@@ -67,13 +66,13 @@ abstract class CameraViewImpl {
 
     abstract AspectRatio getAspectRatio();
 
-    abstract void setAutoFocus(boolean autoFocus);
-
     abstract boolean getAutoFocus();
 
-    abstract void setFlash(int flash);
+    abstract void setAutoFocus(boolean autoFocus);
 
     abstract int getFlash();
+
+    abstract void setFlash(int flash);
 
     abstract void takePicture();
 

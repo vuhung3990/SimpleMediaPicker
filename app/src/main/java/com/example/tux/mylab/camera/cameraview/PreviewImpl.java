@@ -26,14 +26,8 @@ import android.view.View;
  */
 abstract class PreviewImpl {
 
-    interface Callback {
-        void onSurfaceChanged();
-    }
-
     private Callback mCallback;
-
     private int mWidth;
-
     private int mHeight;
 
     void setCallback(Callback callback) {
@@ -76,6 +70,10 @@ abstract class PreviewImpl {
 
     int getHeight() {
         return mHeight;
+    }
+
+    interface Callback {
+        void onSurfaceChanged();
     }
 
 }

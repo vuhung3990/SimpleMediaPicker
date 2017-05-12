@@ -7,6 +7,15 @@ import android.support.v7.app.AppCompatActivity;
  */
 public abstract class MediaPickerBaseActivity extends AppCompatActivity {
     /**
+     * true: send bundle cancel and exit, false: return gallery
+     */
+    protected boolean isCancelIntermediate = false;
+    /**
+     * key og flag  {@link #isCancelIntermediate} in bundle
+     */
+    protected String flagCancelIntermediate = "flagCancelIntermediate";
+
+    /**
      * cancel for camera, gallery
      */
     public abstract void cancel();
@@ -15,14 +24,4 @@ public abstract class MediaPickerBaseActivity extends AppCompatActivity {
      * send bundle result for camera, gallery
      */
     public abstract void sendResult();
-
-    /**
-     * true: send bundle cancel and exit, false: return gallery
-     */
-    protected boolean isCancelIntermediate = false;
-
-    /**
-     * key og flag  {@link #isCancelIntermediate} in bundle
-     */
-    protected String flagCancelIntermediate = "flagCancelIntermediate";
 }
