@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package cameraview;
+package com.example.tux.mylab.camera.cameraview;
 
 import android.support.annotation.NonNull;
 

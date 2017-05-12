@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package cameraview;
+package com.example.tux.mylab.camera.cameraview;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.hardware.Camera;
 import android.os.Build;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -162,6 +163,10 @@ public class CameraView extends FrameLayout {
             preview = new TextureViewPreview(context, this);
         }
         return preview;
+    }
+
+    public void toggleRecordVideo(){
+        mImpl.toggleRecordVideo();
     }
 
     @Override

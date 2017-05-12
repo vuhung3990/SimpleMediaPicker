@@ -14,14 +14,17 @@
  * limitations under the License.
  */
 
-package cameraview;
+package com.example.tux.mylab.camera.cameraview;
 
 import android.view.View;
 
 import java.util.Set;
 
 abstract class CameraViewImpl {
-
+    /**
+     * @see #isRecordingVideo()
+     */
+    protected boolean isRecordingVideo = false;
     protected final Callback mCallback;
 
     protected final PreviewImpl mPreview;
@@ -29,6 +32,13 @@ abstract class CameraViewImpl {
     CameraViewImpl(Callback callback, PreviewImpl preview) {
         mCallback = callback;
         mPreview = preview;
+    }
+
+    /**
+     * @return true: record video in progress, else otherwise
+     */
+    public boolean isRecordingVideo() {
+        return isRecordingVideo;
     }
 
     View getView() {
@@ -68,6 +78,11 @@ abstract class CameraViewImpl {
     abstract void takePicture();
 
     abstract void setDisplayOrientation(int displayOrientation);
+
+    /**
+     * start|stop record video
+     */
+    abstract void toggleRecordVideo();
 
     interface Callback {
 

@@ -14,17 +14,25 @@
  * limitations under the License.
  */
 
-package cameraview;
+package com.example.tux.mylab.camera.cameraview;
 
 import android.annotation.SuppressLint;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
+import android.media.CamcorderProfile;
+import android.media.MediaRecorder;
 import android.os.Build;
+import android.os.Environment;
 import android.support.v4.util.SparseArrayCompat;
+import android.util.Log;
 import android.view.SurfaceHolder;
 
+import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -70,6 +78,7 @@ class Camera1 extends CameraViewImpl {
     private int mFlash;
 
     private int mDisplayOrientation;
+    private MediaRecorder mMediaRecorder;
 
     Camera1(Callback callback, PreviewImpl preview) {
         super(callback, preview);
@@ -98,6 +107,14 @@ class Camera1 extends CameraViewImpl {
 
     @Override
     void stop() {
+        // release media recorder
+        if (isRecordingVideo) {
+            // stop recording and release camera
+            releaseMediaRecorder(); // release the MediaRecorder object
+            // take camera access back from MediaRecorder
+            isRecordingVideo = false;
+        }
+
         if (mCamera != null) {
             mCamera.stopPreview();
         }
@@ -267,6 +284,118 @@ class Camera1 extends CameraViewImpl {
             mCamera.setDisplayOrientation(cameraRotation);
             if (needsToStopPreview) {
                 mCamera.startPreview();
+            }
+        }
+    }
+
+    /**
+     * Create a File for saving an image or video
+     */
+    private static File getOutputMediaFile() {
+        // To be safe, you should check that the SDCard is mounted
+        // using Environment.getExternalStorageState() before doing this.
+
+        File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_MOVIES), "MyVideos");
+        // This location works best if you want the created images to be shared
+        // between applications and persist after your app has been uninstalled.
+
+        // Create the storage directory if it does not exist
+        if (!mediaStorageDir.exists()) {
+            if (!mediaStorageDir.mkdirs()) {
+                Log.d("MyCameraApp", "failed to create directory");
+                return null;
+            }
+        }
+
+        // Create a media file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
+        File mediaFile;
+        mediaFile = new File(mediaStorageDir.getPath() + File.separator +
+                "VID_" + timeStamp + ".mp4");
+
+        Log.d("camera", "save file: " + mediaFile.getAbsolutePath());
+        return mediaFile;
+    }
+
+    /**
+     * prepare media recorder for record video
+     *
+     * @return true: prepare done, else error
+     */
+    private boolean prepareVideoRecorder() {
+        mMediaRecorder = new MediaRecorder();
+
+        // Step 1: Unlock and set camera to MediaRecorder
+        mCamera.unlock();
+        //noinspection deprecation
+        mMediaRecorder.setCamera(mCamera);
+
+        // Step 2: Set sources
+        mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.CAMCORDER);
+        mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
+
+        // Step 3: Set a CamcorderProfile (requires API Level 8 or higher)
+        //noinspection deprecation
+        mMediaRecorder.setProfile(CamcorderProfile.get(getFacing(), CamcorderProfile.QUALITY_HIGH));
+
+        // Step 4: Set output file
+        mMediaRecorder.setOutputFile(getOutputMediaFile().getAbsolutePath());
+
+        // Step 5: Set the preview output
+        mMediaRecorder.setPreviewDisplay(mPreview.getSurface());
+
+        // Step 6: Prepare configured MediaRecorder
+        try {
+            mMediaRecorder.prepare();
+            Log.d("camera", "prepare");
+        } catch (IllegalStateException e) {
+            Log.d("camera", "IllegalStateException preparing MediaRecorder: " + e.getMessage());
+            releaseMediaRecorder();
+            return false;
+        } catch (IOException e) {
+            Log.d("camera", "IOException preparing MediaRecorder: " + e.getMessage());
+            releaseMediaRecorder();
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * free media recorder
+     */
+    private void releaseMediaRecorder() {
+        if (mMediaRecorder != null) {
+            mMediaRecorder.reset();   // clear recorder configuration
+            mMediaRecorder.release(); // release the recorder object
+            mMediaRecorder = null;
+            mCamera.lock();
+        }
+    }
+
+    @Override
+    void toggleRecordVideo() {
+        if (isRecordingVideo) {
+            // stop recording and release camera
+            mMediaRecorder.stop();  // stop the recording
+            releaseMediaRecorder(); // release the MediaRecorder object
+            mCamera.lock();         // take camera access back from MediaRecorder
+
+            // inform the user that recording has stopped
+            isRecordingVideo = false;
+        } else {
+            // initialize video camera
+            if (prepareVideoRecorder()) {
+                // Camera is available and unlocked, MediaRecorder is prepared,
+                // now you can start recording
+                mMediaRecorder.start();
+
+                // inform the user that recording has started
+                isRecordingVideo = true;
+            } else {
+                // prepare didn't work, release the camera
+                releaseMediaRecorder();
+                // inform user
             }
         }
     }
