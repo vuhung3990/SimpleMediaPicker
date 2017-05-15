@@ -18,12 +18,12 @@ interface CameraContract {
         /**
          * @return true: granted, false: denied
          */
-        boolean isHaveCameraPermission();
+        boolean isHaveRequirePermissions();
 
         /**
-         * request permission when not granted
+         * request permission when not granted: camera, audio for record video, write external storage for save media file
          */
-        void requestCameraPermission();
+        void requestRequirePermission();
 
         /**
          * show camera
@@ -35,17 +35,7 @@ interface CameraContract {
         /**
          * @return true: if this device has a camera, else otherwise
          */
-        boolean isHaveCamera();
-
-        /**
-         * @return true: granted, else denied
-         */
-        boolean isHaveWriteExternalStorage();
-
-        /**
-         * request permission write external storage to save media
-         */
-        void requestWriteExternalPermission();
+        boolean hasCameraFeature();
 
         /**
          * capture image
@@ -57,15 +47,27 @@ interface CameraContract {
          */
         void recordVideo();
 
+        /**
+         * change icon when change camera from take photo -> record video or record -> take
+         *
+         * @param state_camera
+         */
         void changeIconPhotoVideo(int state_camera);
 
+        /**
+         * show front camera
+         */
         void showFrontCamera();
 
+        /**
+         * show camera back
+         */
         void showBackCamera();
 
+        /**
+         * create new instance of camera view
+         */
         void refreshCameraView();
-
-        int getFlashMode();
     }
 
     interface Presenter {
@@ -83,16 +85,6 @@ interface CameraContract {
          * save photo or video when have permission
          */
         void saveMedia();
-
-        /**
-         * request permission for save photo, video
-         */
-        void grantedWriteExternalPermission();
-
-        /**
-         * write external permission denied by user
-         */
-        void writeExternalPermissionDenied();
 
         /**
          * switch camera font/back

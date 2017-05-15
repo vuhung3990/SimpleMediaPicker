@@ -98,36 +98,6 @@ class Camera2 extends CameraViewImpl {
     private ImageReader mImageReader;
     private int mFacing;
     private AspectRatio mAspectRatio = Constants.DEFAULT_ASPECT_RATIO;
-    private final CameraDevice.StateCallback mCameraDeviceCallback
-            = new CameraDevice.StateCallback() {
-
-        @Override
-        public void onOpened(@NonNull CameraDevice camera) {
-            mCamera = camera;
-            mCallback.onCameraOpened();
-            startCaptureSession();
-        }
-
-        @Override
-        public void onClosed(@NonNull CameraDevice camera) {
-            mCallback.onCameraClosed();
-        }
-
-        @Override
-        public void onDisconnected(@NonNull CameraDevice camera) {
-            camera.close();
-            mCamera = null;
-            mCamera = null;
-        }
-
-        @Override
-        public void onError(@NonNull CameraDevice camera, int error) {
-            Log.e(TAG, "onError: " + camera.getId() + " (" + error + ")");
-            camera.close();
-            mCamera = null;
-        }
-
-    };
     private boolean mAutoFocus;
     private int mFlash;
     private int mDisplayOrientation;
@@ -184,6 +154,36 @@ class Camera2 extends CameraViewImpl {
             if (mCaptureSession != null && mCaptureSession.equals(session)) {
                 mCaptureSession = null;
             }
+        }
+
+    };
+    private final CameraDevice.StateCallback mCameraDeviceCallback
+            = new CameraDevice.StateCallback() {
+
+        @Override
+        public void onOpened(@NonNull CameraDevice camera) {
+            mCamera = camera;
+            mCallback.onCameraOpened();
+            startCaptureSession();
+        }
+
+        @Override
+        public void onClosed(@NonNull CameraDevice camera) {
+            mCallback.onCameraClosed();
+        }
+
+        @Override
+        public void onDisconnected(@NonNull CameraDevice camera) {
+            camera.close();
+            mCamera = null;
+            mCamera = null;
+        }
+
+        @Override
+        public void onError(@NonNull CameraDevice camera, int error) {
+            Log.e(TAG, "onError: " + camera.getId() + " (" + error + ")");
+            camera.close();
+            mCamera = null;
         }
 
     };

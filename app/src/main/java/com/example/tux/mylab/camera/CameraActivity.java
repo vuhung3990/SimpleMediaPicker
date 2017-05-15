@@ -15,7 +15,6 @@ import android.widget.ImageButton;
 
 import com.example.tux.mylab.MediaPickerBaseActivity;
 import com.example.tux.mylab.R;
-import com.example.tux.mylab.camera.cameraview.AspectRatio;
 import com.example.tux.mylab.camera.cameraview.CameraView;
 
 import java.io.File;
@@ -25,11 +24,9 @@ import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-import java.util.Set;
 
 public class CameraActivity extends MediaPickerBaseActivity implements View.OnClickListener, CameraContract.View {
     private static final int REQUEST_PERMISSION_CAMERA = 77;
-    private static final int REQUEST_PERMISSION_WRITE_EXTERNAL = 89;
     private CameraPresenter presenter;
     private ImageButton btnFlashMode;
     private ImageButton btnTakeRecord;
@@ -123,11 +120,6 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
         mCameraView.start();
     }
 
-    @Override
-    public int getFlashMode() {
-        return flashMode;
-    }
-
     /**
      * set icon and camera when change flash mode
      *
@@ -145,33 +137,26 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
     @Override
     protected void onPause() {
         super.onPause();
-        mCameraView.stop();
+        if (mCameraView != null)
+            mCameraView.stop();
         presenter.setFrontCamera(false);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        refreshCameraView();
+        if (isHaveRequirePermissions())
+            refreshCameraView();
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == REQUEST_PERMISSION_CAMERA) {
             // If request is cancelled, the result arrays are empty.
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED && grantResults[2] == PackageManager.PERMISSION_GRANTED) {
                 presenter.grantedCameraPermission();
             } else {
                 presenter.cameraPermissionDenied();
-            }
-        }
-
-        if (requestCode == REQUEST_PERMISSION_WRITE_EXTERNAL) {
-            // If request is cancelled, the result arrays are empty.
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                presenter.grantedWriteExternalPermission();
-            } else {
-                presenter.writeExternalPermissionDenied();
             }
         }
     }
@@ -187,18 +172,8 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
     }
 
     @Override
-    public boolean isHaveCamera() {
+    public boolean hasCameraFeature() {
         return getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA);
-    }
-
-    @Override
-    public boolean isHaveWriteExternalStorage() {
-        return ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
-    }
-
-    @Override
-    public void requestWriteExternalPermission() {
-        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_PERMISSION_WRITE_EXTERNAL);
     }
 
     @Override
@@ -226,14 +201,12 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
     @Override
     public void showFrontCamera() {
         mCameraView.setFacing(CameraView.FACING_FRONT);
-        Set<AspectRatio> aaa = mCameraView.getSupportedAspectRatios();
     }
 
     @Override
     public void showBackCamera() {
         mCameraView.stop();
         refreshCameraView();
-        Set<AspectRatio> aaa = mCameraView.getSupportedAspectRatios();
     }
 
     @Override
@@ -288,12 +261,12 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
     }
 
     @Override
-    public boolean isHaveCameraPermission() {
+    public boolean isHaveRequirePermissions() {
         return ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED;
     }
 
     @Override
-    public void requestCameraPermission() {
-        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO}, REQUEST_PERMISSION_CAMERA);
+    public void requestRequirePermission() {
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_PERMISSION_CAMERA);
     }
 }

@@ -8,11 +8,11 @@ class CameraPresenter implements CameraContract.Presenter {
     CameraPresenter(CameraContract.View view) {
         this.view = view;
 
-        if (view.isHaveCamera()) {
-            if (!view.isHaveCameraPermission()) {
-                view.requestCameraPermission();
+        if (view.hasCameraFeature()) {
+            if (!view.isHaveRequirePermissions()) {
+                view.requestRequirePermission();
             } else {
-//                view.showCamera(isFrontCamera, flashMode);
+                view.refreshCameraView();
             }
         }
     }
@@ -30,7 +30,7 @@ class CameraPresenter implements CameraContract.Presenter {
 
     @Override
     public void saveMedia() {
-        if (view.isHaveWriteExternalStorage()) {
+        if (view.isHaveRequirePermissions()) {
             switch (state_camera) {
                 case CameraContract.View.STATE_PHOTO:
                     view.captureImage();
@@ -42,19 +42,8 @@ class CameraPresenter implements CameraContract.Presenter {
                     break;
             }
         } else {
-            // TODO: 5/8/17
-            view.requestWriteExternalPermission();
+            view.requestRequirePermission();
         }
-    }
-
-    @Override
-    public void grantedWriteExternalPermission() {
-
-    }
-
-    @Override
-    public void writeExternalPermissionDenied() {
-
     }
 
     @Override
@@ -67,13 +56,6 @@ class CameraPresenter implements CameraContract.Presenter {
         } else {
             view.showBackCamera();
         }
-    }
-
-    /**
-     * @return true: front camera, else back
-     */
-    public boolean isFrontCamera() {
-        return isFrontCamera;
     }
 
     public void setFrontCamera(boolean frontCamera) {
