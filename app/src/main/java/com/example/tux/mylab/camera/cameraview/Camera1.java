@@ -21,7 +21,6 @@ import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
-import android.os.Build;
 import android.os.Environment;
 import android.support.v4.util.SparseArrayCompat;
 import android.util.Log;
@@ -150,7 +149,8 @@ class Camera1 extends CameraViewImpl {
     void setUpPreview() {
         try {
             if (mPreview.getOutputClass() == SurfaceHolder.class) {
-                final boolean needsToStopPreview = mShowingPreview && Build.VERSION.SDK_INT < 14;
+//                final boolean needsToStopPreview = mShowingPreview && Build.VERSION.SDK_INT < 14;
+                final boolean needsToStopPreview = mShowingPreview;
                 if (needsToStopPreview) {
                     mCamera.stopPreview();
                 }
@@ -300,7 +300,8 @@ class Camera1 extends CameraViewImpl {
             int cameraRotation = calcCameraRotation(displayOrientation);
             mCameraParameters.setRotation(cameraRotation);
             mCamera.setParameters(mCameraParameters);
-            final boolean needsToStopPreview = mShowingPreview && Build.VERSION.SDK_INT < 14;
+//            final boolean needsToStopPreview = mShowingPreview && Build.VERSION.SDK_INT < 14;
+            final boolean needsToStopPreview = mShowingPreview;
             if (needsToStopPreview) {
                 mCamera.stopPreview();
             }

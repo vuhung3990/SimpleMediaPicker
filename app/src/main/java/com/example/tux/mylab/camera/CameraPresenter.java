@@ -69,6 +69,17 @@ class CameraPresenter implements CameraContract.Presenter {
         }
     }
 
+    /**
+     * @return true: front camera, else back
+     */
+    public boolean isFrontCamera() {
+        return isFrontCamera;
+    }
+
+    public void setFrontCamera(boolean frontCamera) {
+        isFrontCamera = frontCamera;
+    }
+
     @Override
     public void toggleVideoPhoto() {
         // photo -> video and back

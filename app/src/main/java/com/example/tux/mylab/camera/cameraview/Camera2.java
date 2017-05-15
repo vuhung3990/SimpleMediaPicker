@@ -30,13 +30,22 @@ import android.hardware.camera2.TotalCaptureResult;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.Image;
 import android.media.ImageReader;
+import android.media.MediaRecorder;
+import android.os.Environment;
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.util.SparseIntArray;
 import android.view.Surface;
 
+import java.io.File;
+import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
+import java.util.Locale;
 import java.util.Set;
 import java.util.SortedSet;
 
@@ -89,6 +98,36 @@ class Camera2 extends CameraViewImpl {
     private ImageReader mImageReader;
     private int mFacing;
     private AspectRatio mAspectRatio = Constants.DEFAULT_ASPECT_RATIO;
+    private final CameraDevice.StateCallback mCameraDeviceCallback
+            = new CameraDevice.StateCallback() {
+
+        @Override
+        public void onOpened(@NonNull CameraDevice camera) {
+            mCamera = camera;
+            mCallback.onCameraOpened();
+            startCaptureSession();
+        }
+
+        @Override
+        public void onClosed(@NonNull CameraDevice camera) {
+            mCallback.onCameraClosed();
+        }
+
+        @Override
+        public void onDisconnected(@NonNull CameraDevice camera) {
+            camera.close();
+            mCamera = null;
+            mCamera = null;
+        }
+
+        @Override
+        public void onError(@NonNull CameraDevice camera, int error) {
+            Log.e(TAG, "onError: " + camera.getId() + " (" + error + ")");
+            camera.close();
+            mCamera = null;
+        }
+
+    };
     private boolean mAutoFocus;
     private int mFlash;
     private int mDisplayOrientation;
@@ -148,33 +187,9 @@ class Camera2 extends CameraViewImpl {
         }
 
     };
-    private final CameraDevice.StateCallback mCameraDeviceCallback
-            = new CameraDevice.StateCallback() {
-
-        @Override
-        public void onOpened(@NonNull CameraDevice camera) {
-            mCamera = camera;
-            mCallback.onCameraOpened();
-            startCaptureSession();
-        }
-
-        @Override
-        public void onClosed(@NonNull CameraDevice camera) {
-            mCallback.onCameraClosed();
-        }
-
-        @Override
-        public void onDisconnected(@NonNull CameraDevice camera) {
-            mCamera = null;
-        }
-
-        @Override
-        public void onError(@NonNull CameraDevice camera, int error) {
-            Log.e(TAG, "onError: " + camera.getId() + " (" + error + ")");
-            mCamera = null;
-        }
-
-    };
+    private HandlerThread mBackgroundThread;
+    private Handler mBackgroundHandler;
+    private MediaRecorder mMediaRecorder;
 
     Camera2(Callback callback, PreviewImpl preview, Context context) {
         super(callback, preview);
@@ -187,8 +202,40 @@ class Camera2 extends CameraViewImpl {
         });
     }
 
+    /**
+     * Create a File for saving an image or video
+     */
+    private static File getOutputMediaFile() {
+        // To be safe, you should check that the SDCard is mounted
+        // using Environment.getExternalStorageState() before doing this.
+
+        File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_MOVIES), "MyVideos");
+        // This location works best if you want the created images to be shared
+        // between applications and persist after your app has been uninstalled.
+
+        // Create the storage directory if it does not exist
+        if (!mediaStorageDir.exists()) {
+            if (!mediaStorageDir.mkdirs()) {
+                Log.d("MyCameraApp", "failed to create directory");
+                return null;
+            }
+        }
+
+        // Create a media file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
+        File mediaFile;
+        mediaFile = new File(mediaStorageDir.getPath() + File.separator +
+                "VID_" + timeStamp + ".mp4");
+
+        Log.d("camera", "save file: " + mediaFile.getAbsolutePath());
+        return mediaFile;
+    }
+
     @Override
     boolean start() {
+        startBackgroundThread();
+
         if (!chooseCameraIdByFacing()) {
             return false;
         }
@@ -198,8 +245,32 @@ class Camera2 extends CameraViewImpl {
         return true;
     }
 
+    /**
+     * Starts a background thread and its {@link Handler}.
+     */
+    private void startBackgroundThread() {
+        mBackgroundThread = new HandlerThread("CameraBackground");
+        mBackgroundThread.start();
+        mBackgroundHandler = new Handler(mBackgroundThread.getLooper());
+    }
+
+    /**
+     * Stops the background thread and its {@link Handler}.
+     */
+    private void stopBackgroundThread() {
+        mBackgroundThread.quitSafely();
+        try {
+            mBackgroundThread.join();
+            mBackgroundThread = null;
+            mBackgroundHandler = null;
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     void stop() {
+        stopBackgroundThread();
         if (mCaptureSession != null) {
             mCaptureSession.close();
             mCaptureSession = null;
@@ -329,7 +400,52 @@ class Camera2 extends CameraViewImpl {
 
     @Override
     void toggleRecordVideo() {
+        if (isRecordingVideo) {
+            // stop recording and release camera
 
+            try {
+                mCaptureSession.stopRepeating();
+                mCaptureSession.abortCaptures();
+            } catch (CameraAccessException e) {
+                e.printStackTrace();
+            }
+
+            mMediaRecorder.stop();  // stop the recording
+            mMediaRecorder.reset();
+            releaseMediaRecorder(); // release the MediaRecorder object
+
+            // inform the user that recording has stopped
+            isRecordingVideo = false;
+        } else {
+            // initialize video camera
+            mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+            mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
+            mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
+            mMediaRecorder.setOutputFile(getOutputMediaFile().getAbsolutePath());
+            mMediaRecorder.setVideoEncodingBitRate(10000000);
+            mMediaRecorder.setVideoFrameRate(30);
+
+            Size largest = mPictureSizes.sizes(mAspectRatio).last();
+            mMediaRecorder.setVideoSize(largest.getWidth(), largest.getHeight());
+            mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
+            mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
+            try {
+                mMediaRecorder.prepare();
+                mMediaRecorder.start();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            // inform the user that recording has started
+            isRecordingVideo = true;
+        }
+    }
+
+    private void releaseMediaRecorder() {
+        if (mMediaRecorder != null) {
+            mMediaRecorder.reset();   // clear recorder configuration
+            mMediaRecorder.release(); // release the recorder object
+            mMediaRecorder = null;
+        }
     }
 
     /**
@@ -444,6 +560,7 @@ class Camera2 extends CameraViewImpl {
      */
     private void startOpeningCamera() {
         try {
+            mMediaRecorder = new MediaRecorder();
             mCameraManager.openCamera(mCameraId, mCameraDeviceCallback, null);
         } catch (CameraAccessException e) {
             throw new RuntimeException("Failed to open camera: " + mCameraId, e);

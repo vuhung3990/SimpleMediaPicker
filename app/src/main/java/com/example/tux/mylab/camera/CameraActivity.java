@@ -2,7 +2,6 @@ package com.example.tux.mylab.camera;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
-import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -16,6 +15,7 @@ import android.widget.ImageButton;
 
 import com.example.tux.mylab.MediaPickerBaseActivity;
 import com.example.tux.mylab.R;
+import com.example.tux.mylab.camera.cameraview.AspectRatio;
 import com.example.tux.mylab.camera.cameraview.CameraView;
 
 import java.io.File;
@@ -25,17 +25,16 @@ import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Set;
 
 public class CameraActivity extends MediaPickerBaseActivity implements View.OnClickListener, CameraContract.View {
     private static final int REQUEST_PERMISSION_CAMERA = 77;
     private static final int REQUEST_PERMISSION_WRITE_EXTERNAL = 89;
     private CameraPresenter presenter;
-    private MediaRecorder mMediaRecorder;
-    private boolean isRecording = false;
     private ImageButton btnFlashMode;
     private ImageButton btnTakeRecord;
     private ImageButton btnTogglePhotoVideo;
-    private CameraView mCameraView1;
+    private CameraView mCameraView;
     private FrameLayout cameraContainer;
     private Handler mBackgroundHandler;
     private int flashMode = CameraView.FLASH_AUTO;
@@ -84,13 +83,14 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
      */
     @Override
     public void refreshCameraView() {
-        mCameraView1 = new CameraView(this);
-        mCameraView1.setAutoFocus(true);
-        mCameraView1.setFlash(flashMode);
+        mCameraView = new CameraView(this);
+        mCameraView.setAutoFocus(true);
+        mCameraView.setFlash(flashMode);
+//        mCameraView.setAspectRatio(currentRatio.);
         FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
-        mCameraView1.setLayoutParams(lp);
-        mCameraView1.addCallback(new CameraView.Callback() {
+        mCameraView.setLayoutParams(lp);
+        mCameraView.addCallback(new CameraView.Callback() {
             @Override
             public void onPictureTaken(CameraView cameraView, final byte[] data) {
                 getBackgroundHandler().post(new Runnable() {
@@ -119,8 +119,8 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
         });
 
         cameraContainer.removeAllViews();
-        cameraContainer.addView(mCameraView1);
-        mCameraView1.start();
+        cameraContainer.addView(mCameraView);
+        mCameraView.start();
     }
 
     @Override
@@ -139,13 +139,14 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
         if (flashMode == CameraView.FLASH_OFF) icon = R.drawable.ic_flash_off_white_24dp;
         btnFlashMode.setImageResource(icon);
 
-        mCameraView1.setFlash(flashMode);
+        mCameraView.setFlash(flashMode);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        mCameraView1.stop();
+        mCameraView.stop();
+        presenter.setFrontCamera(false);
     }
 
     @Override
@@ -203,12 +204,12 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
     @Override
     public void captureImage() {
         //noinspection deprecation
-        mCameraView1.takePicture();
+        mCameraView.takePicture();
     }
 
     @Override
     public void recordVideo() {
-        mCameraView1.toggleRecordVideo();
+        mCameraView.toggleRecordVideo();
     }
 
     @Override
@@ -224,13 +225,15 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
 
     @Override
     public void showFrontCamera() {
-        mCameraView1.setFacing(CameraView.FACING_FRONT);
+        mCameraView.setFacing(CameraView.FACING_FRONT);
+        Set<AspectRatio> aaa = mCameraView.getSupportedAspectRatios();
     }
 
     @Override
     public void showBackCamera() {
-        mCameraView1.stop();
+        mCameraView.stop();
         refreshCameraView();
+        Set<AspectRatio> aaa = mCameraView.getSupportedAspectRatios();
     }
 
     @Override
