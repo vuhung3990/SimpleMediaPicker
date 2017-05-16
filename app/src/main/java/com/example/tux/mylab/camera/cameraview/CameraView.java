@@ -71,6 +71,7 @@ public class CameraView extends FrameLayout {
     public static final int FLASH_RED_EYE = Constants.FLASH_RED_EYE;
     private final CallbackBridge mCallbacks;
     private final DisplayOrientationDetector mDisplayOrientationDetector;
+    private final Context context;
     CameraViewImpl mImpl;
     private PreviewImpl preview = null;
     private boolean mAdjustViewBounds;
@@ -86,6 +87,7 @@ public class CameraView extends FrameLayout {
     @SuppressWarnings("WrongConstant")
     public CameraView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        this.context = context;
         if (isInEditMode()) {
             mCallbacks = null;
             mDisplayOrientationDetector = null;
@@ -141,7 +143,7 @@ public class CameraView extends FrameLayout {
     }
 
     public void toggleRecordVideo() {
-        mImpl.toggleRecordVideo();
+        mImpl.toggleRecordVideo(context);
     }
 
     @Override

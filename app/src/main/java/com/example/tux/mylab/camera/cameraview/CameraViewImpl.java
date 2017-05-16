@@ -16,6 +16,7 @@
 
 package com.example.tux.mylab.camera.cameraview;
 
+import android.content.Context;
 import android.view.View;
 
 import java.util.Set;
@@ -80,8 +81,9 @@ abstract class CameraViewImpl {
 
     /**
      * start|stop record video
+     * @param context
      */
-    abstract void toggleRecordVideo();
+    abstract void toggleRecordVideo(Context context);
 
     interface Callback {
 

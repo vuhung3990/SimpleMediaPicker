@@ -399,7 +399,7 @@ class Camera2 extends CameraViewImpl {
     }
 
     @Override
-    void toggleRecordVideo() {
+    void toggleRecordVideo(Context context) {
         if (isRecordingVideo) {
             // stop recording and release camera
 

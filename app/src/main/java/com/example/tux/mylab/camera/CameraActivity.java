@@ -1,9 +1,7 @@
 package com.example.tux.mylab.camera;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.pm.PackageManager;
-import android.media.MediaScannerConnection;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -26,6 +24,8 @@ import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+
+import static com.example.tux.mylab.utils.MediaSanUtils.scanFile;
 
 public class CameraActivity extends MediaPickerBaseActivity implements View.OnClickListener, CameraContract.View {
     private static final int REQUEST_PERMISSION_CAMERA = 77;
@@ -94,14 +94,12 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
                 getBackgroundHandler().post(new Runnable() {
                     @Override
                     public void run() {
-                        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "IMG_" + new SimpleDateFormat("ddMMyyyyHHmmss", Locale.US).format(new Date()) + ".jpg");
+                        File file = new File(Environment.getExternalStorageDirectory(), "IMG_" + new SimpleDateFormat("ddMMyyyyHHmmss", Locale.US).format(new Date()) + ".jpg");
                         OutputStream os = null;
                         try {
                             os = new FileOutputStream(file);
                             os.write(data);
                             os.close();
-
-                            scanFileAfterDownloaded(getApplicationContext(), file);
                         } catch (IOException e) {
                             Log.w("camera", "Cannot write to " + file, e);
                         } finally {
@@ -113,6 +111,7 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
                                 }
                             }
                         }
+                        scanFile(getApplicationContext(), file);
                     }
                 });
             }
@@ -121,10 +120,6 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
         cameraContainer.removeAllViews();
         cameraContainer.addView(mCameraView);
         mCameraView.start();
-    }
-
-    public void scanFileAfterDownloaded(final Context context, File file) {
-        MediaScannerConnection.scanFile(context, new String[]{file.getAbsolutePath()}, null, null);
     }
 
     /**

@@ -17,6 +17,7 @@
 package com.example.tux.mylab.camera.cameraview;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.media.CamcorderProfile;
@@ -25,6 +26,8 @@ import android.os.Environment;
 import android.support.v4.util.SparseArrayCompat;
 import android.util.Log;
 import android.view.SurfaceHolder;
+
+import com.example.tux.mylab.utils.MediaSanUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -71,6 +74,7 @@ class Camera1 extends CameraViewImpl {
 
     private int mDisplayOrientation;
     private MediaRecorder mMediaRecorder;
+    private File outputVideoFile;
 
     Camera1(Callback callback, PreviewImpl preview) {
         super(callback, preview);
@@ -92,8 +96,7 @@ class Camera1 extends CameraViewImpl {
         // To be safe, you should check that the SDCard is mounted
         // using Environment.getExternalStorageState() before doing this.
 
-        File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_MOVIES), "MyVideos");
+        File mediaStorageDir = new File(Environment.getExternalStorageDirectory(), "MyVideos");
         // This location works best if you want the created images to be shared
         // between applications and persist after your app has been uninstalled.
 
@@ -334,7 +337,8 @@ class Camera1 extends CameraViewImpl {
         mMediaRecorder.setProfile(CamcorderProfile.get(getFacing(), CamcorderProfile.QUALITY_HIGH));
 
         // Step 4: Set output file
-        mMediaRecorder.setOutputFile(getOutputMediaFile().getAbsolutePath());
+        outputVideoFile = getOutputMediaFile();
+        mMediaRecorder.setOutputFile(outputVideoFile.getAbsolutePath());
 
         // Step 5: Set the preview output
         mMediaRecorder.setPreviewDisplay(mPreview.getSurface());
@@ -368,7 +372,7 @@ class Camera1 extends CameraViewImpl {
     }
 
     @Override
-    void toggleRecordVideo() {
+    void toggleRecordVideo(Context context) {
         if (isRecordingVideo) {
             // stop recording and release camera
             mMediaRecorder.stop();  // stop the recording
@@ -377,6 +381,9 @@ class Camera1 extends CameraViewImpl {
 
             // inform the user that recording has stopped
             isRecordingVideo = false;
+            // scan file for notify add new video
+            if (outputVideoFile != null)
+                MediaSanUtils.scanFile(context.getApplicationContext(), outputVideoFile);
         } else {
             // initialize video camera
             if (prepareVideoRecorder()) {

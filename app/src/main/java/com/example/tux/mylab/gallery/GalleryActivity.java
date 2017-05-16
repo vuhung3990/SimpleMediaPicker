@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 import com.example.tux.mylab.R;
@@ -17,10 +19,29 @@ import java.util.List;
 
 public class GalleryActivity extends AppCompatActivity {
 
+    private RecyclerView mediaList;
+    private GridLayoutManager lm;
+    private MediaAdapter adapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gallery);
+
+        mediaList = (RecyclerView) findViewById(R.id.media_list);
+        mediaList.setHasFixedSize(true);
+        final int gridCount = getResources().getInteger(R.integer.span_count);
+        lm = new GridLayoutManager(this, gridCount);
+        lm.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+            @Override
+            public int getSpanSize(int position) {
+                return adapter.isHeader(position) ? gridCount : 1;
+            }
+        });
+        mediaList.setLayoutManager(lm);
+
+        adapter = new MediaAdapter(this);
+        mediaList.setAdapter(adapter);
 
         String[] projection = new String[]{
                 MediaStore.Video.Media.TITLE,
@@ -31,9 +52,8 @@ public class GalleryActivity extends AppCompatActivity {
         Cursor mergeCursor = new MergeCursor(new Cursor[]{getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, projection, null, null, null),
                 getContentResolver().query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, projection, null, null, null)
         });
-
+        List<MediaFile> mediaFiles = new ArrayList<>();
         if (mergeCursor.moveToFirst()) {
-            List<MediaFile> mediaFiles = new ArrayList<>();
             int colName = mergeCursor.getColumnIndex(MediaStore.Video.Media.TITLE);
             int colPath = mergeCursor.getColumnIndex(MediaStore.Video.Media.DATA);
             int colFolder = mergeCursor.getColumnIndex(MediaStore.Video.Media.BUCKET_DISPLAY_NAME);
@@ -49,6 +69,7 @@ public class GalleryActivity extends AppCompatActivity {
                 mediaFiles.add(mf);
                 mergeCursor.moveToNext();
             }
+            adapter.updateData(mediaFiles);
             mergeCursor.close();
         }
 
