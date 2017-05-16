@@ -1,7 +1,9 @@
 package com.example.tux.mylab.camera;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.pm.PackageManager;
+import android.media.MediaScannerConnection;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -83,7 +85,6 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
         mCameraView = new CameraView(this);
         mCameraView.setAutoFocus(true);
         mCameraView.setFlash(flashMode);
-//        mCameraView.setAspectRatio(currentRatio.);
         FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
         mCameraView.setLayoutParams(lp);
@@ -99,6 +100,8 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
                             os = new FileOutputStream(file);
                             os.write(data);
                             os.close();
+
+                            scanFileAfterDownloaded(getApplicationContext(), file);
                         } catch (IOException e) {
                             Log.w("camera", "Cannot write to " + file, e);
                         } finally {
@@ -118,6 +121,10 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
         cameraContainer.removeAllViews();
         cameraContainer.addView(mCameraView);
         mCameraView.start();
+    }
+
+    public void scanFileAfterDownloaded(final Context context, File file) {
+        MediaScannerConnection.scanFile(context, new String[]{file.getAbsolutePath()}, null, null);
     }
 
     /**
