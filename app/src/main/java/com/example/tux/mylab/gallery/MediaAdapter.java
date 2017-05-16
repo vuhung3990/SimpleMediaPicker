@@ -10,6 +10,8 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.example.tux.mylab.R;
+import com.example.tux.mylab.gallery.data.BaseItemObject;
+import com.example.tux.mylab.gallery.data.MediaFile;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -134,6 +136,8 @@ class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         for (MediaFile media : mediaData) {
             Date date = new Date(media.getTime());
             String formatedDate = fmt.format(date);
+
+            // check if not same day with currentDate
             if (!formatedDate.equals(currentDate)) {
 
                 currentDate = formatedDate;

@@ -1,5 +1,7 @@
 package com.example.tux.mylab.gallery;
 
+import com.example.tux.mylab.gallery.data.BaseItemObject;
+
 /**
  * Created by dev22 on 5/16/17.
  */

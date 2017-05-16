@@ -1,10 +1,10 @@
-package com.example.tux.mylab.gallery;
+package com.example.tux.mylab.gallery.data;
 
 /**
  * Created by dev22 on 5/15/17.
  */
 
-class MediaFile extends BaseItemObject {
+public class MediaFile extends BaseItemObject {
     /**
      * name for display
      */
