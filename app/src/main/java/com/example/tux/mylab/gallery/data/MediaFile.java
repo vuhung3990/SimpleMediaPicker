@@ -1,10 +1,13 @@
 package com.example.tux.mylab.gallery.data;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 /**
  * Created by dev22 on 5/15/17.
  */
 
-public class MediaFile extends BaseItemObject {
+public class MediaFile extends BaseItemObject implements Parcelable {
     /**
      * name for display
      */
@@ -67,4 +70,39 @@ public class MediaFile extends BaseItemObject {
                 ", time=" + time +
                 '}';
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.name);
+        dest.writeString(this.path);
+        dest.writeString(this.folder);
+        dest.writeLong(this.time);
+        dest.writeByte(this.isChecked ? (byte) 1 : (byte) 0);
+    }
+
+    protected MediaFile(Parcel in) {
+        super(BaseItemObject.TYPE_ITEM);
+        this.name = in.readString();
+        this.path = in.readString();
+        this.folder = in.readString();
+        this.time = in.readLong();
+        this.isChecked = in.readByte() != 0;
+    }
+
+    public static final Parcelable.Creator<MediaFile> CREATOR = new Parcelable.Creator<MediaFile>() {
+        @Override
+        public MediaFile createFromParcel(Parcel source) {
+            return new MediaFile(source);
+        }
+
+        @Override
+        public MediaFile[] newArray(int size) {
+            return new MediaFile[size];
+        }
+    };
 }

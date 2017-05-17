@@ -22,4 +22,11 @@
         android:padding="@dimen/gallery_item_text_padding"
         android:textColor="@color/colorTextGallery"
         android:textSize="12sp" />
+
+    <android.support.v7.widget.AppCompatCheckBox
+        android:id="@+id/tick"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:visibility="gone" />
 </FrameLayout>

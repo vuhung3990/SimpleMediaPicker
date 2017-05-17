@@ -1,10 +1,14 @@
 package com.example.tux.mylab.gallery;
 
 import android.content.Context;
+import android.support.v4.util.ArraySet;
+import android.support.v7.widget.AppCompatCheckBox;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -24,18 +28,20 @@ import java.util.Locale;
 import static com.example.tux.mylab.gallery.GalleryHeader.TYPE_HEADER;
 import static com.example.tux.mylab.utils.MediaSanUtils.isPhoto;
 
-/**
- * Created by dev22 on 5/16/17.
- */
-
 class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private static final int SORT_BY_TIME = 0;
     private static final int SORT_BY_FOLDER = 1;
     private static final int SORT_BY_PHOTOS = 2;
     private static final int SORT_BY_VIDEOS = 3;
     private final Context context;
+    private MyEvent myEvent;
+    /**
+     * true: multi choice, false: single choice
+     */
+    private boolean isEnableMultiChoice = false;
+    private ArraySet<Integer> tickedPositions = new ArraySet<>();
 
-    public MediaAdapter(Context context) {
+    MediaAdapter(Context context) {
         this.context = context;
     }
 
@@ -65,15 +71,15 @@ class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
         int type = getItemViewType(position);
         if (type == TYPE_HEADER) {
             GalleryHeader headerData = (GalleryHeader) displayMediaList.get(position);
             HeaderHolder headerHolder = (HeaderHolder) holder;
             headerHolder.header.setText(headerData.getHeader());
         } else {
-            MediaFile mediaFile = (MediaFile) displayMediaList.get(position);
-            ItemHolder itemHolder = (ItemHolder) holder;
+            MediaFile mediaFile = getItem(position);
+            final ItemHolder itemHolder = (ItemHolder) holder;
             Glide.with(context)
                     .load(mediaFile.getPath())
                     .centerCrop()
@@ -82,6 +88,37 @@ class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                     .into(itemHolder.thumb);
 
             itemHolder.text.setText(mediaFile.getName());
+
+            // multi choice => show tick + event
+            if (isEnableMultiChoice) {
+                itemHolder.tick.setVisibility(View.VISIBLE);
+                itemHolder.tick.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                        if (isChecked) {
+                            Log.d("aaaa", "add: " + position);
+                            tickedPositions.add(position);
+                            if (myEvent != null) myEvent.OnSelectedChange(tickedPositions.size());
+                        } else {
+                            tickedPositions.remove(position);
+                            if (myEvent != null) myEvent.OnSelectedChange(tickedPositions.size());
+                        }
+                    }
+                });
+                itemHolder.tick.setChecked(tickedPositions.contains(position));
+            } else {
+                itemHolder.tick.setVisibility(View.GONE);
+            }
+
+            // set on item click
+            itemHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // if multi choice => tick
+                    if (isEnableMultiChoice) itemHolder.tick.toggle();
+                    if (myEvent != null) myEvent.OnItemClick(position);
+                }
+            });
         }
     }
 
@@ -98,9 +135,9 @@ class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     /**
      * update data for display
      *
-     * @param mediaFiles
+     * @param mediaFiles data update
      */
-    public void updateData(List<MediaFile> mediaFiles) {
+    void updateData(List<MediaFile> mediaFiles) {
         this.mediaData = mediaFiles;
         generateData(displayType);
     }
@@ -109,10 +146,13 @@ class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         // TODO: 5/16/17
         switch (displayType) {
             case SORT_BY_FOLDER:
+                sortByFolder();
                 break;
             case SORT_BY_PHOTOS:
+                sortByPhotos();
                 break;
             case SORT_BY_VIDEOS:
+                sortByVideos();
                 break;
             default:
                 sortByTime();
@@ -131,8 +171,9 @@ class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     /**
      * generate list data to display sort by time
      */
-    public void sortByTime() {
+    void sortByTime() {
         displayMediaList.clear();
+        displayType = SORT_BY_TIME;
         Collections.sort(mediaData, new Comparator<MediaFile>() {
             @Override
             public int compare(MediaFile o1, MediaFile o2) {
@@ -145,12 +186,12 @@ class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         SimpleDateFormat fmt = new SimpleDateFormat("yyyyMMdd", Locale.US);
         for (MediaFile media : mediaData) {
             Date date = new Date(media.getTime());
-            String formatedDate = fmt.format(date);
+            String formattedDate = fmt.format(date);
 
             // check if not same day with currentDate
-            if (!formatedDate.equals(currentDate)) {
+            if (!formattedDate.equals(currentDate)) {
 
-                currentDate = formatedDate;
+                currentDate = formattedDate;
                 displayMediaList.add(new GalleryHeader(currentDate));
             }
             displayMediaList.add(media);
@@ -162,8 +203,9 @@ class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     /**
      * generate list data to display sort by folder
      */
-    public void sortByFolder() {
+    void sortByFolder() {
         displayMediaList.clear();
+        displayType = SORT_BY_FOLDER;
         Collections.sort(mediaData, new Comparator<MediaFile>() {
             @Override
             public int compare(MediaFile o1, MediaFile o2) {
@@ -189,8 +231,9 @@ class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     /**
      * generate list data to display sort by photo
      */
-    public void sortByPhotos() {
+    void sortByPhotos() {
         displayMediaList.clear();
+        displayType = SORT_BY_PHOTOS;
         for (MediaFile media : mediaData) {
             if (isPhoto(media.getPath())) {
                 displayMediaList.add(media);
@@ -202,8 +245,9 @@ class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     /**
      * generate list data to display sort by video
      */
-    public void sortByVideos() {
+    void sortByVideos() {
         displayMediaList.clear();
+        displayType = SORT_BY_VIDEOS;
         for (MediaFile media : mediaData) {
             if (!isPhoto(media.getPath())) {
                 displayMediaList.add(media);
@@ -211,23 +255,80 @@ class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         }
         notifyDataSetChanged();
     }
+
+    /**
+     * register event on item click/tick
+     *
+     * @param myEvent interface to register callback
+     */
+    void setItemEvents(MyEvent myEvent) {
+        this.myEvent = myEvent;
+    }
+
+    /**
+     * set choice mode
+     *
+     * @param isMultiChoice true: multi choice, false: single choice
+     */
+    void setChoiceMode(boolean isMultiChoice) {
+        isEnableMultiChoice = isMultiChoice;
+    }
+
+    /**
+     * @return true: multi choice, false: single choice
+     * @see #setChoiceMode(boolean)
+     */
+    boolean isEnableMultiChoice() {
+        return isEnableMultiChoice;
+    }
+
+    /**
+     * @param position
+     */
+    MediaFile getItem(int position) {
+        return (MediaFile) displayMediaList.get(position);
+    }
+
+    MediaFile[] getSelectedItems() {
+        MediaFile[] mediaFiles = new MediaFile[tickedPositions.size()];
+        for (int i = 0; i < tickedPositions.size(); i++) {
+            mediaFiles[i] = (MediaFile) displayMediaList.get(tickedPositions.valueAt(i));
+        }
+        return mediaFiles;
+    }
+
+    interface MyEvent {
+        /**
+         * event click item in recycle view
+         *
+         * @param position current pos
+         */
+        void OnItemClick(int position);
+
+        /**
+         * only work when {@link #setChoiceMode(boolean)} <- true
+         */
+        void OnSelectedChange(int total);
+    }
 }
 
 class ItemHolder extends RecyclerView.ViewHolder {
     ImageView thumb;
     TextView text;
+    AppCompatCheckBox tick;
 
     ItemHolder(View itemView) {
         super(itemView);
         thumb = (ImageView) itemView.findViewById(R.id.thumb);
         text = (TextView) itemView.findViewById(R.id.txt);
+        tick = (AppCompatCheckBox) itemView.findViewById(R.id.tick);
     }
 }
 
 class HeaderHolder extends RecyclerView.ViewHolder {
     TextView header;
 
-    public HeaderHolder(View itemView) {
+    HeaderHolder(View itemView) {
         super(itemView);
         header = (TextView) itemView.findViewById(R.id.header);
     }
