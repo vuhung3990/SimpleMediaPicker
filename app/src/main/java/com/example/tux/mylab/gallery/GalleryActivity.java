@@ -77,6 +77,9 @@ public class GalleryActivity extends MediaPickerBaseActivity implements GalleryC
         txtFormat = getString(R.string.toolbar_selected_item);
         confirmSelect = (TextView) findViewById(R.id.confirm_select);
         confirmSelect.setOnClickListener(this);
+
+        // back button
+        findViewById(R.id.back).setOnClickListener(this);
     }
 
     @Override
@@ -100,6 +103,11 @@ public class GalleryActivity extends MediaPickerBaseActivity implements GalleryC
                 break;
             case R.id.confirm_select:
                 sendResult(adapter.getSelectedItems());
+                break;
+            case R.id.back:
+                cancel();
+                break;
+            default:
                 break;
         }
     }
@@ -200,10 +208,5 @@ public class GalleryActivity extends MediaPickerBaseActivity implements GalleryC
         sortType.setVisibility(View.VISIBLE);
         txtSelected.setVisibility(View.GONE);
         confirmSelect.setVisibility(View.GONE);
-    }
-
-    @Override
-    public void cancel() {
-
     }
 }

@@ -25,7 +25,11 @@ public abstract class MediaPickerBaseActivity extends AppCompatActivity {
     /**
      * cancel for camera, gallery
      */
-    public abstract void cancel();
+    public void cancel() {
+        Intent intent = new Intent();
+        setResult(RESULT_CANCELED, intent);
+        finish();
+    }
 
     /**
      * send bundle result for camera, gallery

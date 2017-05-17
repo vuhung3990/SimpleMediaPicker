@@ -16,6 +16,7 @@ import android.widget.ImageButton;
 import com.example.tux.mylab.MediaPickerBaseActivity;
 import com.example.tux.mylab.R;
 import com.example.tux.mylab.camera.cameraview.CameraView;
+import com.example.tux.mylab.gallery.data.MediaFile;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -112,8 +113,14 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
                             }
                         }
                         scanFile(getApplicationContext(), file);
+                        sendResult(new MediaFile(file.getName(), file.getAbsolutePath(), file.getParentFile().getName(), System.currentTimeMillis()));
                     }
                 });
+            }
+
+            @Override
+            public void onVideoSaved(File outputVideoFile) {
+                sendResult(new MediaFile(outputVideoFile.getName(), outputVideoFile.getAbsolutePath(), outputVideoFile.getParentFile().getName(), System.currentTimeMillis()));
             }
         });
 
@@ -250,11 +257,6 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
                 break;
         }
         setFlashMode(flashMode);
-    }
-
-    @Override
-    public void cancel() {
-        finish();
     }
 
     @Override

@@ -33,6 +33,7 @@ import android.widget.FrameLayout;
 
 import com.example.tux.mylab.R;
 
+import java.io.File;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
@@ -507,6 +508,8 @@ public class CameraView extends FrameLayout {
          */
         public void onPictureTaken(CameraView cameraView, byte[] data) {
         }
+
+        public abstract void onVideoSaved(File outputVideoFile);
     }
 
     private class CallbackBridge implements CameraViewImpl.Callback {
@@ -548,6 +551,13 @@ public class CameraView extends FrameLayout {
         public void onPictureTaken(byte[] data) {
             for (Callback callback : mCallbacks) {
                 callback.onPictureTaken(CameraView.this, data);
+            }
+        }
+
+        @Override
+        public void onSaveVideo(File outputVideoFile) {
+            for (Callback callback : mCallbacks) {
+                callback.onVideoSaved(outputVideoFile);
             }
         }
 

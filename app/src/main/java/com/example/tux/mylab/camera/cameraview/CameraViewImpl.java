@@ -19,6 +19,7 @@ package com.example.tux.mylab.camera.cameraview;
 import android.content.Context;
 import android.view.View;
 
+import java.io.File;
 import java.util.Set;
 
 abstract class CameraViewImpl {
@@ -92,6 +93,8 @@ abstract class CameraViewImpl {
         void onCameraClosed();
 
         void onPictureTaken(byte[] data);
+
+        void onSaveVideo(File outputVideoFile);
 
     }
 

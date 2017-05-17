@@ -56,6 +56,6 @@ class GalleryPresenter implements GalleryContract.Presenter {
 
     @Override
     public void readExternalPermissionDenied() {
-        // TODO: 5/17/17  
+        // TODO: 5/17/17
     }
 }

@@ -138,6 +138,7 @@ class Camera1 extends CameraViewImpl {
             releaseMediaRecorder(); // release the MediaRecorder object
             // take camera access back from MediaRecorder
             isRecordingVideo = false;
+            mCallback.onSaveVideo(outputVideoFile);
         }
 
         if (mCamera != null) {
@@ -384,6 +385,7 @@ class Camera1 extends CameraViewImpl {
             // scan file for notify add new video
             if (outputVideoFile != null)
                 MediaSanUtils.scanFile(context.getApplicationContext(), outputVideoFile);
+            mCallback.onSaveVideo(outputVideoFile);
         } else {
             // initialize video camera
             if (prepareVideoRecorder()) {
