@@ -258,11 +258,6 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
     }
 
     @Override
-    public void sendResult() {
-
-    }
-
-    @Override
     public boolean isHaveRequirePermissions() {
         return ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED;
     }

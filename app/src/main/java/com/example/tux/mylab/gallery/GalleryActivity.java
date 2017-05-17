@@ -1,9 +1,12 @@
 package com.example.tux.mylab.gallery;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -11,6 +14,7 @@ import android.widget.AdapterView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.example.tux.mylab.MediaPickerBaseActivity;
 import com.example.tux.mylab.R;
 import com.example.tux.mylab.camera.CameraActivity;
 import com.example.tux.mylab.gallery.data.GalleryRepository;
@@ -18,8 +22,9 @@ import com.example.tux.mylab.gallery.data.MediaFile;
 
 import java.util.List;
 
-public class GalleryActivity extends AppCompatActivity implements GalleryContract.View, View.OnClickListener, AdapterView.OnItemSelectedListener, MediaAdapter.MyEvent {
+public class GalleryActivity extends MediaPickerBaseActivity implements GalleryContract.View, View.OnClickListener, AdapterView.OnItemSelectedListener, MediaAdapter.MyEvent {
 
+    private static final int REQUEST_PERMISSION_READ_EXTERNAL_STORAGE = 33;
     private MediaAdapter adapter;
     private GalleryPresenter presenter;
     private Spinner sortType;
@@ -105,6 +110,28 @@ public class GalleryActivity extends AppCompatActivity implements GalleryContrac
     }
 
     @Override
+    public boolean isHaveReadPermission() {
+        return ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    @Override
+    public void requestReadExternalStoragePermission() {
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_PERMISSION_READ_EXTERNAL_STORAGE);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == REQUEST_PERMISSION_READ_EXTERNAL_STORAGE) {
+            // If request is cancelled, the result arrays are empty.
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                presenter.grantedReadExternalPermission();
+            } else {
+                presenter.readExternalPermissionDenied();
+            }
+        }
+    }
+
+    @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         changeDisplayType(position);
     }
@@ -144,14 +171,6 @@ public class GalleryActivity extends AppCompatActivity implements GalleryContrac
         if (!adapter.isEnableMultiChoice()) sendResult(adapter.getItem(position));
     }
 
-    private void sendResult(MediaFile... item) {
-        // TODO: 5/17/17
-        Intent intent = new Intent();
-        intent.putExtra("data", item);
-        setResult(RESULT_OK, intent);
-        finish();
-    }
-
     @Override
     public void OnSelectedChange(int total) {
         if (total > 0) {
@@ -181,5 +200,10 @@ public class GalleryActivity extends AppCompatActivity implements GalleryContrac
         sortType.setVisibility(View.VISIBLE);
         txtSelected.setVisibility(View.GONE);
         confirmSelect.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void cancel() {
+
     }
 }

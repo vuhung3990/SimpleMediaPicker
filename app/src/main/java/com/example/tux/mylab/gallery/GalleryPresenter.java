@@ -25,6 +25,26 @@ class GalleryPresenter implements GalleryContract.Presenter {
     @Override
     public void onResume() {
         isPause = false;
+        if (view.isHaveReadPermission()) {
+            repository.onGetAllMediaFile(new GalleryRepository.Event() {
+                @Override
+                public void onSuccess(List<MediaFile> mediaFiles) {
+                    if (!isPause)
+                        view.updateData(mediaFiles);
+                }
+            });
+        } else {
+            view.requestReadExternalStoragePermission();
+        }
+    }
+
+    @Override
+    public void onPause() {
+        isPause = true;
+    }
+
+    @Override
+    public void grantedReadExternalPermission() {
         repository.onGetAllMediaFile(new GalleryRepository.Event() {
             @Override
             public void onSuccess(List<MediaFile> mediaFiles) {
@@ -35,7 +55,7 @@ class GalleryPresenter implements GalleryContract.Presenter {
     }
 
     @Override
-    public void onPause() {
-        isPause = true;
+    public void readExternalPermissionDenied() {
+        // TODO: 5/17/17  
     }
 }

@@ -17,6 +17,16 @@ public class GalleryContract {
          * @param mediaFiles data to update
          */
         void updateData(List<MediaFile> mediaFiles);
+
+        /**
+         * @return true: has permission read external else otherwise
+         */
+        boolean isHaveReadPermission();
+
+        /**
+         * request read external permission if it not granted
+         */
+        void requestReadExternalStoragePermission();
     }
 
     interface Presenter {
@@ -29,6 +39,16 @@ public class GalleryContract {
          * when user pause activity
          */
         void onPause();
+
+        /**
+         * read external permission granted
+         */
+        void grantedReadExternalPermission();
+
+        /**
+         * read external permission denied
+         */
+        void readExternalPermissionDenied();
     }
 
     public interface Repository {
