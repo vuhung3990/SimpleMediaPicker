@@ -7,6 +7,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.Spinner;
 
 import com.example.tux.mylab.R;
 import com.example.tux.mylab.camera.CameraActivity;
@@ -15,12 +17,15 @@ import com.example.tux.mylab.gallery.data.MediaFile;
 
 import java.util.List;
 
-public class GalleryActivity extends AppCompatActivity implements GalleryContract.View, View.OnClickListener {
+public class GalleryActivity extends AppCompatActivity implements GalleryContract.View, View.OnClickListener, AdapterView.OnItemSelectedListener {
 
-    private RecyclerView mediaList;
-    private GridLayoutManager lm;
     private MediaAdapter adapter;
     private GalleryPresenter presenter;
+    private Spinner sortType;
+    /**
+     * @see #changeDisplayType(int)
+     */
+    private int currentDisplayPosition = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,12 +35,12 @@ public class GalleryActivity extends AppCompatActivity implements GalleryContrac
         presenter = new GalleryPresenter(this, new GalleryRepository(this));
 
         // setup recycle view
-        mediaList = (RecyclerView) findViewById(R.id.media_list);
+        RecyclerView mediaList = (RecyclerView) findViewById(R.id.media_list);
         mediaList.setHasFixedSize(true);
 
         //setup grid layout manager
         final int gridCount = getResources().getInteger(R.integer.span_count);
-        lm = new GridLayoutManager(this, gridCount);
+        GridLayoutManager lm = new GridLayoutManager(this, gridCount);
         lm.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
             @Override
             public int getSpanSize(int position) {
@@ -51,6 +56,10 @@ public class GalleryActivity extends AppCompatActivity implements GalleryContrac
         // fab button to show camera
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(this);
+
+        // change sort type
+        sortType = (Spinner) findViewById(R.id.sort_type);
+        sortType.setOnItemSelectedListener(this);
     }
 
     @Override
@@ -78,5 +87,39 @@ public class GalleryActivity extends AppCompatActivity implements GalleryContrac
     @Override
     public void updateData(List<MediaFile> mediaFiles) {
         adapter.updateData(mediaFiles);
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        changeDisplayType(position);
+    }
+
+    /**
+     * change display type
+     *
+     * @param position 0: time, 1: folder, 2: photos, 3: videos
+     */
+    private void changeDisplayType(int position) {
+        if (currentDisplayPosition != position) {
+            currentDisplayPosition = position;
+            switch (position) {
+                case 1:
+                    adapter.sortByFolder();
+                    break;
+                case 2:
+                    adapter.sortByPhotos();
+                    break;
+                case 3:
+                    adapter.sortByVideos();
+                    break;
+                default:
+                    adapter.sortByTime();
+                    break;
+            }
+        }
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
     }
 }

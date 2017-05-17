@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Locale;
 
 import static com.example.tux.mylab.gallery.GalleryHeader.TYPE_HEADER;
+import static com.example.tux.mylab.utils.MediaSanUtils.isPhoto;
 
 /**
  * Created by dev22 on 5/16/17.
@@ -102,13 +103,10 @@ class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public void updateData(List<MediaFile> mediaFiles) {
         this.mediaData = mediaFiles;
         generateData(displayType);
-
-        notifyDataSetChanged();
     }
 
     private void generateData(int displayType) {
         // TODO: 5/16/17
-        displayMediaList.clear();
         switch (displayType) {
             case SORT_BY_FOLDER:
                 break;
@@ -117,12 +115,24 @@ class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             case SORT_BY_VIDEOS:
                 break;
             default:
-                generateDataSortByTime();
+                sortByTime();
                 break;
         }
     }
 
-    private void generateDataSortByTime() {
+    /**
+     * @param position to check type
+     * @return true: header type, false item type
+     */
+    boolean isHeader(int position) {
+        return displayMediaList.size() != 0 && displayMediaList.get(position).getType() == BaseItemObject.TYPE_HEADER;
+    }
+
+    /**
+     * generate list data to display sort by time
+     */
+    public void sortByTime() {
+        displayMediaList.clear();
         Collections.sort(mediaData, new Comparator<MediaFile>() {
             @Override
             public int compare(MediaFile o1, MediaFile o2) {
@@ -145,14 +155,61 @@ class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             }
             displayMediaList.add(media);
         }
+
+        notifyDataSetChanged();
     }
 
     /**
-     * @param position to check type
-     * @return true: header type, false item type
+     * generate list data to display sort by folder
      */
-    boolean isHeader(int position) {
-        return displayMediaList.size() != 0 && displayMediaList.get(position).getType() == BaseItemObject.TYPE_HEADER;
+    public void sortByFolder() {
+        displayMediaList.clear();
+        Collections.sort(mediaData, new Comparator<MediaFile>() {
+            @Override
+            public int compare(MediaFile o1, MediaFile o2) {
+                String folder2 = o2.getFolder();
+                return folder2.compareTo(o1.getFolder());
+            }
+        });
+
+        String currentFolder = null;
+        for (MediaFile media : mediaData) {
+            // check if not same day with currentDate
+            if (!media.getFolder().equals(currentFolder)) {
+
+                currentFolder = media.getFolder();
+                displayMediaList.add(new GalleryHeader(currentFolder));
+            }
+            displayMediaList.add(media);
+        }
+
+        notifyDataSetChanged();
+    }
+
+    /**
+     * generate list data to display sort by photo
+     */
+    public void sortByPhotos() {
+        displayMediaList.clear();
+        for (MediaFile media : mediaData) {
+            if (isPhoto(media.getPath())) {
+                displayMediaList.add(media);
+            }
+        }
+        notifyDataSetChanged();
+    }
+
+    /**
+     * generate list data to display sort by video
+     */
+    public void sortByVideos() {
+        displayMediaList.clear();
+        for (MediaFile media : mediaData) {
+            if (!isPhoto(media.getPath())) {
+                displayMediaList.add(media);
+            }
+        }
+        notifyDataSetChanged();
     }
 }
 
