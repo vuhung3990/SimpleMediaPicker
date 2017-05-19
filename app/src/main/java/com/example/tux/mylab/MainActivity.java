@@ -7,7 +7,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 
-import com.example.tux.mylab.camera.CameraActivity;
+import com.example.tux.mylab.camera.Camera;
+import com.example.tux.mylab.camera.cameraview.CameraView;
 import com.example.tux.mylab.gallery.Gallery;
 import com.example.tux.mylab.gallery.data.MediaFile;
 
@@ -15,6 +16,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private static final int TAKE_PHOTO = 1;
     private static final int RECORD_VIDEO = 2;
+    private static final int PICK_IMAGE = 3;
+    private static final int PICK_VIDEO = 4;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,24 +34,33 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.take_photo:
-                startActivityForResult(new Intent(this, CameraActivity.class), TAKE_PHOTO);
+                new Camera.Builder()
+                        .isVideoMode(false)
+                        .flashMode(CameraView.FLASH_AUTO)
+                        .build()
+                        .start(this, TAKE_PHOTO);
                 break;
             case R.id.pick_image:
                 new Gallery.Builder()
                         .isMultichoice(true)
                         .sortType(Gallery.SORT_BY_PHOTOS)
                         .build()
-                        .start(this);
+                        .start(this, PICK_IMAGE);
                 break;
             case R.id.pick_video:
                 new Gallery.Builder()
                         .isMultichoice(false)
                         .sortType(Gallery.SORT_BY_VIDEOS)
                         .build()
-                        .start(this);
+                        .start(this, PICK_VIDEO);
                 break;
             case R.id.record_video:
-                startActivityForResult(new Intent(this, CameraActivity.class), RECORD_VIDEO);
+                new Camera.Builder()
+                        .facing(CameraView.FACING_FRONT)
+                        .isVideoMode(true)
+                        .flashMode(CameraView.FLASH_ON)
+                        .build()
+                        .start(this, RECORD_VIDEO);
                 break;
             default:
                 break;
@@ -67,6 +79,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     }
                 }
                 if (requestCode == RECORD_VIDEO) {
+                    Parcelable[] files = data.getParcelableArrayExtra(MediaPickerBaseActivity.RESULT_KEY);
+                    for (Parcelable parcelable : files) {
+                        MediaFile file = (MediaFile) parcelable;
+                        Log.d("aaa", "result: " + file.getPath());
+                    }
+                }
+                if (requestCode == PICK_IMAGE) {
+                    Parcelable[] files = data.getParcelableArrayExtra(MediaPickerBaseActivity.RESULT_KEY);
+                    for (Parcelable parcelable : files) {
+                        MediaFile file = (MediaFile) parcelable;
+                        Log.d("aaa", "result: " + file.getPath());
+                    }
+                }
+                if (requestCode == PICK_VIDEO) {
                     Parcelable[] files = data.getParcelableArrayExtra(MediaPickerBaseActivity.RESULT_KEY);
                     for (Parcelable parcelable : files) {
                         MediaFile file = (MediaFile) parcelable;

@@ -38,11 +38,14 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
     private FrameLayout cameraContainer;
     private Handler mBackgroundHandler;
     private int flashMode = CameraView.FLASH_AUTO;
+    private Camera input;
+    private int facingMode = CameraView.FACING_BACK;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
+        getInputBundle();
 
         //btn to close the application
         findViewById(R.id.imgClose).setOnClickListener(this);
@@ -66,6 +69,32 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
 
         presenter = new CameraPresenter(this);
         setCancelFlag();
+        config();
+    }
+
+    /**
+     * config gallery if input valid, else exit (depend on input)
+     */
+    private void config() {
+        if (input != null) {
+            facingMode = input.getFacing();
+            presenter.setFrontCamera(facingMode == CameraView.FACING_FRONT);
+
+            setFlashMode(input.getFlashMode());
+            if (input.isVideoMode()) presenter.toggleVideoPhoto();
+        } else {
+            Log.e("media-picker", "input not valid");
+            finish();
+        }
+    }
+
+    /**
+     * get bundle input
+     *
+     * @see #config()
+     */
+    private void getInputBundle() {
+        input = getIntent().getParcelableExtra("input");
     }
 
     private Handler getBackgroundHandler() {
@@ -85,6 +114,7 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
     public void refreshCameraView() {
         mCameraView = new CameraView(this);
         mCameraView.setAutoFocus(true);
+        mCameraView.setFacing(facingMode);
         mCameraView.setFlash(flashMode);
         FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
@@ -135,12 +165,14 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
      * @param flashMode FLASH_MODE_AUTO (default), FLASH_MODE_ON ,FLASH_MODE_OFF
      */
     private void setFlashMode(int flashMode) {
+        this.flashMode = flashMode;
         int icon = R.drawable.ic_flash_auto_white_24dp;
         if (flashMode == CameraView.FLASH_ON) icon = R.drawable.ic_flash_on_white_24dp;
         if (flashMode == CameraView.FLASH_OFF) icon = R.drawable.ic_flash_off_white_24dp;
         btnFlashMode.setImageResource(icon);
 
-        mCameraView.setFlash(flashMode);
+        if (mCameraView != null)
+            mCameraView.setFlash(flashMode);
     }
 
     @Override
@@ -209,11 +241,13 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
 
     @Override
     public void showFrontCamera() {
-        mCameraView.setFacing(CameraView.FACING_FRONT);
+        facingMode = CameraView.FACING_FRONT;
+        mCameraView.setFacing(facingMode);
     }
 
     @Override
     public void showBackCamera() {
+        facingMode = CameraView.FACING_BACK;
         mCameraView.stop();
         refreshCameraView();
     }

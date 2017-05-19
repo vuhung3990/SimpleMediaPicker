@@ -1,14 +1,15 @@
 package com.example.tux.mylab.gallery;
 
-import android.content.Context;
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Parcel;
 import android.os.Parcelable;
 
 /**
- * Created by dev22 on 5/17/17.
+ * input builder for gallery<br/>
+ * <p>- sort type = time</p>
+ * <p>- multi choice = false</p>
  */
-
 public class Gallery implements Parcelable {
     public static final int SORT_BY_TIME = 0;
     public static final int SORT_BY_FOLDER = 1;
@@ -22,10 +23,16 @@ public class Gallery implements Parcelable {
         isMultichoice = builder.isMultichoice;
     }
 
+    /**
+     * @see Builder#sortType(int)
+     */
     public int getSortType() {
         return sortType;
     }
 
+    /**
+     * @see Builder#isMultichoice(boolean)
+     */
     public boolean isMultichoice() {
         return isMultichoice;
     }
@@ -33,29 +40,31 @@ public class Gallery implements Parcelable {
     /**
      * start media picker
      *
-     * @param context not application context
+     * @param activity    current activity
+     * @param requestCode The integer request code originally supplied to startActivityForResult(), allowing you to identify who this result came from.
      */
-    public void start(Context context) {
-        Intent intent = new Intent(context, GalleryActivity.class);
+    public void start(Activity activity, int requestCode) {
+        Intent intent = new Intent(activity, GalleryActivity.class);
         intent.putExtra("input", this);
-        context.startActivity(intent);
+        activity.startActivityForResult(intent, requestCode);
     }
 
     /**
      * {@code Gallery} builder static inner class.
      */
     public static final class Builder {
-        private int sortType;
-        private boolean isMultichoice;
+        private int sortType = Gallery.SORT_BY_TIME;
+        private boolean isMultichoice = false;
 
         public Builder() {
         }
 
         /**
-         * Sets the {@code sortType} and returns a reference to this Builder so that the methods can be chained together.
-         *
-         * @param val the {@code sortType} to set
-         * @return a reference to this Builder
+         * available values
+         * <p>{@link #SORT_BY_FOLDER}</p>
+         * <p>{@link #SORT_BY_PHOTOS}</p>
+         * <p>{@link #SORT_BY_VIDEOS}</p>
+         * <p>{@link #SORT_BY_TIME}</p>
          */
         public Builder sortType(int val) {
             sortType = val;
@@ -63,10 +72,7 @@ public class Gallery implements Parcelable {
         }
 
         /**
-         * Sets the {@code isMultichoice} and returns a reference to this Builder so that the methods can be chained together.
-         *
-         * @param val the {@code isMultichoice} to set
-         * @return a reference to this Builder
+         * true: enable multi choice, false: single choice
          */
         public Builder isMultichoice(boolean val) {
             isMultichoice = val;
