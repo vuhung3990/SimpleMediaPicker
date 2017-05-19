@@ -11,8 +11,6 @@ class CameraPresenter implements CameraContract.Presenter {
         if (view.hasCameraFeature()) {
             if (!view.isHaveRequirePermissions()) {
                 view.requestRequirePermission();
-            } else {
-                view.refreshCameraView();
             }
         }
     }

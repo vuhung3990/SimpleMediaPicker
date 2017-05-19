@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.pick_video:
                 new Gallery.Builder()
-                        .isMultichoice(true)
+                        .isMultichoice(false)
                         .sortType(Gallery.SORT_BY_VIDEOS)
                         .build()
                         .start(this);

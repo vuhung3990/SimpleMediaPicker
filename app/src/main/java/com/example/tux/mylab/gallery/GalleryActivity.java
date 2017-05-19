@@ -9,6 +9,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Spinner;
@@ -63,10 +64,6 @@ public class GalleryActivity extends MediaPickerBaseActivity implements GalleryC
         // set adapter for RV
         adapter = new MediaAdapter(this);
         adapter.setItemEvents(this);
-        if (input != null) {
-            adapter.setChoiceMode(input.isMultichoice());
-            changeDisplayType(input.getSortType());
-        }
         mediaList.setAdapter(adapter);
 
         // fab button to show camera
@@ -85,8 +82,29 @@ public class GalleryActivity extends MediaPickerBaseActivity implements GalleryC
 
         // back button
         findViewById(R.id.back).setOnClickListener(this);
+
+        config();
     }
 
+    /**
+     * config gallery if input valid, else exit (depend on input)
+     */
+    private void config() {
+        if (input != null) {
+            adapter.setChoiceMode(input.isMultichoice());
+            changeDisplayType(input.getSortType());
+            sortType.setSelection(input.getSortType());
+        } else {
+            Log.e("media-picker", "input not valid");
+            finish();
+        }
+    }
+
+    /**
+     * get bundle input
+     *
+     * @see #config()
+     */
     private void getInputBundle() {
         input = getIntent().getParcelableExtra("input");
     }

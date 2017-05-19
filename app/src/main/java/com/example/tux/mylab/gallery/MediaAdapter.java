@@ -89,7 +89,7 @@ class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                         public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
                             // don't show invalid image file, example: aa.jpg but it not image
                             mediaData.remove(mediaFile);
-                            displayMediaList.remove(position);
+                            displayMediaList.remove(mediaFile);
                             notifyDataSetChanged();
                             return false;
                         }
