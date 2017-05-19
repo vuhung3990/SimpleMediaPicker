@@ -35,11 +35,13 @@ public class GalleryActivity extends MediaPickerBaseActivity implements GalleryC
     private TextView txtSelected;
     private TextView confirmSelect;
     private String txtFormat;
+    private Gallery input;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gallery);
+        getInputBundle();
 
         presenter = new GalleryPresenter(this, new GalleryRepository(this));
 
@@ -61,7 +63,10 @@ public class GalleryActivity extends MediaPickerBaseActivity implements GalleryC
         // set adapter for RV
         adapter = new MediaAdapter(this);
         adapter.setItemEvents(this);
-        adapter.setChoiceMode(false);
+        if (input != null) {
+            adapter.setChoiceMode(input.isMultichoice());
+            changeDisplayType(input.getSortType());
+        }
         mediaList.setAdapter(adapter);
 
         // fab button to show camera
@@ -80,6 +85,10 @@ public class GalleryActivity extends MediaPickerBaseActivity implements GalleryC
 
         // back button
         findViewById(R.id.back).setOnClickListener(this);
+    }
+
+    private void getInputBundle() {
+        input = getIntent().getParcelableExtra("input");
     }
 
     @Override

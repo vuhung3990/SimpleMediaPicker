@@ -36,7 +36,6 @@ class CameraPresenter implements CameraContract.Presenter {
                     view.captureImage();
                     break;
 
-                // TODO: 5/8/17
                 case CameraContract.View.STATE_VIDEO:
                     view.recordVideo();
                     break;

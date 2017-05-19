@@ -13,6 +13,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.example.tux.mylab.R;
 import com.example.tux.mylab.gallery.data.BaseItemObject;
 import com.example.tux.mylab.gallery.data.MediaFile;
@@ -25,14 +28,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import static com.example.tux.mylab.gallery.GalleryHeader.TYPE_HEADER;
+import static com.example.tux.mylab.gallery.data.BaseItemObject.TYPE_HEADER;
 import static com.example.tux.mylab.utils.MediaSanUtils.isPhoto;
 
 class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    private static final int SORT_BY_TIME = 0;
-    private static final int SORT_BY_FOLDER = 1;
-    private static final int SORT_BY_PHOTOS = 2;
-    private static final int SORT_BY_VIDEOS = 3;
     private final Context context;
     private MyEvent myEvent;
     /**
@@ -54,9 +53,9 @@ class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
      */
     private List<BaseItemObject> displayMediaList = new ArrayList<>();
     /**
-     * display type values: {@link #SORT_BY_TIME}, {@link #SORT_BY_FOLDER}, {@link #SORT_BY_PHOTOS}, {@link #SORT_BY_VIDEOS}
+     * display type values: {@link Gallery#SORT_BY_TIME}, {@link Gallery#SORT_BY_FOLDER}, {@link Gallery#SORT_BY_PHOTOS}, {@link Gallery#SORT_BY_VIDEOS}
      */
-    private int displayType = SORT_BY_TIME;
+    private int displayType = Gallery.SORT_BY_TIME;
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -78,13 +77,28 @@ class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             HeaderHolder headerHolder = (HeaderHolder) holder;
             headerHolder.header.setText(headerData.getHeader());
         } else {
-            MediaFile mediaFile = getItem(position);
+            final MediaFile mediaFile = getItem(position);
             final ItemHolder itemHolder = (ItemHolder) holder;
             Glide.with(context)
                     .load(mediaFile.getPath())
                     .centerCrop()
                     .crossFade()
-                    .error(R.drawable.ic_broken_image_blue_grey_800_24dp)
+                    .error(R.drawable.ic_broken_image_blue_grey_900_48dp)
+                    .listener(new RequestListener<String, GlideDrawable>() {
+                        @Override
+                        public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
+                            // don't show invalid image file, example: aa.jpg but it not image
+                            mediaData.remove(mediaFile);
+                            displayMediaList.remove(position);
+                            notifyDataSetChanged();
+                            return false;
+                        }
+
+                        @Override
+                        public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                            return false;
+                        }
+                    })
                     .into(itemHolder.thumb);
 
             itemHolder.text.setText(mediaFile.getName());
@@ -143,15 +157,14 @@ class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     }
 
     private void generateData(int displayType) {
-        // TODO: 5/16/17
         switch (displayType) {
-            case SORT_BY_FOLDER:
+            case Gallery.SORT_BY_FOLDER:
                 sortByFolder();
                 break;
-            case SORT_BY_PHOTOS:
+            case Gallery.SORT_BY_PHOTOS:
                 sortByPhotos();
                 break;
-            case SORT_BY_VIDEOS:
+            case Gallery.SORT_BY_VIDEOS:
                 sortByVideos();
                 break;
             default:
@@ -165,7 +178,7 @@ class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
      * @return true: header type, false item type
      */
     boolean isHeader(int position) {
-        return displayMediaList.size() != 0 && displayMediaList.get(position).getType() == BaseItemObject.TYPE_HEADER;
+        return displayMediaList.size() != 0 && displayMediaList.get(position).getType() == TYPE_HEADER;
     }
 
     /**
@@ -173,7 +186,7 @@ class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
      */
     void sortByTime() {
         displayMediaList.clear();
-        displayType = SORT_BY_TIME;
+        displayType = Gallery.SORT_BY_TIME;
         Collections.sort(mediaData, new Comparator<MediaFile>() {
             @Override
             public int compare(MediaFile o1, MediaFile o2) {
@@ -205,7 +218,7 @@ class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
      */
     void sortByFolder() {
         displayMediaList.clear();
-        displayType = SORT_BY_FOLDER;
+        displayType = Gallery.SORT_BY_FOLDER;
         Collections.sort(mediaData, new Comparator<MediaFile>() {
             @Override
             public int compare(MediaFile o1, MediaFile o2) {
@@ -233,7 +246,7 @@ class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
      */
     void sortByPhotos() {
         displayMediaList.clear();
-        displayType = SORT_BY_PHOTOS;
+        displayType = Gallery.SORT_BY_PHOTOS;
         for (MediaFile media : mediaData) {
             if (isPhoto(media.getPath())) {
                 displayMediaList.add(media);
@@ -247,7 +260,7 @@ class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
      */
     void sortByVideos() {
         displayMediaList.clear();
-        displayType = SORT_BY_VIDEOS;
+        displayType = Gallery.SORT_BY_VIDEOS;
         for (MediaFile media : mediaData) {
             if (!isPhoto(media.getPath())) {
                 displayMediaList.add(media);
@@ -283,7 +296,7 @@ class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     }
 
     /**
-     * @param position
+     * @param position position to get item
      */
     MediaFile getItem(int position) {
         return (MediaFile) displayMediaList.get(position);
