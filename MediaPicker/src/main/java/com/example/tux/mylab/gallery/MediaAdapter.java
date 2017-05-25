@@ -39,11 +39,6 @@ class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
      */
     private boolean isEnableMultiChoice = false;
     private ArraySet<Integer> tickedPositions = new ArraySet<>();
-
-    MediaAdapter(Context context) {
-        this.context = context;
-    }
-
     /**
      * origin data (update data) => generate display data
      */
@@ -56,6 +51,9 @@ class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
      * display type values: {@link Gallery#SORT_BY_TIME}, {@link Gallery#SORT_BY_FOLDER}, {@link Gallery#SORT_BY_PHOTOS}, {@link Gallery#SORT_BY_VIDEOS}
      */
     private int displayType = Gallery.SORT_BY_TIME;
+    MediaAdapter(Context context) {
+        this.context = context;
+    }
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {

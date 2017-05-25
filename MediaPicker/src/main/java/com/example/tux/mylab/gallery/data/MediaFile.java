@@ -8,6 +8,17 @@ import android.os.Parcelable;
  */
 
 public class MediaFile extends BaseItemObject implements Parcelable {
+    public static final Parcelable.Creator<MediaFile> CREATOR = new Parcelable.Creator<MediaFile>() {
+        @Override
+        public MediaFile createFromParcel(Parcel source) {
+            return new MediaFile(source);
+        }
+
+        @Override
+        public MediaFile[] newArray(int size) {
+            return new MediaFile[size];
+        }
+    };
     /**
      * name for display
      */
@@ -35,6 +46,15 @@ public class MediaFile extends BaseItemObject implements Parcelable {
         this.path = path;
         this.folder = folder;
         this.time = time;
+    }
+
+    protected MediaFile(Parcel in) {
+        super(BaseItemObject.TYPE_ITEM);
+        this.name = in.readString();
+        this.path = in.readString();
+        this.folder = in.readString();
+        this.time = in.readLong();
+        this.isChecked = in.readByte() != 0;
     }
 
     public String getName() {
@@ -84,25 +104,4 @@ public class MediaFile extends BaseItemObject implements Parcelable {
         dest.writeLong(this.time);
         dest.writeByte(this.isChecked ? (byte) 1 : (byte) 0);
     }
-
-    protected MediaFile(Parcel in) {
-        super(BaseItemObject.TYPE_ITEM);
-        this.name = in.readString();
-        this.path = in.readString();
-        this.folder = in.readString();
-        this.time = in.readLong();
-        this.isChecked = in.readByte() != 0;
-    }
-
-    public static final Parcelable.Creator<MediaFile> CREATOR = new Parcelable.Creator<MediaFile>() {
-        @Override
-        public MediaFile createFromParcel(Parcel source) {
-            return new MediaFile(source);
-        }
-
-        @Override
-        public MediaFile[] newArray(int size) {
-            return new MediaFile[size];
-        }
-    };
 }

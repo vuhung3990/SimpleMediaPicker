@@ -14,6 +14,17 @@ import com.example.tux.mylab.camera.cameraview.CameraView;
  * <p>- isVideoMode = false</p>
  */
 public class Camera implements Parcelable {
+    public static final Parcelable.Creator<Camera> CREATOR = new Parcelable.Creator<Camera>() {
+        @Override
+        public Camera createFromParcel(Parcel source) {
+            return new Camera(source);
+        }
+
+        @Override
+        public Camera[] newArray(int size) {
+            return new Camera[size];
+        }
+    };
     private int flashMode = CameraView.FLASH_AUTO;
     private int facing = CameraView.FACING_BACK;
     private boolean isVideoMode = false;
@@ -22,6 +33,12 @@ public class Camera implements Parcelable {
         flashMode = builder.flashMode;
         facing = builder.facing;
         isVideoMode = builder.isVideoMode;
+    }
+
+    protected Camera(Parcel in) {
+        this.flashMode = in.readInt();
+        this.facing = in.readInt();
+        this.isVideoMode = in.readByte() != 0;
     }
 
     /**
@@ -55,6 +72,18 @@ public class Camera implements Parcelable {
      */
     public boolean isVideoMode() {
         return isVideoMode;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(this.flashMode);
+        dest.writeInt(this.facing);
+        dest.writeByte(this.isVideoMode ? (byte) 1 : (byte) 0);
     }
 
     /**
@@ -106,34 +135,4 @@ public class Camera implements Parcelable {
             return new Camera(this);
         }
     }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(this.flashMode);
-        dest.writeInt(this.facing);
-        dest.writeByte(this.isVideoMode ? (byte) 1 : (byte) 0);
-    }
-
-    protected Camera(Parcel in) {
-        this.flashMode = in.readInt();
-        this.facing = in.readInt();
-        this.isVideoMode = in.readByte() != 0;
-    }
-
-    public static final Parcelable.Creator<Camera> CREATOR = new Parcelable.Creator<Camera>() {
-        @Override
-        public Camera createFromParcel(Parcel source) {
-            return new Camera(source);
-        }
-
-        @Override
-        public Camera[] newArray(int size) {
-            return new Camera[size];
-        }
-    };
 }

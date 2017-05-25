@@ -23,12 +23,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(com.example.tux.mylab.R.layout.activity_main);
+        setContentView(R.layout.activity_main);
 
-        findViewById(com.example.tux.mylab.R.id.take_photo).setOnClickListener(this);
-        findViewById(com.example.tux.mylab.R.id.pick_image).setOnClickListener(this);
-        findViewById(com.example.tux.mylab.R.id.pick_video).setOnClickListener(this);
-        findViewById(com.example.tux.mylab.R.id.record_video).setOnClickListener(this);
+        findViewById(R.id.take_photo).setOnClickListener(this);
+        findViewById(R.id.pick_image).setOnClickListener(this);
+        findViewById(R.id.pick_video).setOnClickListener(this);
+        findViewById(R.id.record_video).setOnClickListener(this);
     }
 
     @Override

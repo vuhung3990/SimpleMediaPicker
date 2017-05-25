@@ -15,12 +15,28 @@ public class Gallery implements Parcelable {
     public static final int SORT_BY_FOLDER = 1;
     public static final int SORT_BY_PHOTOS = 2;
     public static final int SORT_BY_VIDEOS = 3;
+    public static final Parcelable.Creator<Gallery> CREATOR = new Parcelable.Creator<Gallery>() {
+        @Override
+        public Gallery createFromParcel(Parcel source) {
+            return new Gallery(source);
+        }
+
+        @Override
+        public Gallery[] newArray(int size) {
+            return new Gallery[size];
+        }
+    };
     private int sortType;
     private boolean isMultichoice = false;
 
     private Gallery(Builder builder) {
         sortType = builder.sortType;
         isMultichoice = builder.isMultichoice;
+    }
+
+    protected Gallery(Parcel in) {
+        this.sortType = in.readInt();
+        this.isMultichoice = in.readByte() != 0;
     }
 
     /**
@@ -47,6 +63,17 @@ public class Gallery implements Parcelable {
         Intent intent = new Intent(activity, GalleryActivity.class);
         intent.putExtra("input", this);
         activity.startActivityForResult(intent, requestCode);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(this.sortType);
+        dest.writeByte(this.isMultichoice ? (byte) 1 : (byte) 0);
     }
 
     /**
@@ -88,32 +115,4 @@ public class Gallery implements Parcelable {
             return new Gallery(this);
         }
     }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(this.sortType);
-        dest.writeByte(this.isMultichoice ? (byte) 1 : (byte) 0);
-    }
-
-    protected Gallery(Parcel in) {
-        this.sortType = in.readInt();
-        this.isMultichoice = in.readByte() != 0;
-    }
-
-    public static final Parcelable.Creator<Gallery> CREATOR = new Parcelable.Creator<Gallery>() {
-        @Override
-        public Gallery createFromParcel(Parcel source) {
-            return new Gallery(source);
-        }
-
-        @Override
-        public Gallery[] newArray(int size) {
-            return new Gallery[size];
-        }
-    };
 }
