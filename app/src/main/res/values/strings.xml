@@ -1,6 +1,3 @@
 <resources>
-    <string name="app_name">MyLab</string>
-    <string name="title_activity_gallery">Gallery</string>
-    <string name="all_ok">OK</string>
-    <string name="toolbar_selected_item">%d selected</string>
+    <string name="app_name">My Application</string>
 </resources>
