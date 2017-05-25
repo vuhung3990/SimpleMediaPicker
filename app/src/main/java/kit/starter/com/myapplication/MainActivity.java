@@ -23,39 +23,39 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(com.example.tux.mylab.R.layout.activity_main);
+        setContentView(R.layout.activity_main);
 
-        findViewById(com.example.tux.mylab.R.id.take_photo).setOnClickListener(this);
-        findViewById(com.example.tux.mylab.R.id.pick_image).setOnClickListener(this);
-        findViewById(com.example.tux.mylab.R.id.pick_video).setOnClickListener(this);
-        findViewById(com.example.tux.mylab.R.id.record_video).setOnClickListener(this);
+        findViewById(R.id.take_photo).setOnClickListener(this);
+        findViewById(R.id.pick_image).setOnClickListener(this);
+        findViewById(R.id.pick_video).setOnClickListener(this);
+        findViewById(R.id.record_video).setOnClickListener(this);
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case com.example.tux.mylab.R.id.take_photo:
+            case R.id.take_photo:
                 new Camera.Builder()
                         .isVideoMode(false)
                         .flashMode(CameraView.FLASH_AUTO)
                         .build()
                         .start(this, TAKE_PHOTO);
                 break;
-            case com.example.tux.mylab.R.id.pick_image:
+            case R.id.pick_image:
                 new Gallery.Builder()
                         .isMultichoice(true)
                         .sortType(Gallery.SORT_BY_PHOTOS)
                         .build()
                         .start(this, PICK_IMAGE);
                 break;
-            case com.example.tux.mylab.R.id.pick_video:
+            case R.id.pick_video:
                 new Gallery.Builder()
                         .isMultichoice(false)
                         .sortType(Gallery.SORT_BY_VIDEOS)
                         .build()
                         .start(this, PICK_VIDEO);
                 break;
-            case com.example.tux.mylab.R.id.record_video:
+            case R.id.record_video:
                 new Camera.Builder()
                         .facing(CameraView.FACING_FRONT)
                         .isVideoMode(true)

@@ -82,6 +82,7 @@ abstract class CameraViewImpl {
 
     /**
      * start|stop record video
+     *
      * @param context
      */
     abstract void toggleRecordVideo(Context context);

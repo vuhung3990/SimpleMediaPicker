@@ -18,10 +18,6 @@ import java.util.List;
 public class GalleryRepository implements GalleryContract.Repository {
     private final Context context;
 
-    public interface Event {
-        void onSuccess(List<MediaFile> mediaFiles);
-    }
-
     public GalleryRepository(Context context) {
         this.context = context;
     }
@@ -29,6 +25,10 @@ public class GalleryRepository implements GalleryContract.Repository {
     @Override
     public void onGetAllMediaFile(Event event) {
         new GetMediaFilesAsync(context.getApplicationContext(), event).execute();
+    }
+
+    public interface Event {
+        void onSuccess(List<MediaFile> mediaFiles);
     }
 
     /**
