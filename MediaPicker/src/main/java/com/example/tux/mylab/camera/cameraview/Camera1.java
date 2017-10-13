@@ -22,6 +22,7 @@ import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
+import android.os.AsyncTask;
 import android.os.Environment;
 import android.support.v4.util.SparseArrayCompat;
 import android.util.Log;
@@ -365,10 +366,17 @@ class Camera1 extends CameraViewImpl {
      */
     private void releaseMediaRecorder() {
         if (mMediaRecorder != null) {
-            mMediaRecorder.reset();   // clear recorder configuration
-            mMediaRecorder.release(); // release the recorder object
-            mMediaRecorder = null;
-            mCamera.lock();
+            try {
+                mMediaRecorder.stop();  // stop the recording
+            } catch (RuntimeException stopException) {
+                stopException.printStackTrace();
+                outputVideoFile.delete();
+            } finally {
+                mMediaRecorder.reset();   // clear recorder configuration
+                mMediaRecorder.release(); // release the recorder object
+                mMediaRecorder = null;
+                mCamera.lock();
+            }
         }
     }
 
@@ -376,9 +384,7 @@ class Camera1 extends CameraViewImpl {
     void toggleRecordVideo(Context context) {
         if (isRecordingVideo) {
             // stop recording and release camera
-            mMediaRecorder.stop();  // stop the recording
             releaseMediaRecorder(); // release the MediaRecorder object
-            mCamera.lock();         // take camera access back from MediaRecorder
 
             // inform the user that recording has stopped
             isRecordingVideo = false;
@@ -388,18 +394,7 @@ class Camera1 extends CameraViewImpl {
             mCallback.onSaveVideo(outputVideoFile);
         } else {
             // initialize video camera
-            if (prepareVideoRecorder()) {
-                // Camera is available and unlocked, MediaRecorder is prepared,
-                // now you can start recording
-                mMediaRecorder.start();
-
-                // inform the user that recording has started
-                isRecordingVideo = true;
-            } else {
-                // prepare didn't work, release the camera
-                releaseMediaRecorder();
-                // inform user
-            }
+            new MediaPrepareTask().execute();
         }
     }
 
@@ -566,6 +561,37 @@ class Camera1 extends CameraViewImpl {
         } else {
             mFlash = flash;
             return false;
+        }
+    }
+
+    /**
+     * Asynchronous task for preparing the {@link android.media.MediaRecorder} since it's a long blocking operation.
+     */
+    private class MediaPrepareTask extends AsyncTask<Void, Void, Boolean> {
+
+        @Override
+        protected Boolean doInBackground(Void... voids) {
+            // initialize video camera
+            if (prepareVideoRecorder()) {
+                // Camera is available and unlocked, MediaRecorder is prepared,
+                // now you can start recording
+                mMediaRecorder.start();
+
+                isRecordingVideo = true;
+            } else {
+                // prepare didn't work, release the camera
+                releaseMediaRecorder();
+                return false;
+            }
+            return true;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+            if (!result) {
+                Log.e("CameraView", "onPostExecute: " + result);
+            }
+            // inform the user that recording has started
         }
     }
 

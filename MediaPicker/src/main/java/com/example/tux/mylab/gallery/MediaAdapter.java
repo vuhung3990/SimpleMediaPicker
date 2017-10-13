@@ -51,6 +51,7 @@ class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
      * display type values: {@link Gallery#SORT_BY_TIME}, {@link Gallery#SORT_BY_FOLDER}, {@link Gallery#SORT_BY_PHOTOS}, {@link Gallery#SORT_BY_VIDEOS}
      */
     private int displayType = Gallery.SORT_BY_TIME;
+
     MediaAdapter(Context context) {
         this.context = context;
     }
