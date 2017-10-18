@@ -11,11 +11,12 @@ import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
-import android.widget.ImageButton;
+import android.widget.ImageView;
 
 import com.example.tux.mylab.MediaPickerBaseActivity;
 import com.example.tux.mylab.R;
 import com.example.tux.mylab.camera.cameraview.CameraView;
+import com.example.tux.mylab.gallery.Gallery;
 import com.example.tux.mylab.gallery.data.MediaFile;
 
 import java.io.File;
@@ -31,9 +32,8 @@ import static com.example.tux.mylab.utils.MediaSanUtils.scanFile;
 public class CameraActivity extends MediaPickerBaseActivity implements View.OnClickListener, CameraContract.View {
     private static final int REQUEST_PERMISSION_CAMERA = 77;
     private CameraPresenter presenter;
-    private ImageButton btnFlashMode;
-    private ImageButton btnTakeRecord;
-    private ImageButton btnTogglePhotoVideo;
+    private ImageView btnFlashMode;
+    private ImageView btnTogglePhotoVideo;
     private CameraView mCameraView;
     private FrameLayout cameraContainer;
     private Handler mBackgroundHandler;
@@ -51,19 +51,21 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
         findViewById(R.id.imgClose).setOnClickListener(this);
 
         // btn take/record photo
-        btnTakeRecord = (ImageButton) findViewById(R.id.take_record);
-        btnTakeRecord.setOnClickListener(this);
+        findViewById(R.id.take_record).setOnClickListener(this);
 
         // btn switch camera
         findViewById(R.id.switch_camera).setOnClickListener(this);
 
         // btn flash mode
-        btnFlashMode = (ImageButton) findViewById(R.id.flash_mode);
+        btnFlashMode = (ImageView) findViewById(R.id.flash_mode);
         btnFlashMode.setOnClickListener(this);
 
         // btn change photo -> video
-        btnTogglePhotoVideo = (ImageButton) findViewById(R.id.toggle_video_photo);
+        btnTogglePhotoVideo = (ImageView) findViewById(R.id.toggle_video_photo);
         btnTogglePhotoVideo.setOnClickListener(this);
+
+        // btn open gallery
+        findViewById(R.id.open_gallery).setOnClickListener(this);
 
         cameraContainer = (FrameLayout) findViewById(R.id.camera_view);
 
@@ -159,6 +161,15 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
         mCameraView.start();
     }
 
+    @Override
+    public void openGallery(int stateCamera) {
+        new Gallery.Builder()
+                .isMultichoice(true)
+                .sortType(stateCamera == CameraContract.View.STATE_PHOTO ? Gallery.SORT_BY_PHOTOS : Gallery.SORT_BY_VIDEOS)
+                .build()
+                .start(this);
+    }
+
     /**
      * set icon and camera when change flash mode
      *
@@ -231,11 +242,9 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
     @Override
     public void changeIconPhotoVideo(int state_camera) {
         if (state_camera == STATE_PHOTO) {
-            btnTakeRecord.setImageResource(R.drawable.ic_photo_camera_white_24dp);
-            btnTogglePhotoVideo.setImageResource(R.drawable.ic_camera_roll_white_24dp);
+            btnTogglePhotoVideo.setImageResource(R.drawable.ic_record_video_white_48dp);
         } else {
-            btnTakeRecord.setImageResource(R.drawable.ic_camera_roll_white_24dp);
-            btnTogglePhotoVideo.setImageResource(R.drawable.ic_photo_camera_white_24dp);
+            btnTogglePhotoVideo.setImageResource(R.drawable.ic_cature_picture_white_48dp);
         }
     }
 
@@ -273,6 +282,10 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
         }
         if (id == R.id.toggle_video_photo) {
             presenter.toggleVideoPhoto();
+            return;
+        }
+        if (id == R.id.open_gallery) {
+            presenter.openGallery();
         }
     }
 

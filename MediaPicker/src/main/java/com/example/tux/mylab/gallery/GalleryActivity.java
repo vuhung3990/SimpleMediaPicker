@@ -1,7 +1,6 @@
 package com.example.tux.mylab.gallery;
 
 import android.Manifest;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -17,7 +16,8 @@ import android.widget.TextView;
 
 import com.example.tux.mylab.MediaPickerBaseActivity;
 import com.example.tux.mylab.R;
-import com.example.tux.mylab.camera.CameraActivity;
+import com.example.tux.mylab.camera.Camera;
+import com.example.tux.mylab.camera.cameraview.CameraView;
 import com.example.tux.mylab.gallery.data.GalleryRepository;
 import com.example.tux.mylab.gallery.data.MediaFile;
 
@@ -126,7 +126,11 @@ public class GalleryActivity extends MediaPickerBaseActivity implements GalleryC
         int id = v.getId();
         if (id == R.id.fab) {
             // show camera
-            startActivity(new Intent(GalleryActivity.this, CameraActivity.class));
+            new Camera.Builder()
+                    .flashMode(CameraView.FLASH_AUTO)
+                    .isVideoMode(false)
+                    .build()
+                    .start(this);
             return;
         }
         if (id == R.id.confirm_select) {

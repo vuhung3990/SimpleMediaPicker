@@ -15,6 +15,12 @@ public class Gallery implements Parcelable {
     public static final int SORT_BY_FOLDER = 1;
     public static final int SORT_BY_PHOTOS = 2;
     public static final int SORT_BY_VIDEOS = 3;
+
+    /**
+     * requestCode The integer request code originally supplied to startActivityForResult(), allowing you to identify who this result came from.
+     */
+    public static final int REQUEST_CODE_GALLERY = 4;
+
     public static final Parcelable.Creator<Gallery> CREATOR = new Parcelable.Creator<Gallery>() {
         @Override
         public Gallery createFromParcel(Parcel source) {
@@ -56,13 +62,12 @@ public class Gallery implements Parcelable {
     /**
      * start media picker
      *
-     * @param activity    current activity
-     * @param requestCode The integer request code originally supplied to startActivityForResult(), allowing you to identify who this result came from.
+     * @param activity current activity
      */
-    public void start(Activity activity, int requestCode) {
+    public void start(Activity activity) {
         Intent intent = new Intent(activity, GalleryActivity.class);
         intent.putExtra("input", this);
-        activity.startActivityForResult(intent, requestCode);
+        activity.startActivityForResult(intent, REQUEST_CODE_GALLERY);
     }
 
     @Override

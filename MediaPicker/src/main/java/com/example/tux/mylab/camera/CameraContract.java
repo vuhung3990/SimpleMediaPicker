@@ -68,6 +68,13 @@ interface CameraContract {
          * create new instance of camera view
          */
         void refreshCameraView();
+
+        /**
+         * open gallery
+         *
+         * @param stateCamera photo|video
+         */
+        void openGallery(int stateCamera);
     }
 
     interface Presenter {
@@ -95,5 +102,10 @@ interface CameraContract {
          * handle when click change camera mode : video | photo
          */
         void toggleVideoPhoto();
+
+        /**
+         * open gallery on each case: photo, video
+         */
+        void openGallery();
     }
 }

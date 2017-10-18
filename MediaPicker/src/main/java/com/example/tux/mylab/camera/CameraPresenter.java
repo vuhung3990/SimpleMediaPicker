@@ -65,4 +65,9 @@ class CameraPresenter implements CameraContract.Presenter {
         state_camera = state_camera == CameraContract.View.STATE_PHOTO ? CameraContract.View.STATE_VIDEO : CameraContract.View.STATE_PHOTO;
         view.changeIconPhotoVideo(state_camera);
     }
+
+    @Override
+    public void openGallery() {
+        view.openGallery(state_camera);
+    }
 }

@@ -1,8 +1,11 @@
 package com.example.tux.mylab;
 
 import android.content.Intent;
+import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 
+import com.example.tux.mylab.camera.Camera;
+import com.example.tux.mylab.gallery.Gallery;
 import com.example.tux.mylab.gallery.data.MediaFile;
 
 /**
@@ -39,5 +42,18 @@ public abstract class MediaPickerBaseActivity extends AppCompatActivity {
         intent.putExtra(RESULT_KEY, mediaFiles);
         setResult(RESULT_OK, intent);
         finish();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if ((requestCode == Gallery.REQUEST_CODE_GALLERY || requestCode == Camera.REQUEST_CODE_CAMERA) && resultCode == RESULT_OK) {
+            Parcelable[] files = data.getParcelableArrayExtra(MediaPickerBaseActivity.RESULT_KEY);
+            MediaFile[] mediaFiles = new MediaFile[files.length];
+            for (int i = 0; i < files.length; i++) {
+                mediaFiles[i] = (MediaFile) files[i];
+            }
+            sendResult(mediaFiles);
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 }

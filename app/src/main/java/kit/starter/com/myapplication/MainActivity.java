@@ -1,9 +1,9 @@
 package kit.starter.com.myapplication;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 
@@ -39,21 +39,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         .isVideoMode(false)
                         .flashMode(CameraView.FLASH_AUTO)
                         .build()
-                        .start(this, TAKE_PHOTO);
+                        .start(this);
                 break;
             case R.id.pick_image:
                 new Gallery.Builder()
                         .isMultichoice(true)
                         .sortType(Gallery.SORT_BY_PHOTOS)
                         .build()
-                        .start(this, PICK_IMAGE);
+                        .start(this);
                 break;
             case R.id.pick_video:
                 new Gallery.Builder()
                         .isMultichoice(false)
                         .sortType(Gallery.SORT_BY_VIDEOS)
                         .build()
-                        .start(this, PICK_VIDEO);
+                        .start(this);
                 break;
             case R.id.record_video:
                 new Camera.Builder()
@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         .isVideoMode(true)
                         .flashMode(CameraView.FLASH_ON)
                         .build()
-                        .start(this, RECORD_VIDEO);
+                        .start(this);
                 break;
             default:
                 break;
@@ -72,28 +72,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (resultCode) {
             case RESULT_OK:
-                if (requestCode == TAKE_PHOTO) {
+                if (requestCode == Camera.REQUEST_CODE_CAMERA) {
                     Parcelable[] files = data.getParcelableArrayExtra(MediaPickerBaseActivity.RESULT_KEY);
                     for (Parcelable parcelable : files) {
                         MediaFile file = (MediaFile) parcelable;
                         Log.d("aaa", "result: " + file.getPath());
                     }
                 }
-                if (requestCode == RECORD_VIDEO) {
-                    Parcelable[] files = data.getParcelableArrayExtra(MediaPickerBaseActivity.RESULT_KEY);
-                    for (Parcelable parcelable : files) {
-                        MediaFile file = (MediaFile) parcelable;
-                        Log.d("aaa", "result: " + file.getPath());
-                    }
-                }
-                if (requestCode == PICK_IMAGE) {
-                    Parcelable[] files = data.getParcelableArrayExtra(MediaPickerBaseActivity.RESULT_KEY);
-                    for (Parcelable parcelable : files) {
-                        MediaFile file = (MediaFile) parcelable;
-                        Log.d("aaa", "result: " + file.getPath());
-                    }
-                }
-                if (requestCode == PICK_VIDEO) {
+                if (requestCode == Gallery.REQUEST_CODE_GALLERY) {
                     Parcelable[] files = data.getParcelableArrayExtra(MediaPickerBaseActivity.RESULT_KEY);
                     for (Parcelable parcelable : files) {
                         MediaFile file = (MediaFile) parcelable;
