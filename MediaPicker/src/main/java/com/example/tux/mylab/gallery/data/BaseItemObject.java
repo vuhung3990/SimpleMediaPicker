@@ -10,9 +10,9 @@ public class BaseItemObject {
     /**
      * values: {@link #TYPE_HEADER}, {@link #TYPE_ITEM}
      */
-    private int type;
+    private final int type;
 
-    public BaseItemObject(int type) {
+    protected BaseItemObject(int type) {
         this.type = type;
     }
 

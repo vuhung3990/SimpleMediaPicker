@@ -24,8 +24,6 @@ import android.os.Parcelable;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.os.ParcelableCompat;
-import android.support.v4.os.ParcelableCompatCreatorCallbacks;
 import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
 import android.view.Surface;
@@ -61,7 +59,7 @@ public class CameraView extends FrameLayout {
     /**
      * Constant emission of light during preview, auto-focus and snapshot.
      */
-    public static final int FLASH_TORCH = Constants.FLASH_TORCH;
+    private static final int FLASH_TORCH = Constants.FLASH_TORCH;
     /**
      * Flash will be fired automatically when required.
      */
@@ -69,11 +67,11 @@ public class CameraView extends FrameLayout {
     /**
      * Flash will be fired in red-eye reduction mode.
      */
-    public static final int FLASH_RED_EYE = Constants.FLASH_RED_EYE;
+    private static final int FLASH_RED_EYE = Constants.FLASH_RED_EYE;
     private final CallbackBridge mCallbacks;
     private final DisplayOrientationDetector mDisplayOrientationDetector;
     private final Context context;
-    CameraViewImpl mImpl;
+    private CameraViewImpl mImpl;
     private PreviewImpl preview = null;
     private boolean mAdjustViewBounds;
 
@@ -273,7 +271,7 @@ public class CameraView extends FrameLayout {
     /**
      * @return {@code true} if the camera is opened.
      */
-    public boolean isCameraOpened() {
+    private boolean isCameraOpened() {
         return mImpl.isCameraOpened();
     }
 
@@ -324,7 +322,7 @@ public class CameraView extends FrameLayout {
      * @return The camera facing.
      */
     @Facing
-    public int getFacing() {
+    private int getFacing() {
         //noinspection WrongConstant
         return mImpl.getFacing();
     }
@@ -352,7 +350,7 @@ public class CameraView extends FrameLayout {
      * @return The current {@link AspectRatio}. Can be {@code null} if no camera is opened yet.
      */
     @Nullable
-    public AspectRatio getAspectRatio() {
+    private AspectRatio getAspectRatio() {
         return mImpl.getAspectRatio();
     }
 
@@ -361,7 +359,7 @@ public class CameraView extends FrameLayout {
      *
      * @param ratio The {@link AspectRatio} to be set.
      */
-    public void setAspectRatio(@NonNull AspectRatio ratio) {
+    private void setAspectRatio(@NonNull AspectRatio ratio) {
         if (mImpl.setAspectRatio(ratio)) {
             requestLayout();
         }
@@ -373,7 +371,7 @@ public class CameraView extends FrameLayout {
      * @return {@code true} if the continuous auto-focus mode is enabled. {@code false} if it is
      * disabled, or if it is not supported by the current camera.
      */
-    public boolean getAutoFocus() {
+    private boolean getAutoFocus() {
         return mImpl.getAutoFocus();
     }
 
@@ -394,7 +392,7 @@ public class CameraView extends FrameLayout {
      * @return The current flash mode.
      */
     @Flash
-    public int getFlash() {
+    private int getFlash() {
         //noinspection WrongConstant
         return mImpl.getFlash();
     }
@@ -429,17 +427,15 @@ public class CameraView extends FrameLayout {
      */
     @Retention(RetentionPolicy.SOURCE)
     @IntDef({FLASH_OFF, FLASH_ON, FLASH_TORCH, FLASH_AUTO, FLASH_RED_EYE})
-    public @interface Flash {
+    @interface Flash {
     }
 
     protected static class SavedState extends BaseSavedState {
 
-        public static final Creator<SavedState> CREATOR
-                = ParcelableCompat.newCreator(new ParcelableCompatCreatorCallbacks<SavedState>() {
-
+        public static final Creator<SavedState> CREATOR = new ClassLoaderCreator<SavedState>() {
             @Override
-            public SavedState createFromParcel(Parcel in, ClassLoader loader) {
-                return new SavedState(in, loader);
+            public SavedState createFromParcel(Parcel source) {
+                return new SavedState(source, null);
             }
 
             @Override
@@ -447,7 +443,12 @@ public class CameraView extends FrameLayout {
                 return new SavedState[size];
             }
 
-        });
+            @Override
+            public SavedState createFromParcel(Parcel source, ClassLoader loader) {
+                return new SavedState(source, loader);
+            }
+        };
+
         @Facing
         int facing;
         AspectRatio ratio;
@@ -456,7 +457,7 @@ public class CameraView extends FrameLayout {
         int flash;
 
         @SuppressWarnings("WrongConstant")
-        public SavedState(Parcel source, ClassLoader loader) {
+        SavedState(Parcel source, ClassLoader loader) {
             super(source);
             facing = source.readInt();
             ratio = source.readParcelable(loader);
@@ -464,7 +465,7 @@ public class CameraView extends FrameLayout {
             flash = source.readInt();
         }
 
-        public SavedState(Parcelable superState) {
+        SavedState(Parcelable superState) {
             super(superState);
         }
 
@@ -490,7 +491,7 @@ public class CameraView extends FrameLayout {
          *
          * @param cameraView The associated {@link CameraView}.
          */
-        public void onCameraOpened(CameraView cameraView) {
+        void onCameraOpened(CameraView cameraView) {
         }
 
         /**
@@ -498,7 +499,7 @@ public class CameraView extends FrameLayout {
          *
          * @param cameraView The associated {@link CameraView}.
          */
-        public void onCameraClosed(CameraView cameraView) {
+        void onCameraClosed(CameraView cameraView) {
         }
 
         /**
@@ -522,11 +523,11 @@ public class CameraView extends FrameLayout {
         CallbackBridge() {
         }
 
-        public void add(Callback callback) {
+        void add(Callback callback) {
             mCallbacks.add(callback);
         }
 
-        public void remove(Callback callback) {
+        void remove(Callback callback) {
             mCallbacks.remove(callback);
         }
 
@@ -562,7 +563,7 @@ public class CameraView extends FrameLayout {
             }
         }
 
-        public void reserveRequestLayoutOnOpen() {
+        void reserveRequestLayoutOnOpen() {
             mRequestLayoutOnOpen = true;
         }
     }

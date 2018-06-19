@@ -26,13 +26,6 @@ interface CameraContract {
         void requestRequirePermission();
 
         /**
-         * show camera
-         *
-         * @param isFrontCamera true: show front, false show back camera
-         * @param flashMode     FLASH_MODE_AUTO (default), FLASH_MODE_ON ,FLASH_MODE_OFF
-         */
-
-        /**
          * @return true: if this device has a camera, else otherwise
          */
         boolean hasCameraFeature();
@@ -50,7 +43,7 @@ interface CameraContract {
         /**
          * change icon when change camera from take photo -> record video or record -> take
          *
-         * @param state_camera
+         * @param state_camera {@link CameraContract.View#STATE_PHOTO}, {@link CameraContract.View#STATE_VIDEO}
          */
         void changeIconPhotoVideo(int state_camera);
 

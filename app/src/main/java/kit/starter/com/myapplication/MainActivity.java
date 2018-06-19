@@ -43,14 +43,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.pick_image:
                 new Gallery.Builder()
-                        .isMultichoice(true)
+                        .isMultiChoice(true)
                         .sortType(Gallery.SORT_BY_PHOTOS)
+                        .limitChoice(3)
                         .build()
                         .start(this);
                 break;
             case R.id.pick_video:
                 new Gallery.Builder()
-                        .isMultichoice(false)
+                        .isMultiChoice(false)
                         .sortType(Gallery.SORT_BY_VIDEOS)
                         .build()
                         .start(this);

@@ -36,7 +36,7 @@ class TextureViewPreview extends PreviewImpl {
 
     TextureViewPreview(Context context, ViewGroup parent) {
         final View view = View.inflate(context, R.layout.texture_view, parent);
-        mTextureView = (TextureView) view.findViewById(R.id.texture_view);
+        mTextureView = view.findViewById(R.id.texture_view);
         mTextureView.setSurfaceTextureListener(new TextureView.SurfaceTextureListener() {
 
             @Override
@@ -107,7 +107,7 @@ class TextureViewPreview extends PreviewImpl {
      * Configures the transform matrix for TextureView based on {@link #mDisplayOrientation} and
      * the surface size.
      */
-    void configureTransform() {
+    private void configureTransform() {
         Matrix matrix = new Matrix();
         if (mDisplayOrientation % 180 == 90) {
             final int width = getWidth();

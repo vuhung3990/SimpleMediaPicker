@@ -32,7 +32,7 @@ public class Camera implements Parcelable {
     public static final int REQUEST_CODE_CAMERA = 66;
     private int flashMode = CameraView.FLASH_AUTO;
     private int facing = CameraView.FACING_BACK;
-    private boolean isVideoMode = false;
+    private boolean isVideoMode;
 
     private Camera(Builder builder) {
         flashMode = builder.flashMode;
@@ -40,7 +40,7 @@ public class Camera implements Parcelable {
         isVideoMode = builder.isVideoMode;
     }
 
-    protected Camera(Parcel in) {
+    private Camera(Parcel in) {
         this.flashMode = in.readInt();
         this.facing = in.readInt();
         this.isVideoMode = in.readByte() != 0;

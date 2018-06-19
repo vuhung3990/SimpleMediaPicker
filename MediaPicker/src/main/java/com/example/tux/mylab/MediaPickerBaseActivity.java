@@ -15,7 +15,7 @@ public abstract class MediaPickerBaseActivity extends AppCompatActivity {
     /**
      * key for send result
      */
-    public static String RESULT_KEY = "data";
+    public static final String RESULT_KEY = "data";
     /**
      * true: send bundle cancel and exit, false: return gallery
      */
@@ -23,12 +23,12 @@ public abstract class MediaPickerBaseActivity extends AppCompatActivity {
     /**
      * key og flag  {@link #isCancelIntermediate} in bundle
      */
-    public static final String FLAG_CANCEL_INTERMEDIATE = "FLAG_CANCEL_INTERMEDIATE";
+    protected static final String FLAG_CANCEL_INTERMEDIATE = "FLAG_CANCEL_INTERMEDIATE";
 
     /**
      * cancel for camera, gallery
      */
-    public void cancel() {
+    protected void cancel() {
         Intent intent = new Intent();
         setResult(RESULT_CANCELED, intent);
         finish();
@@ -37,7 +37,7 @@ public abstract class MediaPickerBaseActivity extends AppCompatActivity {
     /**
      * send bundle result for camera, gallery
      */
-    public void sendResult(MediaFile... mediaFiles) {
+    protected void sendResult(MediaFile... mediaFiles) {
         Intent intent = new Intent();
         intent.putExtra(RESULT_KEY, mediaFiles);
         setResult(RESULT_OK, intent);

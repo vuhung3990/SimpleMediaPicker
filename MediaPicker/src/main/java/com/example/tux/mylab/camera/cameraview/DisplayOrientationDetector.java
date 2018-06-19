@@ -82,7 +82,7 @@ abstract class DisplayOrientationDetector {
         return mLastKnownDisplayOrientation;
     }
 
-    void dispatchOnDisplayOrientationChanged(int displayOrientation) {
+    private void dispatchOnDisplayOrientationChanged(int displayOrientation) {
         mLastKnownDisplayOrientation = displayOrientation;
         onDisplayOrientationChanged(displayOrientation);
     }
@@ -92,6 +92,6 @@ abstract class DisplayOrientationDetector {
      *
      * @param displayOrientation One of 0, 90, 180, and 270.
      */
-    public abstract void onDisplayOrientationChanged(int displayOrientation);
+    protected abstract void onDisplayOrientationChanged(int displayOrientation);
 
 }

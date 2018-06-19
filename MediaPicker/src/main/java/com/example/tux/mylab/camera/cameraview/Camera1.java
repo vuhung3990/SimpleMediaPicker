@@ -154,7 +154,7 @@ class Camera1 extends CameraViewImpl {
 
     // Suppresses Camera#setPreviewTexture
     @SuppressLint("NewApi")
-    void setUpPreview() {
+    private void setUpPreview() {
         try {
             if (mPreview.getOutputClass() == SurfaceHolder.class) {
 //                final boolean needsToStopPreview = mShowingPreview && Build.VERSION.SDK_INT < 14;
@@ -284,7 +284,7 @@ class Camera1 extends CameraViewImpl {
         }
     }
 
-    void takePictureInternal() {
+    private void takePictureInternal() {
         if (!isPictureCaptureInProgress.getAndSet(true)) {
             mCamera.takePicture(null, null, null, new Camera.PictureCallback() {
                 @Override
@@ -346,6 +346,7 @@ class Camera1 extends CameraViewImpl {
 
         // Step 4: Set output file
         outputVideoFile = getOutputMediaFile();
+        if(outputVideoFile == null) return false;
         mMediaRecorder.setOutputFile(outputVideoFile.getAbsolutePath());
 
         // Step 5: Set the preview output
@@ -457,7 +458,7 @@ class Camera1 extends CameraViewImpl {
         return r;
     }
 
-    void adjustCameraParameters() {
+    private void adjustCameraParameters() {
         SortedSet<Size> sizes = mPreviewSizes.sizes(mAspectRatio);
         if (sizes == null) { // Not supported
             mAspectRatio = chooseAspectRatio();

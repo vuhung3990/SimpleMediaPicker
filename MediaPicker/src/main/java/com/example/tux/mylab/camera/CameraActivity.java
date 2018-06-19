@@ -11,7 +11,6 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -188,7 +187,7 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
     @Override
     public void openGallery(int stateCamera) {
         new Gallery.Builder()
-                .isMultichoice(true)
+                .isMultiChoice(true)
                 .sortType(stateCamera == CameraContract.View.STATE_PHOTO ? Gallery.SORT_BY_PHOTOS : Gallery.SORT_BY_VIDEOS)
                 .build()
                 .start(this);

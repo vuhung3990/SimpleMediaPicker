@@ -21,7 +21,7 @@ import android.support.annotation.NonNull;
 /**
  * Immutable class for describing width and height dimensions in pixels.
  */
-public class Size implements Comparable<Size> {
+class Size implements Comparable<Size> {
 
     private final int mWidth;
     private final int mHeight;

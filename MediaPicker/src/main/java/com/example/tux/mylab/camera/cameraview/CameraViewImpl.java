@@ -23,12 +23,12 @@ import java.io.File;
 import java.util.Set;
 
 abstract class CameraViewImpl {
-    protected final Callback mCallback;
-    protected final PreviewImpl mPreview;
+    final Callback mCallback;
+    final PreviewImpl mPreview;
     /**
      * @see #isRecordingVideo()
      */
-    protected boolean isRecordingVideo = false;
+    boolean isRecordingVideo = false;
 
     CameraViewImpl(Callback callback, PreviewImpl preview) {
         mCallback = callback;
@@ -83,7 +83,7 @@ abstract class CameraViewImpl {
     /**
      * start|stop record video
      *
-     * @param context
+     * @param context required for notify media added
      */
     abstract void toggleRecordVideo(Context context);
 

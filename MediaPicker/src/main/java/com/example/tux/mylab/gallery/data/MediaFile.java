@@ -22,19 +22,19 @@ public class MediaFile extends BaseItemObject implements Parcelable {
     /**
      * name for display
      */
-    private String name;
+    private final String name;
     /**
      * location of file
      */
-    private String path;
+    private final String path;
     /**
      * container name: /Videos/my_video/aaaaaaaa.mp4 => my_video
      */
-    private String folder;
+    private final String folder;
     /**
      * date time taken in millisecond from 1970
      */
-    private long time;
+    private final long time;
     /**
      * true: checked in list, default false
      */
@@ -48,7 +48,7 @@ public class MediaFile extends BaseItemObject implements Parcelable {
         this.time = time;
     }
 
-    protected MediaFile(Parcel in) {
+    private MediaFile(Parcel in) {
         super(BaseItemObject.TYPE_ITEM);
         this.name = in.readString();
         this.path = in.readString();

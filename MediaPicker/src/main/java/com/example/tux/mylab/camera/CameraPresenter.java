@@ -1,7 +1,7 @@
 package com.example.tux.mylab.camera;
 
 class CameraPresenter implements CameraContract.Presenter {
-    private CameraContract.View view;
+    private final CameraContract.View view;
     private int state_camera = CameraContract.View.STATE_PHOTO;
     private boolean isFrontCamera = false;
 

@@ -23,7 +23,7 @@ public class MediaSanUtils {
     }
 
     /**
-     * @param path
+     * @param path file path to check
      * @return true: if file ext is: jpg|png|gif|bmp
      */
     public static boolean isPhoto(String path) {

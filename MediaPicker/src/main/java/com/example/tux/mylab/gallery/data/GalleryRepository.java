@@ -38,7 +38,7 @@ public class GalleryRepository implements GalleryContract.Repository {
 
         private final Context appContext;
         private final String[] projection;
-        private Event event;
+        private final Event event;
 
         GetMediaFilesAsync(Context appContext, Event event) {
             this.appContext = appContext;

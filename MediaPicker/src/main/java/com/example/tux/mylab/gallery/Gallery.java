@@ -21,10 +21,10 @@ public class Gallery implements Parcelable {
      * The integer request code originally supplied to startActivityForResult(), allowing you to identify who this result came from.
      */
     public static final int REQUEST_CODE_GALLERY = 55;
-    private int requestCode;
-    private int sortType;
-    private boolean isMultichoice = false;
-    private int limitChose;
+    private final int requestCode;
+    private final int sortType;
+    private boolean isMultiChoice;
+    private final int limitChose;
 
 
     public int getRequestCode() {
@@ -35,8 +35,8 @@ public class Gallery implements Parcelable {
         return sortType;
     }
 
-    public boolean isMultichoice() {
-        return isMultichoice;
+    public boolean isMultiChoice() {
+        return isMultiChoice;
     }
 
 
@@ -47,7 +47,7 @@ public class Gallery implements Parcelable {
     private Gallery(Builder builder) {
         requestCode = builder.requestCode;
         sortType = builder.sortType;
-        isMultichoice = builder.isMultichoice;
+        isMultiChoice = builder.isMultiChoice;
         limitChose = builder.limitChose;
 
     }
@@ -65,7 +65,7 @@ public class Gallery implements Parcelable {
 
     public static final class Builder {
         private int sortType = Gallery.SORT_BY_TIME;
-        private boolean isMultichoice = false;
+        private boolean isMultiChoice = false;
         private int requestCode;
         private int limitChose;
 
@@ -88,8 +88,8 @@ public class Gallery implements Parcelable {
         /**
          * true: enable multi choice, false: single choice
          */
-        public Builder isMultichoice(boolean val) {
-            isMultichoice = val;
+        public Builder isMultiChoice(boolean val) {
+            isMultiChoice = val;
             return this;
         }
 
@@ -124,14 +124,14 @@ public class Gallery implements Parcelable {
         dest.writeInt(this.requestCode);
         dest.writeInt(this.sortType);
         dest.writeInt(this.limitChose);
-        dest.writeByte(this.isMultichoice ? (byte) 1 : (byte) 0);
+        dest.writeByte(this.isMultiChoice ? (byte) 1 : (byte) 0);
     }
 
     private Gallery(Parcel in) {
         this.requestCode = in.readInt();
         this.sortType = in.readInt();
         this.limitChose = in.readInt();
-        this.isMultichoice = in.readByte() != 0;
+        this.isMultiChoice = in.readByte() != 0;
     }
 
     public static final Creator<Gallery> CREATOR = new Creator<Gallery>() {

@@ -102,7 +102,7 @@ public class GalleryActivity extends MediaPickerBaseActivity implements GalleryC
      */
     private void config() {
         if (input != null) {
-            adapter.setChoiceMode(input.isMultichoice());
+            adapter.setChoiceMode(input.isMultiChoice());
             adapter.setLimitChose(input.getLimitChoice());
             adapter.setSortType(input.getSortType());
             changeDisplayType(input.getSortType());

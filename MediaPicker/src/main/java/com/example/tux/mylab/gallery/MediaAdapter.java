@@ -3,6 +3,7 @@ package com.example.tux.mylab.gallery;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.drawable.Drawable;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.util.ArraySet;
 import android.support.v7.app.AlertDialog;
@@ -37,7 +38,7 @@ import static com.example.tux.mylab.gallery.data.BaseItemObject.TYPE_HEADER;
 import static com.example.tux.mylab.utils.MediaSanUtils.isPhoto;
 
 class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    public static final int LIMIT_CHOICE = 20;
+    private static final int LIMIT_CHOICE = 20;
     private final Context context;
     private MyEvent myEvent;
     private int limitChose;
@@ -46,7 +47,7 @@ class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
      * true: multi choice, false: single choice
      */
     private boolean isEnableMultiChoice = false;
-    private ArraySet<Integer> tickedPositions = new ArraySet<>();
+    private final ArraySet<Integer> tickedPositions = new ArraySet<>();
     /**
      * origin data (update data) => generate display data
      */
@@ -54,7 +55,7 @@ class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     /**
      * NOTE: do not update this list, it's generated list by {@link #mediaData}
      */
-    private List<BaseItemObject> displayMediaList = new ArrayList<>();
+    private final List<BaseItemObject> displayMediaList = new ArrayList<>();
     /**
      * display type values: {@link Gallery#SORT_BY_TIME}, {@link Gallery#SORT_BY_FOLDER}, {@link Gallery#SORT_BY_PHOTOS}, {@link Gallery#SORT_BY_VIDEOS}
      */
@@ -66,8 +67,9 @@ class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         this.context = context;
     }
 
+    @NonNull
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         RecyclerView.ViewHolder holder;
         if (viewType == TYPE_HEADER) {
             holder = new HeaderHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.gallery_header, parent, false));
@@ -79,14 +81,15 @@ class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
-        int type = getItemViewType(position);
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+        final int position1 = holder.getAdapterPosition();
+        int type = getItemViewType(position1);
         if (type == TYPE_HEADER) {
-            GalleryHeader headerData = (GalleryHeader) displayMediaList.get(position);
+            GalleryHeader headerData = (GalleryHeader) displayMediaList.get(position1);
             HeaderHolder headerHolder = (HeaderHolder) holder;
             headerHolder.header.setText(headerData.getHeader());
         } else {
-            final MediaFile mediaFile = getItem(position);
+            final MediaFile mediaFile = getItem(position1);
             final ItemHolder itemHolder = (ItemHolder) holder;
             Glide.with(context)
                     .load(mediaFile.getPath())
@@ -116,28 +119,28 @@ class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                     @Override
                     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                         if (isChecked) {
-                            Log.d("aaaa", "add: " + position);
+                            Log.d("aaaa", "add: " + position1);
                             Log.e("MediaAdapter", "tickedPositions:" + tickedPositions.size() + "limitChose : " + limitChose);
                             if (limitChose == LIMIT_CHOICE) {
                                 if (tickedPositions.size() == limitChose && recycler.getScrollState() == RecyclerView.SCROLL_STATE_IDLE) {
                                     showDialogLimitChoice();
-                                    itemHolder.tick.setChecked(tickedPositions.contains(position));
+                                    itemHolder.tick.setChecked(tickedPositions.contains(position1));
                                     return;
                                 } else {
-                                    tickedPositions.add(position);
+                                    tickedPositions.add(position1);
                                 }
                             } else {
-                                tickedPositions.add(position);
+                                tickedPositions.add(position1);
                             }
                             if (myEvent != null)
                                 myEvent.OnSelectedChange(tickedPositions.size());
                         } else {
-                            tickedPositions.remove(position);
+                            tickedPositions.remove(position1);
                             if (myEvent != null) myEvent.OnSelectedChange(tickedPositions.size());
                         }
                     }
                 });
-                itemHolder.tick.setChecked(tickedPositions.contains(position));
+                itemHolder.tick.setChecked(tickedPositions.contains(position1));
             } else {
                 itemHolder.tick.setVisibility(View.GONE);
             }
@@ -149,7 +152,7 @@ class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                     // if multi choice => tick
                     Log.e("MediaAdapter", "onItemClick");
                     if (isEnableMultiChoice) itemHolder.tick.toggle();
-                    if (myEvent != null) myEvent.OnItemClick(position);
+                    if (myEvent != null) myEvent.OnItemClick(position1);
                 }
             });
         }
@@ -362,7 +365,9 @@ class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     MediaFile[] getSelectedItems() {
         MediaFile[] mediaFiles = new MediaFile[tickedPositions.size()];
         for (int i = 0; i < tickedPositions.size(); i++) {
-            mediaFiles[i] = (MediaFile) displayMediaList.get(tickedPositions.valueAt(i));
+            Integer checkedPosition = tickedPositions.valueAt(i);
+            if (checkedPosition != null)
+                mediaFiles[i] = (MediaFile) displayMediaList.get(checkedPosition);
         }
         return mediaFiles;
     }
@@ -387,23 +392,23 @@ class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 }
 
 class ItemHolder extends RecyclerView.ViewHolder {
-    ImageView thumb;
-    TextView text;
-    AppCompatCheckBox tick;
+    final ImageView thumb;
+    final TextView text;
+    final AppCompatCheckBox tick;
 
     ItemHolder(View itemView) {
         super(itemView);
-        thumb = (ImageView) itemView.findViewById(R.id.thumb);
-        text = (TextView) itemView.findViewById(R.id.txt);
-        tick = (AppCompatCheckBox) itemView.findViewById(R.id.tick);
+        thumb = itemView.findViewById(R.id.thumb);
+        text = itemView.findViewById(R.id.txt);
+        tick = itemView.findViewById(R.id.tick);
     }
 }
 
 class HeaderHolder extends RecyclerView.ViewHolder {
-    TextView header;
+    final TextView header;
 
     HeaderHolder(View itemView) {
         super(itemView);
-        header = (TextView) itemView.findViewById(R.id.header);
+        header = itemView.findViewById(R.id.header);
     }
 }
