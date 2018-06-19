@@ -34,6 +34,8 @@ import android.widget.FrameLayout;
 import com.example.tux.mylab.R;
 
 import java.io.File;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.Set;
 
@@ -417,6 +419,7 @@ public class CameraView extends FrameLayout {
     /**
      * Direction the camera faces relative to device screen.
      */
+    @Retention(RetentionPolicy.SOURCE)
     @IntDef({FACING_BACK, FACING_FRONT})
     public @interface Facing {
     }
@@ -424,6 +427,7 @@ public class CameraView extends FrameLayout {
     /**
      * The mode for for the camera device's flash control
      */
+    @Retention(RetentionPolicy.SOURCE)
     @IntDef({FLASH_OFF, FLASH_ON, FLASH_TORCH, FLASH_AUTO, FLASH_RED_EYE})
     public @interface Flash {
     }

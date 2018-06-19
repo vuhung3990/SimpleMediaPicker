@@ -23,7 +23,7 @@ public abstract class MediaPickerBaseActivity extends AppCompatActivity {
     /**
      * key og flag  {@link #isCancelIntermediate} in bundle
      */
-    protected String flagCancelIntermediate = "flagCancelIntermediate";
+    public static final String FLAG_CANCEL_INTERMEDIATE = "FLAG_CANCEL_INTERMEDIATE";
 
     /**
      * cancel for camera, gallery

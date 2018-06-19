@@ -9,7 +9,6 @@ import java.util.regex.Pattern;
 /**
  * Created by dev22 on 5/16/17.
  */
-
 public class MediaSanUtils {
     private static final java.lang.String IMAGE_PATTERN = "([^\\s]+(\\.(?i)(jpg|png|gif|bmp))$)";
 

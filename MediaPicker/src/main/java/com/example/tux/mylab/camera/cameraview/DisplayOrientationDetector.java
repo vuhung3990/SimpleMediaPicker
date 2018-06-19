@@ -31,7 +31,7 @@ abstract class DisplayOrientationDetector {
     /**
      * Mapping from Surface.Rotation_n to degrees.
      */
-    static final SparseIntArray DISPLAY_ORIENTATIONS = new SparseIntArray();
+    private static final SparseIntArray DISPLAY_ORIENTATIONS = new SparseIntArray();
 
     static {
         DISPLAY_ORIENTATIONS.put(Surface.ROTATION_0, 0);
@@ -41,7 +41,7 @@ abstract class DisplayOrientationDetector {
     }
 
     private final OrientationEventListener mOrientationEventListener;
-    Display mDisplay;
+    private Display mDisplay;
 
     private int mLastKnownDisplayOrientation = 0;
 

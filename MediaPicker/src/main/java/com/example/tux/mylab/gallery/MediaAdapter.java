@@ -1,7 +1,11 @@
 package com.example.tux.mylab.gallery;
 
 import android.content.Context;
+import android.content.DialogInterface;
+import android.graphics.drawable.Drawable;
+import android.support.annotation.Nullable;
 import android.support.v4.util.ArraySet;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatCheckBox;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -13,7 +17,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.example.tux.mylab.R;
@@ -32,8 +37,11 @@ import static com.example.tux.mylab.gallery.data.BaseItemObject.TYPE_HEADER;
 import static com.example.tux.mylab.utils.MediaSanUtils.isPhoto;
 
 class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+    public static final int LIMIT_CHOICE = 20;
     private final Context context;
     private MyEvent myEvent;
+    private int limitChose;
+    private int sortType;
     /**
      * true: multi choice, false: single choice
      */
@@ -51,6 +59,8 @@ class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
      * display type values: {@link Gallery#SORT_BY_TIME}, {@link Gallery#SORT_BY_FOLDER}, {@link Gallery#SORT_BY_PHOTOS}, {@link Gallery#SORT_BY_VIDEOS}
      */
     private int displayType = Gallery.SORT_BY_TIME;
+    private RecyclerView recycler;
+
 
     MediaAdapter(Context context) {
         this.context = context;
@@ -80,12 +90,9 @@ class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             final ItemHolder itemHolder = (ItemHolder) holder;
             Glide.with(context)
                     .load(mediaFile.getPath())
-                    .centerCrop()
-                    .crossFade()
-                    .error(R.drawable.ic_broken_image_blue_grey_900_48dp)
-                    .listener(new RequestListener<String, GlideDrawable>() {
+                    .listener(new RequestListener<Drawable>() {
                         @Override
-                        public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
+                        public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
                             // don't show invalid image file, example: aa.jpg but it not image
                             mediaData.remove(mediaFile);
                             displayMediaList.remove(mediaFile);
@@ -94,7 +101,7 @@ class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                         }
 
                         @Override
-                        public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                        public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
                             return false;
                         }
                     })
@@ -110,8 +117,20 @@ class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                         if (isChecked) {
                             Log.d("aaaa", "add: " + position);
-                            tickedPositions.add(position);
-                            if (myEvent != null) myEvent.OnSelectedChange(tickedPositions.size());
+                            Log.e("MediaAdapter", "tickedPositions:" + tickedPositions.size() + "limitChose : " + limitChose);
+                            if (limitChose == LIMIT_CHOICE) {
+                                if (tickedPositions.size() == limitChose && recycler.getScrollState() == RecyclerView.SCROLL_STATE_IDLE) {
+                                    showDialogLimitChoice();
+                                    itemHolder.tick.setChecked(tickedPositions.contains(position));
+                                    return;
+                                } else {
+                                    tickedPositions.add(position);
+                                }
+                            } else {
+                                tickedPositions.add(position);
+                            }
+                            if (myEvent != null)
+                                myEvent.OnSelectedChange(tickedPositions.size());
                         } else {
                             tickedPositions.remove(position);
                             if (myEvent != null) myEvent.OnSelectedChange(tickedPositions.size());
@@ -128,6 +147,7 @@ class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 @Override
                 public void onClick(View v) {
                     // if multi choice => tick
+                    Log.e("MediaAdapter", "onItemClick");
                     if (isEnableMultiChoice) itemHolder.tick.toggle();
                     if (myEvent != null) myEvent.OnItemClick(position);
                 }
@@ -170,6 +190,30 @@ class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 sortByTime();
                 break;
         }
+    }
+
+    private void showDialogLimitChoice() {
+        String type = null;
+        switch (sortType) {
+            case Gallery.SORT_BY_PHOTOS:
+                type = context.getString(R.string.message_photo);
+                break;
+            case Gallery.SORT_BY_VIDEOS:
+                type = context.getString(R.string.message_videos);
+                break;
+        }
+
+        new AlertDialog.Builder(context, R.style.CustomDialog)
+                .setTitle(context.getString(R.string.confirm))
+                .setMessage(type)
+                .setCancelable(false)
+                .setPositiveButton(R.string.all_ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                    }
+                })
+                .show();
     }
 
     /**
@@ -236,7 +280,6 @@ class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             }
             displayMediaList.add(media);
         }
-
         notifyDataSetChanged();
     }
 
@@ -251,6 +294,9 @@ class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 displayMediaList.add(media);
             }
         }
+
+        // reorder by time: newest first
+        Collections.reverse(displayMediaList);
         notifyDataSetChanged();
     }
 
@@ -265,6 +311,9 @@ class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 displayMediaList.add(media);
             }
         }
+
+        // reorder by time: newest first
+        Collections.reverse(displayMediaList);
         notifyDataSetChanged();
     }
 
@@ -294,6 +343,15 @@ class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         return isEnableMultiChoice;
     }
 
+
+    void setLimitChose(int number) {
+        limitChose = number;
+    }
+
+    void setSortType(int sortType) {
+        this.sortType = sortType;
+    }
+
     /**
      * @param position position to get item
      */
@@ -307,6 +365,10 @@ class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             mediaFiles[i] = (MediaFile) displayMediaList.get(tickedPositions.valueAt(i));
         }
         return mediaFiles;
+    }
+
+    public void setRecycler(RecyclerView ryclercy) {
+        this.recycler = ryclercy;
     }
 
     interface MyEvent {

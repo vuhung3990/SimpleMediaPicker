@@ -33,8 +33,6 @@ class GalleryPresenter implements GalleryContract.Presenter {
                         view.updateData(mediaFiles);
                 }
             });
-        } else {
-            view.requestReadExternalStoragePermission();
         }
     }
 
@@ -52,10 +50,5 @@ class GalleryPresenter implements GalleryContract.Presenter {
                     view.updateData(mediaFiles);
             }
         });
-    }
-
-    @Override
-    public void readExternalPermissionDenied() {
-        // TODO: 5/17/17
     }
 }

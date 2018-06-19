@@ -1,11 +1,16 @@
 package com.example.tux.mylab.gallery;
 
 import android.Manifest;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -13,6 +18,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.tux.mylab.MediaPickerBaseActivity;
 import com.example.tux.mylab.R;
@@ -26,6 +32,7 @@ import java.util.List;
 public class GalleryActivity extends MediaPickerBaseActivity implements GalleryContract.View, View.OnClickListener, AdapterView.OnItemSelectedListener, MediaAdapter.MyEvent {
 
     private static final int REQUEST_PERMISSION_READ_EXTERNAL_STORAGE = 33;
+    private static final int OPEN_SETTING = 39;
     private MediaAdapter adapter;
     private GalleryPresenter presenter;
     private Spinner sortType;
@@ -47,7 +54,7 @@ public class GalleryActivity extends MediaPickerBaseActivity implements GalleryC
         presenter = new GalleryPresenter(this, new GalleryRepository(this));
 
         // setup recycle view
-        RecyclerView mediaList = (RecyclerView) findViewById(R.id.media_list);
+        RecyclerView mediaList = findViewById(R.id.media_list);
         mediaList.setHasFixedSize(true);
 
         //setup grid layout manager
@@ -63,27 +70,31 @@ public class GalleryActivity extends MediaPickerBaseActivity implements GalleryC
 
         // set adapter for RV
         adapter = new MediaAdapter(this);
+        adapter.setRecycler(mediaList);
         adapter.setItemEvents(this);
         mediaList.setAdapter(adapter);
 
+
         // fab button to show camera
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(this);
 
         // change sort type
-        sortType = (Spinner) findViewById(R.id.sort_type);
+        sortType = findViewById(R.id.sort_type);
         sortType.setOnItemSelectedListener(this);
 
         // selected item
-        txtSelected = (TextView) findViewById(R.id.txt_selected);
+        txtSelected = findViewById(R.id.txt_selected);
         txtFormat = getString(R.string.toolbar_selected_item);
-        confirmSelect = (TextView) findViewById(R.id.confirm_select);
+        confirmSelect = findViewById(R.id.confirm_select);
         confirmSelect.setOnClickListener(this);
 
         // back button
         findViewById(R.id.back).setOnClickListener(this);
 
         config();
+
+        requestReadExternalStoragePermission();
     }
 
     /**
@@ -92,8 +103,12 @@ public class GalleryActivity extends MediaPickerBaseActivity implements GalleryC
     private void config() {
         if (input != null) {
             adapter.setChoiceMode(input.isMultichoice());
+            adapter.setLimitChose(input.getLimitChoice());
+            adapter.setSortType(input.getSortType());
             changeDisplayType(input.getSortType());
             sortType.setSelection(input.getSortType());
+
+            Log.e("Gallery", "MediaAdapter:" + input.getLimitChoice());
         } else {
             Log.e("media-picker", "input not valid");
             finish();
@@ -127,8 +142,9 @@ public class GalleryActivity extends MediaPickerBaseActivity implements GalleryC
         if (id == R.id.fab) {
             // show camera
             new Camera.Builder()
-                    .flashMode(CameraView.FLASH_AUTO)
+                    .facing(CameraView.FACING_BACK)
                     .isVideoMode(false)
+                    .flashMode(CameraView.FLASH_AUTO)
                     .build()
                     .start(this);
             return;
@@ -139,8 +155,29 @@ public class GalleryActivity extends MediaPickerBaseActivity implements GalleryC
         }
         if (id == R.id.back) {
             cancel();
-            return;
         }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == RESULT_OK && requestCode == input.getRequestCode()) {
+            MediaFile file = (MediaFile) data.getParcelableArrayExtra(MediaPickerBaseActivity.RESULT_KEY)[0];
+            sendResult(file);
+        }
+        if (requestCode == OPEN_SETTING) {
+            if (!isHaveReadPermission()) {
+                noHaveRequirePermission();
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    /**
+     * exit app if don't have require permission
+     */
+    private void noHaveRequirePermission() {
+        Toast.makeText(this, R.string.message_no_permission_require, Toast.LENGTH_LONG).show();
+        finish();
     }
 
     @Override
@@ -165,9 +202,41 @@ public class GalleryActivity extends MediaPickerBaseActivity implements GalleryC
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 presenter.grantedReadExternalPermission();
             } else {
-                presenter.readExternalPermissionDenied();
+                if (!ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                    // case tick "never ask again"
+                    showDialogConfirmOpenSetting();
+                } else {
+                    // case deny permission
+                    noHaveRequirePermission();
+                }
             }
         }
+    }
+
+    /**
+     * when user tick "never ask again" request permission
+     */
+    private void showDialogConfirmOpenSetting() {
+        new AlertDialog.Builder(this, R.style.Theme_AppCompat_Dialog_Alert)
+                .setMessage(R.string.message_always_deny_read_external)
+                .setCancelable(false)
+                .setPositiveButton(R.string.all_ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent intent = new Intent();
+                        intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                        Uri uri = Uri.fromParts("package", GalleryActivity.this.getPackageName(), null);
+                        intent.setData(uri);
+                        GalleryActivity.this.startActivityForResult(intent, OPEN_SETTING);
+                    }
+                })
+                .setNegativeButton(R.string.all_exit, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        GalleryActivity.this.finish();
+                    }
+                })
+                .show();
     }
 
     @Override

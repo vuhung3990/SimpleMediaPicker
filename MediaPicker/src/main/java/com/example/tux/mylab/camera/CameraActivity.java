@@ -6,10 +6,13 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
+import android.widget.Chronometer;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
@@ -40,6 +43,8 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
     private int flashMode = CameraView.FLASH_AUTO;
     private Camera input;
     private int facingMode = CameraView.FACING_BACK;
+    private Chronometer videoRecordTimer;
+    private ImageView btnOpenGallery;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,17 +62,21 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
         findViewById(R.id.switch_camera).setOnClickListener(this);
 
         // btn flash mode
-        btnFlashMode = (ImageView) findViewById(R.id.flash_mode);
+        btnFlashMode = findViewById(R.id.flash_mode);
         btnFlashMode.setOnClickListener(this);
 
         // btn change photo -> video
-        btnTogglePhotoVideo = (ImageView) findViewById(R.id.toggle_video_photo);
+        btnTogglePhotoVideo = findViewById(R.id.toggle_video_photo);
         btnTogglePhotoVideo.setOnClickListener(this);
 
         // btn open gallery
-        findViewById(R.id.open_gallery).setOnClickListener(this);
+        btnOpenGallery = findViewById(R.id.open_gallery);
+        btnOpenGallery.setOnClickListener(this);
 
-        cameraContainer = (FrameLayout) findViewById(R.id.camera_view);
+        // Chronometer video timer
+        videoRecordTimer = findViewById(R.id.video_record_timer);
+
+        cameraContainer = findViewById(R.id.camera_view);
 
         presenter = new CameraPresenter(this);
         setCancelFlag();
@@ -153,12 +162,27 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
             @Override
             public void onVideoSaved(File outputVideoFile) {
                 sendResult(new MediaFile(outputVideoFile.getName(), outputVideoFile.getAbsolutePath(), outputVideoFile.getParentFile().getName(), System.currentTimeMillis()));
+                stopVideoRecordTimer();
             }
         });
 
         cameraContainer.removeAllViews();
         cameraContainer.addView(mCameraView);
         mCameraView.start();
+    }
+
+    /**
+     * stop & hide video record timer
+     *
+     * @see #startVideoRecordTimer()
+     */
+    private void stopVideoRecordTimer() {
+        // show open gallery and toggle video/photo mode
+        btnTogglePhotoVideo.setVisibility(View.VISIBLE);
+        btnOpenGallery.setVisibility(View.VISIBLE);
+
+        videoRecordTimer.stop();
+        videoRecordTimer.setVisibility(View.GONE);
     }
 
     @Override
@@ -192,6 +216,7 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
         if (mCameraView != null)
             mCameraView.stop();
         presenter.setFrontCamera(false);
+        stopVideoRecordTimer();
     }
 
     @Override
@@ -217,10 +242,10 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
      * set cancel state from bundle (default: true)
      *
      * @see #isCancelIntermediate
-     * @see #flagCancelIntermediate
+     * @see #FLAG_CANCEL_INTERMEDIATE
      */
     private void setCancelFlag() {
-        isCancelIntermediate = getIntent().getBooleanExtra(flagCancelIntermediate, true);
+        isCancelIntermediate = getIntent().getBooleanExtra(FLAG_CANCEL_INTERMEDIATE, true);
     }
 
     @Override
@@ -236,7 +261,23 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
 
     @Override
     public void recordVideo() {
+        startVideoRecordTimer();
         mCameraView.toggleRecordVideo();
+    }
+
+    /**
+     * show & start video record timer
+     *
+     * @see #stopVideoRecordTimer()
+     */
+    private void startVideoRecordTimer() {
+        // hide open gallery and toggle video/photo mode
+        btnTogglePhotoVideo.setVisibility(View.GONE);
+        btnOpenGallery.setVisibility(View.GONE);
+
+        videoRecordTimer.setVisibility(View.VISIBLE);
+        videoRecordTimer.setBase(SystemClock.elapsedRealtime());
+        videoRecordTimer.start();
     }
 
     @Override

@@ -7,7 +7,7 @@
         android:id="@+id/thumb"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:contentDescription="@string/app_name" />
+        android:contentDescription="@string/image_description" />
 
     <TextView
         android:id="@+id/txt"
@@ -16,10 +16,10 @@
         android:layout_gravity="bottom|center"
         android:background="@color/colorBackgroundTextGallery"
         android:ellipsize="middle"
-        android:maxLines="1"
         android:padding="@dimen/gallery_item_text_padding"
         android:textColor="@color/colorTextGallery"
-        android:textSize="12sp" />
+        android:textSize="12sp"
+        android:singleLine="true" />
 
     <android.support.v7.widget.AppCompatCheckBox
         android:id="@+id/tick"

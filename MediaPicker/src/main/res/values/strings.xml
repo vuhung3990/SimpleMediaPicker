@@ -1,6 +1,14 @@
 <resources>
-    <string name="app_name">MyLab</string>
     <string name="title_activity_gallery">Gallery</string>
     <string name="all_ok">OK</string>
     <string name="toolbar_selected_item">%d selected</string>
+    <string name="message_always_deny_read_external">bạn có muốn mở cài đặt để cho phép quyền đọc file không?</string>
+    <string name="all_exit">Thoát</string>
+    <string name="message_request_read_external">Bạn có muốn cấp quyền đọc file?</string>
+    <string name="message_no_permission_require">Không có quyền truy cập file.</string>
+    <string name="confirm">Thông báo</string>
+    <string name="message_photo"> Chỉ có thể gửi tối đa 20 ảnh 1 lần</string>
+    <string name="message_videos"> Chỉ có thể gửi tối đa 20 video 1 lần</string>
+    <string name="image_description">image</string>
+
 </resources>

@@ -44,11 +44,6 @@ public class GalleryContract {
          * read external permission granted
          */
         void grantedReadExternalPermission();
-
-        /**
-         * read external permission denied
-         */
-        void readExternalPermissionDenied();
     }
 
     public interface Repository {

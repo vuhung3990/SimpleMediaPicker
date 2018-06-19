@@ -14,10 +14,6 @@ import com.example.tux.mylab.camera.cameraview.CameraView;
  * <p>- isVideoMode = false</p>
  */
 public class Camera implements Parcelable {
-    /**
-     * The integer request code originally supplied to startActivityForResult(), allowing you to identify who this result came from.
-     */
-    public static final int REQUEST_CODE_CAMERA = 28;
     public static final Parcelable.Creator<Camera> CREATOR = new Parcelable.Creator<Camera>() {
         @Override
         public Camera createFromParcel(Parcel source) {
@@ -29,6 +25,11 @@ public class Camera implements Parcelable {
             return new Camera[size];
         }
     };
+
+    /**
+     * The integer request code originally supplied to startActivityForResult(), allowing you to identify who this result came from.
+     */
+    public static final int REQUEST_CODE_CAMERA = 66;
     private int flashMode = CameraView.FLASH_AUTO;
     private int facing = CameraView.FACING_BACK;
     private boolean isVideoMode = false;

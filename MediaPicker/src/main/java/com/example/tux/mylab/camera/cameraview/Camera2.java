@@ -90,9 +90,9 @@ class Camera2 extends CameraViewImpl {
     };
     private final SizeMap mPreviewSizes = new SizeMap();
     private final SizeMap mPictureSizes = new SizeMap();
-    CameraDevice mCamera;
-    CameraCaptureSession mCaptureSession;
-    CaptureRequest.Builder mPreviewRequestBuilder;
+    private CameraDevice mCamera;
+    private CameraCaptureSession mCaptureSession;
+    private CaptureRequest.Builder mPreviewRequestBuilder;
     private String mCameraId;
     private CameraCharacteristics mCameraCharacteristics;
     private ImageReader mImageReader;

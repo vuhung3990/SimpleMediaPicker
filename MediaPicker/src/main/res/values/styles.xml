@@ -24,4 +24,10 @@
         <item name="autoFocus">true</item>
         <item name="flash">auto</item>
     </style>
+
+    <style name="CustomDialog" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+
 </resources>

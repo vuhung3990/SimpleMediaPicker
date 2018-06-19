@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 
 /**
  * input builder for gallery<br/>
@@ -17,46 +18,38 @@ public class Gallery implements Parcelable {
     public static final int SORT_BY_VIDEOS = 3;
 
     /**
-     * requestCode The integer request code originally supplied to startActivityForResult(), allowing you to identify who this result came from.
+     * The integer request code originally supplied to startActivityForResult(), allowing you to identify who this result came from.
      */
-    public static final int REQUEST_CODE_GALLERY = 4;
-
-    public static final Parcelable.Creator<Gallery> CREATOR = new Parcelable.Creator<Gallery>() {
-        @Override
-        public Gallery createFromParcel(Parcel source) {
-            return new Gallery(source);
-        }
-
-        @Override
-        public Gallery[] newArray(int size) {
-            return new Gallery[size];
-        }
-    };
+    public static final int REQUEST_CODE_GALLERY = 55;
+    private int requestCode;
     private int sortType;
     private boolean isMultichoice = false;
+    private int limitChose;
 
-    private Gallery(Builder builder) {
-        sortType = builder.sortType;
-        isMultichoice = builder.isMultichoice;
+
+    public int getRequestCode() {
+        return requestCode;
     }
 
-    protected Gallery(Parcel in) {
-        this.sortType = in.readInt();
-        this.isMultichoice = in.readByte() != 0;
-    }
-
-    /**
-     * @see Builder#sortType(int)
-     */
     public int getSortType() {
         return sortType;
     }
 
-    /**
-     * @see Builder#isMultichoice(boolean)
-     */
     public boolean isMultichoice() {
         return isMultichoice;
+    }
+
+
+    public int getLimitChoice() {
+        return limitChose;
+    }
+
+    private Gallery(Builder builder) {
+        requestCode = builder.requestCode;
+        sortType = builder.sortType;
+        isMultichoice = builder.isMultichoice;
+        limitChose = builder.limitChose;
+
     }
 
     /**
@@ -70,25 +63,14 @@ public class Gallery implements Parcelable {
         activity.startActivityForResult(intent, REQUEST_CODE_GALLERY);
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(this.sortType);
-        dest.writeByte(this.isMultichoice ? (byte) 1 : (byte) 0);
-    }
-
-    /**
-     * {@code Gallery} builder static inner class.
-     */
     public static final class Builder {
         private int sortType = Gallery.SORT_BY_TIME;
         private boolean isMultichoice = false;
+        private int requestCode;
+        private int limitChose;
 
         public Builder() {
+
         }
 
         /**
@@ -119,5 +101,48 @@ public class Gallery implements Parcelable {
         public Gallery build() {
             return new Gallery(this);
         }
+
+        public Builder requestCode(int val) {
+            requestCode = val;
+            return this;
+        }
+
+        public Builder limitChoice(int number) {
+            limitChose = number;
+            Log.e("Gallery", "limitChoice: " + limitChose);
+            return this;
+        }
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(this.requestCode);
+        dest.writeInt(this.sortType);
+        dest.writeInt(this.limitChose);
+        dest.writeByte(this.isMultichoice ? (byte) 1 : (byte) 0);
+    }
+
+    private Gallery(Parcel in) {
+        this.requestCode = in.readInt();
+        this.sortType = in.readInt();
+        this.limitChose = in.readInt();
+        this.isMultichoice = in.readByte() != 0;
+    }
+
+    public static final Creator<Gallery> CREATOR = new Creator<Gallery>() {
+        @Override
+        public Gallery createFromParcel(Parcel source) {
+            return new Gallery(source);
+        }
+
+        @Override
+        public Gallery[] newArray(int size) {
+            return new Gallery[size];
+        }
+    };
 }
