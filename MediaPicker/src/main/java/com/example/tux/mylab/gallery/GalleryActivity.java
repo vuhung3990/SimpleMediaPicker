@@ -39,7 +39,7 @@ public class GalleryActivity extends MediaPickerBaseActivity implements GalleryC
     /**
      * @see #changeDisplayType(int)
      */
-    private int currentDisplayPosition = 0;
+    private int currentDisplayType = 0;
     private TextView txtSelected;
     private TextView confirmSelect;
     private String txtFormat;
@@ -56,6 +56,10 @@ public class GalleryActivity extends MediaPickerBaseActivity implements GalleryC
         // setup recycle view
         RecyclerView mediaList = findViewById(R.id.media_list);
         mediaList.setHasFixedSize(true);
+
+        // padding on each item
+        int itemPadding = getResources().getDimensionPixelSize(R.dimen.gallery_item_padding);
+        mediaList.addItemDecoration(new SpacesItemDecoration(itemPadding));
 
         //setup grid layout manager
         final int gridCount = getResources().getInteger(R.integer.span_count);
@@ -102,9 +106,7 @@ public class GalleryActivity extends MediaPickerBaseActivity implements GalleryC
     private void config() {
         if (input != null) {
             adapter.setChoiceMode(input.isMultiChoice());
-            adapter.setSortType(input.getSortType());
             changeDisplayType(input.getSortType());
-            sortType.setSelection(input.getSortType());
 
             Log.e("Gallery", "MediaAdapter:" + input.getLimitChoice());
         } else {
@@ -245,12 +247,12 @@ public class GalleryActivity extends MediaPickerBaseActivity implements GalleryC
     /**
      * change display type
      *
-     * @param position 0: time, 1: folder, 2: photos, 3: videos
+     * @param type 0: time, 1: folder, 2: photos, 3: videos
      */
-    private void changeDisplayType(int position) {
-        if (currentDisplayPosition != position) {
-            currentDisplayPosition = position;
-            switch (position) {
+    private void changeDisplayType(int type) {
+        if (currentDisplayType != type) {
+            currentDisplayType = type;
+            switch (type) {
                 case 1:
                     adapter.sortByFolder();
                     break;
@@ -264,6 +266,8 @@ public class GalleryActivity extends MediaPickerBaseActivity implements GalleryC
                     adapter.sortByTime();
                     break;
             }
+
+            sortType.setSelection(type);
         }
     }
 

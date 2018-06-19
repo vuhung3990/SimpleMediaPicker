@@ -1,13 +1,10 @@
 package com.example.tux.mylab.gallery;
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.util.ArraySet;
 import android.support.v7.widget.AppCompatCheckBox;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,10 +13,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.DataSource;
-import com.bumptech.glide.load.engine.GlideException;
-import com.bumptech.glide.request.RequestListener;
-import com.bumptech.glide.request.target.Target;
+import com.bumptech.glide.request.RequestOptions;
 import com.example.tux.mylab.R;
 import com.example.tux.mylab.gallery.data.BaseItemObject;
 import com.example.tux.mylab.gallery.data.MediaFile;
@@ -36,9 +30,15 @@ import static com.example.tux.mylab.gallery.data.BaseItemObject.TYPE_HEADER;
 import static com.example.tux.mylab.utils.MediaSanUtils.isPhoto;
 
 class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+    /**
+     * option for load glide
+     */
+    private RequestOptions defaultOptions = new RequestOptions()
+            .centerCrop()
+            .error(R.drawable.ic_broken_image_blue_grey_900_48dp);
+
     private final Context context;
     private MyEvent myEvent;
-    private int sortType;
     /**
      * true: multi choice, false: single choice
      */
@@ -87,21 +87,24 @@ class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             final ItemHolder itemHolder = (ItemHolder) holder;
             Glide.with(context)
                     .load(mediaFile.getPath())
-                    .listener(new RequestListener<Drawable>() {
-                        @Override
-                        public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-                            // don't show invalid image file, example: aa.jpg but it not image
-                            mediaData.remove(mediaFile);
-                            displayMediaList.remove(mediaFile);
-                            notifyDataSetChanged();
-                            return false;
-                        }
+                    .apply(defaultOptions)
+                    // if have many invalid image it's will notify multiple times => should use error image instead
 
-                        @Override
-                        public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-                            return false;
-                        }
-                    })
+//                    .listener(new RequestListener<Drawable>() {
+//                        @Override
+//                        public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+//                            // don't show invalid image file, example: aa.jpg but it not image
+//                            mediaData.remove(mediaFile);
+//                            displayMediaList.remove(mediaFile);
+//                            notifyItemRemoved(itemPosition);
+//                            return false;
+//                        }
+//
+//                        @Override
+//                        public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+//                            return false;
+//                        }
+//                    })
                     .into(itemHolder.thumb);
 
             itemHolder.text.setText(mediaFile.getName());
@@ -131,7 +134,6 @@ class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 @Override
                 public void onClick(View v) {
                     // if multi choice => tick
-                    Log.e("MediaAdapter", "onItemClick");
                     if (isEnableMultiChoice) itemHolder.tick.toggle();
                     if (myEvent != null) myEvent.OnItemClick(itemPosition);
                 }
@@ -301,10 +303,6 @@ class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
      */
     boolean isEnableMultiChoice() {
         return isEnableMultiChoice;
-    }
-
-    void setSortType(int sortType) {
-        this.sortType = sortType;
     }
 
     /**

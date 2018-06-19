@@ -30,8 +30,8 @@ public class Camera implements Parcelable {
      * The integer request code originally supplied to startActivityForResult(), allowing you to identify who this result came from.
      */
     public static final int REQUEST_CODE_CAMERA = 66;
-    private int flashMode = CameraView.FLASH_AUTO;
-    private int facing = CameraView.FACING_BACK;
+    private int flashMode;
+    private int facing;
     private boolean isVideoMode;
 
     private Camera(Builder builder) {

@@ -37,14 +37,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.take_photo:
                 new Camera.Builder()
                         .isVideoMode(false)
-                        .flashMode(CameraView.FLASH_AUTO)
+                        .flashMode(CameraView.FLASH_OFF)
                         .build()
                         .start(this);
                 break;
             case R.id.pick_image:
                 new Gallery.Builder()
                         .isMultiChoice(true)
-                        .sortType(Gallery.SORT_BY_PHOTOS)
+                        .sortType(Gallery.SORT_BY_FOLDER)
                         .limitChoice(3)
                         .build()
                         .start(this);
