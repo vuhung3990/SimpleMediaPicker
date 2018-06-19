@@ -70,7 +70,6 @@ public class GalleryActivity extends MediaPickerBaseActivity implements GalleryC
 
         // set adapter for RV
         adapter = new MediaAdapter(this);
-        adapter.setRecycler(mediaList);
         adapter.setItemEvents(this);
         mediaList.setAdapter(adapter);
 
@@ -103,7 +102,6 @@ public class GalleryActivity extends MediaPickerBaseActivity implements GalleryC
     private void config() {
         if (input != null) {
             adapter.setChoiceMode(input.isMultiChoice());
-            adapter.setLimitChose(input.getLimitChoice());
             adapter.setSortType(input.getSortType());
             changeDisplayType(input.getSortType());
             sortType.setSelection(input.getSortType());
