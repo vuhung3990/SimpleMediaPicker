@@ -30,6 +30,7 @@ public class Camera implements Parcelable {
      * The integer request code originally supplied to startActivityForResult(), allowing you to identify who this result came from.
      */
     public static final int REQUEST_CODE_CAMERA = 66;
+    private boolean isCropOutput;
     private int flashMode;
     private int facing;
     private boolean isVideoMode;
@@ -38,12 +39,14 @@ public class Camera implements Parcelable {
         flashMode = builder.flashMode;
         facing = builder.facing;
         isVideoMode = builder.isVideoMode;
+        isCropOutput = builder.isCropOutput;
     }
 
     private Camera(Parcel in) {
         this.flashMode = in.readInt();
         this.facing = in.readInt();
         this.isVideoMode = in.readByte() != 0;
+        this.isCropOutput = in.readByte() != 0;
     }
 
     /**
@@ -78,6 +81,13 @@ public class Camera implements Parcelable {
         return isVideoMode;
     }
 
+    /**
+     * @see Builder#isCropOutput(boolean)
+     */
+    public boolean isCropOutput() {
+        return isCropOutput;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -88,6 +98,7 @@ public class Camera implements Parcelable {
         dest.writeInt(this.flashMode);
         dest.writeInt(this.facing);
         dest.writeByte(this.isVideoMode ? (byte) 1 : (byte) 0);
+        dest.writeByte(this.isCropOutput ? (byte) 1 : (byte) 0);
     }
 
     /**
@@ -97,6 +108,7 @@ public class Camera implements Parcelable {
         private int flashMode;
         private int facing;
         private boolean isVideoMode;
+        private boolean isCropOutput;
 
         public Builder() {
         }
@@ -137,6 +149,15 @@ public class Camera implements Parcelable {
          */
         public Camera build() {
             return new Camera(this);
+        }
+
+        /**
+         * @param isCropOutput true: crop
+         * @return crop output after take photo
+         */
+        public Builder isCropOutput(boolean isCropOutput) {
+            this.isCropOutput = isCropOutput;
+            return this;
         }
     }
 }

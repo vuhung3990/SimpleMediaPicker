@@ -107,8 +107,6 @@ public class GalleryActivity extends MediaPickerBaseActivity implements GalleryC
         if (input != null) {
             adapter.setChoiceMode(input.isMultiChoice());
             changeDisplayType(input.getSortType());
-
-            Log.e("Gallery", "MediaAdapter:" + input.getLimitChoice());
         } else {
             Log.e("media-picker", "input not valid");
             finish();
@@ -145,6 +143,7 @@ public class GalleryActivity extends MediaPickerBaseActivity implements GalleryC
                     .facing(CameraView.FACING_BACK)
                     .isVideoMode(false)
                     .flashMode(CameraView.FLASH_AUTO)
+                    .isCropOutput(false)
                     .build()
                     .start(this);
             return;
@@ -160,7 +159,7 @@ public class GalleryActivity extends MediaPickerBaseActivity implements GalleryC
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == RESULT_OK && requestCode == input.getRequestCode()) {
+        if (resultCode == RESULT_OK && requestCode == Camera.REQUEST_CODE_CAMERA) {
             MediaFile file = (MediaFile) data.getParcelableArrayExtra(MediaPickerBaseActivity.RESULT_KEY)[0];
             sendResult(file);
         }

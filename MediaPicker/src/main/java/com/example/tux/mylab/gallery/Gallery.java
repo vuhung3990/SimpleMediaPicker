@@ -21,15 +21,8 @@ public class Gallery implements Parcelable {
      * The integer request code originally supplied to startActivityForResult(), allowing you to identify who this result came from.
      */
     public static final int REQUEST_CODE_GALLERY = 55;
-    private final int requestCode;
     private final int sortType;
     private boolean isMultiChoice;
-    private final int limitChose;
-
-
-    public int getRequestCode() {
-        return requestCode;
-    }
 
     public int getSortType() {
         return sortType;
@@ -40,16 +33,10 @@ public class Gallery implements Parcelable {
     }
 
 
-    public int getLimitChoice() {
-        return limitChose;
-    }
 
     private Gallery(Builder builder) {
-        requestCode = builder.requestCode;
         sortType = builder.sortType;
         isMultiChoice = builder.isMultiChoice;
-        limitChose = builder.limitChose;
-
     }
 
     /**
@@ -66,7 +53,6 @@ public class Gallery implements Parcelable {
     public static final class Builder {
         private int sortType = Gallery.SORT_BY_TIME;
         private boolean isMultiChoice = false;
-        private int requestCode;
         private int limitChose;
 
         public Builder() {
@@ -102,11 +88,6 @@ public class Gallery implements Parcelable {
             return new Gallery(this);
         }
 
-        public Builder requestCode(int val) {
-            requestCode = val;
-            return this;
-        }
-
         public Builder limitChoice(int number) {
             limitChose = number;
             Log.e("Gallery", "limitChoice: " + limitChose);
@@ -121,16 +102,12 @@ public class Gallery implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(this.requestCode);
         dest.writeInt(this.sortType);
-        dest.writeInt(this.limitChose);
         dest.writeByte(this.isMultiChoice ? (byte) 1 : (byte) 0);
     }
 
     private Gallery(Parcel in) {
-        this.requestCode = in.readInt();
         this.sortType = in.readInt();
-        this.limitChose = in.readInt();
         this.isMultiChoice = in.readByte() != 0;
     }
 

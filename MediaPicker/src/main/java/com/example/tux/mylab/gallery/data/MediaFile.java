@@ -34,10 +34,6 @@ public class MediaFile extends BaseItemObject implements Parcelable {
      * date time taken in millisecond from 1970
      */
     private final long time;
-    /**
-     * true: checked in list, default false
-     */
-    private boolean isChecked;
 
     public MediaFile(String name, String path, String folder, long time) {
         super(BaseItemObject.TYPE_ITEM);
@@ -53,7 +49,6 @@ public class MediaFile extends BaseItemObject implements Parcelable {
         this.path = in.readString();
         this.folder = in.readString();
         this.time = in.readLong();
-        this.isChecked = in.readByte() != 0;
     }
 
     public String getName() {
@@ -70,14 +65,6 @@ public class MediaFile extends BaseItemObject implements Parcelable {
 
     public long getTime() {
         return time;
-    }
-
-    public void toggleCheck() {
-        isChecked = !isChecked;
-    }
-
-    public boolean isChecked() {
-        return isChecked;
     }
 
     @Override
@@ -101,6 +88,5 @@ public class MediaFile extends BaseItemObject implements Parcelable {
         dest.writeString(this.path);
         dest.writeString(this.folder);
         dest.writeLong(this.time);
-        dest.writeByte(this.isChecked ? (byte) 1 : (byte) 0);
     }
 }

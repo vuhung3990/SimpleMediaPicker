@@ -48,9 +48,23 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
     private int facingMode = CameraView.FACING_BACK;
     private Chronometer videoRecordTimer;
     private ImageView btnOpenGallery;
+    /**
+     * minimum size to crop
+     */
     private int cropMinSize;
+    /**
+     * Pictures/ folder to save photo and cropped photo
+     */
     private File pictureFolder;
+    /**
+     * @see Camera.Builder#isCropOutput(boolean)
+     */
     private File croppedFileOutput;
+    /**
+     * @see Camera.Builder#isCropOutput(boolean)
+     * @see #croppedFileOutput
+     */
+    private boolean isCropOutput;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,7 +114,7 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
         if (input != null) {
             facingMode = input.getFacing();
             presenter.setFrontCamera(facingMode == CameraView.FACING_FRONT);
-
+            isCropOutput = input.isCropOutput();
             setFlashMode(input.getFlashMode());
             if (input.isVideoMode()) presenter.toggleVideoPhoto();
         } else {
@@ -174,7 +188,11 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
                             }
                         }
 
-                        cropImage(file, croppedFileOutput);
+                        // option crop
+                        if (isCropOutput)
+                            cropImage(file, croppedFileOutput);
+                        else
+                            setResult(file);
                     }
                 });
             }
@@ -407,12 +425,21 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
         if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
             if (resultCode == RESULT_OK) {
-                Utils.scanFile(getApplicationContext(), croppedFileOutput);
-                sendResult(new MediaFile(croppedFileOutput.getName(), croppedFileOutput.getAbsolutePath(), croppedFileOutput.getParentFile().getName(), System.currentTimeMillis()));
+                setResult(croppedFileOutput);
             } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
                 Exception error = result.getError();
                 error.printStackTrace();
             }
         }
+    }
+
+    /**
+     * after take photo or crop, send result back {@link #sendResult(MediaFile...)}
+     *
+     * @param file result to send back
+     */
+    private void setResult(File file) {
+        Utils.scanFile(getApplicationContext(), file);
+        sendResult(new MediaFile(file.getName(), file.getAbsolutePath(), file.getParentFile().getName(), System.currentTimeMillis()));
     }
 }
