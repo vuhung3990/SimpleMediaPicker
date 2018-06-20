@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 new Gallery.Builder()
                         .isMultiChoice(true)
                         .sortType(Gallery.SORT_BY_FOLDER)
-                        .limitChoice(3)
+                        .isCropOutput(false)
                         .build()
                         .start(this);
                 break;

@@ -44,6 +44,7 @@ public class GalleryActivity extends MediaPickerBaseActivity implements GalleryC
     private TextView confirmSelect;
     private String txtFormat;
     private Gallery input;
+    private boolean isCrop;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,6 +108,7 @@ public class GalleryActivity extends MediaPickerBaseActivity implements GalleryC
         if (input != null) {
             adapter.setChoiceMode(input.isMultiChoice());
             changeDisplayType(input.getSortType());
+            isCrop = input.isCropOutput();
         } else {
             Log.e("media-picker", "input not valid");
             finish();
@@ -143,7 +145,7 @@ public class GalleryActivity extends MediaPickerBaseActivity implements GalleryC
                     .facing(CameraView.FACING_BACK)
                     .isVideoMode(false)
                     .flashMode(CameraView.FLASH_AUTO)
-                    .isCropOutput(false)
+                    .isCropOutput(isCrop)
                     .build()
                     .start(this);
             return;

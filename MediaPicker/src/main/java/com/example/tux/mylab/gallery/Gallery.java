@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
 
 /**
  * input builder for gallery<br/>
@@ -22,6 +21,13 @@ public class Gallery implements Parcelable {
      */
     public static final int REQUEST_CODE_GALLERY = 55;
     private final int sortType;
+    /**
+     * @see Gallery.Builder#isCropOutput(boolean)
+     */
+    private boolean isCropOutput;
+    /**
+     * @see Gallery.Builder#isMultiChoice(boolean)
+     */
     private boolean isMultiChoice;
 
     public int getSortType() {
@@ -32,11 +38,14 @@ public class Gallery implements Parcelable {
         return isMultiChoice;
     }
 
-
+    public boolean isCropOutput() {
+        return isCropOutput;
+    }
 
     private Gallery(Builder builder) {
         sortType = builder.sortType;
         isMultiChoice = builder.isMultiChoice;
+        isCropOutput = builder.isCropOutput;
     }
 
     /**
@@ -53,7 +62,7 @@ public class Gallery implements Parcelable {
     public static final class Builder {
         private int sortType = Gallery.SORT_BY_TIME;
         private boolean isMultiChoice = false;
-        private int limitChose;
+        private boolean isCropOutput;
 
         public Builder() {
 
@@ -80,18 +89,20 @@ public class Gallery implements Parcelable {
         }
 
         /**
+         * true: crop after take photo
+         */
+        public Builder isCropOutput(boolean val) {
+            isCropOutput = val;
+            return this;
+        }
+
+        /**
          * Returns a {@code Gallery} built from the parameters previously set.
          *
          * @return a {@code Gallery} built with parameters of this {@code Gallery.Builder}
          */
         public Gallery build() {
             return new Gallery(this);
-        }
-
-        public Builder limitChoice(int number) {
-            limitChose = number;
-            Log.e("Gallery", "limitChoice: " + limitChose);
-            return this;
         }
     }
 
@@ -104,11 +115,13 @@ public class Gallery implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeInt(this.sortType);
         dest.writeByte(this.isMultiChoice ? (byte) 1 : (byte) 0);
+        dest.writeByte(this.isCropOutput ? (byte) 1 : (byte) 0);
     }
 
     private Gallery(Parcel in) {
         this.sortType = in.readInt();
         this.isMultiChoice = in.readByte() != 0;
+        this.isCropOutput = in.readByte() != 0;
     }
 
     public static final Creator<Gallery> CREATOR = new Creator<Gallery>() {
