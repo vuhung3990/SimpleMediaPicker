@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Locale;
 
 import static com.example.tux.mylab.gallery.data.BaseItemObject.TYPE_HEADER;
-import static com.example.tux.mylab.utils.MediaSanUtils.isPhoto;
+import static com.example.tux.mylab.utils.Utils.isPhoto;
 
 class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     /**

@@ -15,6 +15,8 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
+
+# glide
 -dontwarn com.bumptech.glide.load.resource.bitmap.VideoDecoder
 -keep public class * implements com.bumptech.glide.module.GlideModule
 -keep public class * extends com.bumptech.glide.module.AppGlideModule
@@ -22,3 +24,6 @@
   **[] $VALUES;
   public *;
 }
+
+# uCrop
+-keep class android.support.v7.widget.** { *; }

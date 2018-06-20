@@ -12,7 +12,6 @@ import android.os.HandlerThread;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.FileProvider;
 import android.util.Log;
 import android.view.View;
 import android.widget.Chronometer;
@@ -24,20 +23,17 @@ import com.example.tux.mylab.R;
 import com.example.tux.mylab.camera.cameraview.CameraView;
 import com.example.tux.mylab.gallery.Gallery;
 import com.example.tux.mylab.gallery.data.MediaFile;
+import com.example.tux.mylab.utils.Utils;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-
-import static com.example.tux.mylab.utils.MediaSanUtils.scanFile;
 
 public class CameraActivity extends MediaPickerBaseActivity implements View.OnClickListener, CameraContract.View {
     private static final int REQUEST_PERMISSION_CAMERA = 77;
@@ -53,6 +49,8 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
     private Chronometer videoRecordTimer;
     private ImageView btnOpenGallery;
     private int cropMinSize;
+    private File pictureFolder;
+    private File croppedFileOutput;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,8 +85,9 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
         // camera container
         cameraContainer = findViewById(R.id.camera_view);
 
-        // min crop size
+        // crop config
         cropMinSize = getResources().getDimensionPixelSize(R.dimen.crop_min_size);
+
         presenter = new CameraPresenter(this);
         setCancelFlag();
         config();
@@ -132,8 +131,17 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
      * add camera view into container
      * reason: refresh camera view for avoid flash issue
      */
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
     public void refreshCameraView() {
+        try {
+            pictureFolder = new File(Environment.getExternalStorageDirectory(), "Pictures");
+            croppedFileOutput = new File(pictureFolder, "cropped.jpg");
+            croppedFileOutput.createNewFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         mCameraView = new CameraView(this);
         mCameraView.setAutoFocus(true);
         mCameraView.setFacing(facingMode);
@@ -148,7 +156,7 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
                 getBackgroundHandler().post(new Runnable() {
                     @Override
                     public void run() {
-                        File file = new File(Environment.getExternalStorageDirectory(), "IMG_" + new SimpleDateFormat("ddMMyyyyHHmmss", Locale.US).format(new Date()) + ".jpg");
+                        File file = new File(pictureFolder, "IMG_" + new SimpleDateFormat("ddMMyyyyHHmmss", Locale.US).format(new Date()) + ".jpg");
                         OutputStream os = null;
                         try {
                             os = new FileOutputStream(file);
@@ -166,22 +174,7 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
                             }
                         }
 
-                        Uri imageUri = FileProvider.getUriForFile(CameraActivity.this, "com.tux.file_provider", file);
-                        CropImage.activity(imageUri)
-                                .setGuidelines(CropImageView.Guidelines.ON)
-                                .setAllowFlipping(false)
-                                .setOutputCompressFormat(Bitmap.CompressFormat.JPEG)
-                                .setAllowRotation(false)
-                                .setMultiTouchEnabled(false)
-                                .setAutoZoomEnabled(false)
-                                .setFixAspectRatio(true)
-                                .setMinCropWindowSize(cropMinSize, cropMinSize)
-                                .setCropMenuCropButtonIcon(R.drawable.ic_crop_white_24dp)
-                                .start(CameraActivity.this);
-
-                        // TODO: 6/20/18 move to onActivityResult
-//                        scanFile(getApplicationContext(), file);
-//                        sendResult(new MediaFile(file.getName(), file.getAbsolutePath(), file.getParentFile().getName(), System.currentTimeMillis()));
+                        cropImage(file, croppedFileOutput);
                     }
                 });
             }
@@ -196,6 +189,29 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
         cameraContainer.removeAllViews();
         cameraContainer.addView(mCameraView);
         mCameraView.start();
+    }
+
+    /**
+     * crop image using {@link com.theartofdev.edmodo.cropper.CropImageActivity}
+     *
+     * @param inputFile  image file to crop
+     * @param outputFile cropped file output
+     */
+    private void cropImage(File inputFile, File outputFile) {
+        Uri cropUri = Utils.getFileUri(this, outputFile);
+        Uri imageUri = Utils.getFileUri(this, inputFile);
+        CropImage.activity(imageUri)
+                .setGuidelines(CropImageView.Guidelines.ON)
+                .setAllowFlipping(false)
+                .setOutputCompressFormat(Bitmap.CompressFormat.JPEG)
+                .setAllowRotation(false)
+                .setMultiTouchEnabled(false)
+                .setAutoZoomEnabled(false)
+                .setFixAspectRatio(true)
+                .setOutputUri(cropUri)
+                .setMinCropWindowSize(cropMinSize, cropMinSize)
+                .setCropMenuCropButtonIcon(R.drawable.ic_crop_white_24dp)
+                .start(this);
     }
 
     /**
@@ -391,10 +407,11 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
         if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
             if (resultCode == RESULT_OK) {
-                Uri resultUri = result.getUri();
-                result
+                Utils.scanFile(getApplicationContext(), croppedFileOutput);
+                sendResult(new MediaFile(croppedFileOutput.getName(), croppedFileOutput.getAbsolutePath(), croppedFileOutput.getParentFile().getName(), System.currentTimeMillis()));
             } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
                 Exception error = result.getError();
+                error.printStackTrace();
             }
         }
     }

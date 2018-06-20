@@ -28,7 +28,7 @@ import android.support.v4.util.SparseArrayCompat;
 import android.util.Log;
 import android.view.SurfaceHolder;
 
-import com.example.tux.mylab.utils.MediaSanUtils;
+import com.example.tux.mylab.utils.Utils;
 
 import java.io.File;
 import java.io.IOException;
@@ -371,6 +371,7 @@ class Camera1 extends CameraViewImpl {
     /**
      * free media recorder
      */
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     private void releaseMediaRecorder() {
         if (mMediaRecorder != null) {
             try {
@@ -398,7 +399,7 @@ class Camera1 extends CameraViewImpl {
             isRecordingVideo = false;
             // scan file for notify add new video
             if (outputVideoFile != null)
-                MediaSanUtils.scanFile(context.getApplicationContext(), outputVideoFile);
+                Utils.scanFile(context.getApplicationContext(), outputVideoFile);
             mCallback.onSaveVideo(outputVideoFile);
         } else {
             // initialize video camera

@@ -6,7 +6,6 @@ import android.os.Parcelable;
 /**
  * Created by dev22 on 5/15/17.
  */
-
 public class MediaFile extends BaseItemObject implements Parcelable {
     public static final Parcelable.Creator<MediaFile> CREATOR = new Parcelable.Creator<MediaFile>() {
         @Override
