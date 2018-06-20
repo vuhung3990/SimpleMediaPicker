@@ -15,11 +15,6 @@ import com.example.tux.mylab.gallery.data.MediaFile;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private static final int TAKE_PHOTO = 1;
-    private static final int RECORD_VIDEO = 2;
-    private static final int PICK_IMAGE = 3;
-    private static final int PICK_VIDEO = 4;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

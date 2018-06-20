@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <external-path
+        name="external_files"
+        path="." />
+
+    <!-- https://stackoverflow.com/questions/42027914/android-fileprovider-geturiforfile-when-the-file-is-on-an-external-sd/42028996 -->
+    <root-path
+        name="external_files"
+        path="/storage/" />
+</paths>

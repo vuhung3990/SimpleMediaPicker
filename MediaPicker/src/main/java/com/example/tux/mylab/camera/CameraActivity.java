@@ -1,7 +1,10 @@
 package com.example.tux.mylab.camera;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -9,6 +12,7 @@ import android.os.HandlerThread;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.FileProvider;
 import android.util.Log;
 import android.view.View;
 import android.widget.Chronometer;
@@ -20,10 +24,14 @@ import com.example.tux.mylab.R;
 import com.example.tux.mylab.camera.cameraview.CameraView;
 import com.example.tux.mylab.gallery.Gallery;
 import com.example.tux.mylab.gallery.data.MediaFile;
+import com.theartofdev.edmodo.cropper.CropImage;
+import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -44,6 +52,7 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
     private int facingMode = CameraView.FACING_BACK;
     private Chronometer videoRecordTimer;
     private ImageView btnOpenGallery;
+    private int cropMinSize;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,8 +84,11 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
         // Chronometer video timer
         videoRecordTimer = findViewById(R.id.video_record_timer);
 
+        // camera container
         cameraContainer = findViewById(R.id.camera_view);
 
+        // min crop size
+        cropMinSize = getResources().getDimensionPixelSize(R.dimen.crop_min_size);
         presenter = new CameraPresenter(this);
         setCancelFlag();
         config();
@@ -132,6 +144,7 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
         mCameraView.addCallback(new CameraView.Callback() {
             @Override
             public void onPictureTaken(CameraView cameraView, final byte[] data) {
+
                 getBackgroundHandler().post(new Runnable() {
                     @Override
                     public void run() {
@@ -152,8 +165,23 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
                                 }
                             }
                         }
-                        scanFile(getApplicationContext(), file);
-                        sendResult(new MediaFile(file.getName(), file.getAbsolutePath(), file.getParentFile().getName(), System.currentTimeMillis()));
+
+                        Uri imageUri = FileProvider.getUriForFile(CameraActivity.this, "com.tux.file_provider", file);
+                        CropImage.activity(imageUri)
+                                .setGuidelines(CropImageView.Guidelines.ON)
+                                .setAllowFlipping(false)
+                                .setOutputCompressFormat(Bitmap.CompressFormat.JPEG)
+                                .setAllowRotation(false)
+                                .setMultiTouchEnabled(false)
+                                .setAutoZoomEnabled(false)
+                                .setFixAspectRatio(true)
+                                .setMinCropWindowSize(cropMinSize, cropMinSize)
+                                .setCropMenuCropButtonIcon(R.drawable.ic_crop_white_24dp)
+                                .start(CameraActivity.this);
+
+                        // TODO: 6/20/18 move to onActivityResult
+//                        scanFile(getApplicationContext(), file);
+//                        sendResult(new MediaFile(file.getName(), file.getAbsolutePath(), file.getParentFile().getName(), System.currentTimeMillis()));
                     }
                 });
             }
@@ -355,5 +383,19 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
     @Override
     public void requestRequirePermission() {
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_PERMISSION_CAMERA);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+            if (resultCode == RESULT_OK) {
+                Uri resultUri = result.getUri();
+                result
+            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+                Exception error = result.getError();
+            }
+        }
     }
 }
