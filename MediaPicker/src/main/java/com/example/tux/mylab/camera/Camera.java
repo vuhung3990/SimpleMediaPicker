@@ -33,11 +33,11 @@ public class Camera implements Parcelable {
     /**
      * don not allow change camera mode and gallery
      */
-    private boolean isLock;
-    private boolean isCropOutput;
-    private int flashMode;
-    private int facing;
-    private boolean isVideoMode;
+    private final boolean isLock;
+    private final boolean isCropOutput;
+    private final int flashMode;
+    private final int facing;
+    private final boolean isVideoMode;
 
     private Camera(Builder builder) {
         flashMode = builder.flashMode;

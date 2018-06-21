@@ -7,10 +7,10 @@ import android.view.View;
 /**
  * use for add space between item in recycler view
  */
-public class SpacesItemDecoration extends RecyclerView.ItemDecoration{
-    private int space;
+class SpacesItemDecoration extends RecyclerView.ItemDecoration {
+    private final int space;
 
-    public SpacesItemDecoration(int space) {
+    SpacesItemDecoration(int space) {
         this.space = space;
     }
 

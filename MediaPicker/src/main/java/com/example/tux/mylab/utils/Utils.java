@@ -7,7 +7,6 @@ import android.support.v4.content.FileProvider;
 import android.support.v4.content.MimeTypeFilter;
 
 import java.io.File;
-import java.util.regex.Pattern;
 
 /**
  * Created by dev22 on 5/16/17.

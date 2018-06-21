@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
@@ -7,7 +9,8 @@
         android:id="@+id/thumb"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:contentDescription="@string/image_description" />
+        android:contentDescription="@string/image_description"
+        tools:background="@color/colorAccent" />
 
     <TextView
         android:id="@+id/txt"
@@ -17,14 +20,26 @@
         android:background="@color/colorBackgroundTextGallery"
         android:ellipsize="middle"
         android:padding="@dimen/gallery_item_text_padding"
+        android:singleLine="true"
         android:textColor="@color/colorTextGallery"
         android:textSize="12sp"
-        android:singleLine="true" />
+        tools:text="file name" />
 
     <android.support.v7.widget.AppCompatCheckBox
         android:id="@+id/tick"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end"
-        android:visibility="gone" />
+        android:visibility="gone"
+        tools:visibility="visible" />
+
+    <ImageView
+        android:layout_gravity="center"
+        android:id="@+id/video_icon"
+        android:layout_width="@dimen/gallery_item_video_size"
+        android:layout_height="@dimen/gallery_item_video_size"
+        android:contentDescription="@string/image_description"
+        android:visibility="gone"
+        app:srcCompat="@drawable/ic_play_circle_outline_white_48dp"
+        tools:visibility="visible" />
 </FrameLayout>

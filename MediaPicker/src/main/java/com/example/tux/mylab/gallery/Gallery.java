@@ -38,11 +38,11 @@ public class Gallery implements Parcelable {
     /**
      * @see Gallery.Builder#isCropOutput(boolean)
      */
-    private boolean isCropOutput;
+    private final boolean isCropOutput;
     /**
      * @see Gallery.Builder#isMultiChoice(boolean)
      */
-    private boolean isMultiChoice;
+    private final boolean isMultiChoice;
 
     @ViewType
     public int getViewType() {

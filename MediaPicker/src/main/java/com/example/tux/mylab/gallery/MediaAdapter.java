@@ -17,6 +17,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.example.tux.mylab.R;
 import com.example.tux.mylab.gallery.data.BaseItemObject;
 import com.example.tux.mylab.gallery.data.MediaFile;
+import com.example.tux.mylab.utils.Utils;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -33,7 +34,7 @@ class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     /**
      * option for load glide
      */
-    private RequestOptions defaultOptions = new RequestOptions()
+    private final RequestOptions defaultOptions = new RequestOptions()
             .centerCrop()
             .error(R.drawable.ic_broken_image_blue_grey_900_48dp);
 
@@ -138,6 +139,9 @@ class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                     if (myEvent != null) myEvent.OnItemClick(itemPosition);
                 }
             });
+
+            // show video icon
+            itemHolder.videoIcon.setVisibility(Utils.isPhoto(mediaFile.getMineType()) ? View.GONE : View.VISIBLE);
         }
     }
 
@@ -343,12 +347,14 @@ class ItemHolder extends RecyclerView.ViewHolder {
     final ImageView thumb;
     final TextView text;
     final AppCompatCheckBox tick;
+    public ImageView videoIcon;
 
     ItemHolder(View itemView) {
         super(itemView);
         thumb = itemView.findViewById(R.id.thumb);
         text = itemView.findViewById(R.id.txt);
         tick = itemView.findViewById(R.id.tick);
+        videoIcon = itemView.findViewById(R.id.video_icon);
     }
 }
 
