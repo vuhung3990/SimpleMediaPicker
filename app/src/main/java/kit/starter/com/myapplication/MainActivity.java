@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.pick_image:
                 new Gallery.Builder()
                         .isMultiChoice(true)
-                        .viewType(Gallery.VIEW_TYPE_FOLDER)
+                        .viewType(Gallery.VIEW_TYPE_PHOTOS_ONLY)
                         .isCropOutput(false)
                         .build()
                         .start(this);

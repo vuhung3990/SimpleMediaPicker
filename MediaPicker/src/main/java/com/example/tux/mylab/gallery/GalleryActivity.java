@@ -35,7 +35,7 @@ public class GalleryActivity extends MediaPickerBaseActivity implements GalleryC
     private static final int OPEN_SETTING = 39;
     private MediaAdapter adapter;
     private GalleryPresenter presenter;
-    private Spinner sortType;
+    private Spinner viewType;
     /**
      * @see #changeDisplayType(int)
      */
@@ -84,8 +84,8 @@ public class GalleryActivity extends MediaPickerBaseActivity implements GalleryC
         fab.setOnClickListener(this);
 
         // change sort type
-        sortType = findViewById(R.id.sort_type);
-        sortType.setOnItemSelectedListener(this);
+        viewType = findViewById(R.id.sort_type);
+        viewType.setOnItemSelectedListener(this);
 
         // selected item
         txtSelected = findViewById(R.id.txt_selected);
@@ -108,11 +108,22 @@ public class GalleryActivity extends MediaPickerBaseActivity implements GalleryC
         if (input != null) {
             adapter.setChoiceMode(input.isMultiChoice());
             changeDisplayType(input.getViewType());
+            lockSelectViewType(input.getViewType());
             isCrop = input.isCropOutput();
         } else {
             Log.e("media-picker", "input not valid");
             finish();
         }
+    }
+
+    /**
+     * lock select view type if {@link Gallery#VIEW_TYPE_PHOTOS_ONLY} or {@link Gallery#VIEW_TYPE_VIDEOS_ONLY}
+     *
+     * @param viewType to check
+     */
+    private void lockSelectViewType(int viewType) {
+        boolean isLock = viewType == Gallery.VIEW_TYPE_PHOTOS_ONLY || viewType == Gallery.VIEW_TYPE_VIDEOS_ONLY;
+        this.viewType.setEnabled(!isLock);
     }
 
     /**
@@ -250,25 +261,31 @@ public class GalleryActivity extends MediaPickerBaseActivity implements GalleryC
      *
      * @param type 0: time, 1: folder, 2: photos, 3: videos
      */
-    private void changeDisplayType(int type) {
+    private void changeDisplayType(@Gallery.ViewType int type) {
         if (currentDisplayType != type) {
             currentDisplayType = type;
             switch (type) {
-                case 1:
+                case Gallery.VIEW_TYPE_FOLDER:
                     adapter.sortByFolder();
                     break;
-                case 2:
+                case Gallery.VIEW_TYPE_PHOTOS:
+                case Gallery.VIEW_TYPE_PHOTOS_ONLY:
+                    // case VIEW_TYPE_PHOTOS_ONLY => re-define type to for `viewType.setSelection(type)`
+                    type = Gallery.VIEW_TYPE_PHOTOS;
                     adapter.sortByPhotos();
                     break;
-                case 3:
+                case Gallery.VIEW_TYPE_VIDEOS:
+                case Gallery.VIEW_TYPE_VIDEOS_ONLY:
+                    // case VIEW_TYPE_VIDEOS_ONLY => re-define type to for `viewType.setSelection(type)`
+                    type = Gallery.VIEW_TYPE_VIDEOS;
                     adapter.sortByVideos();
                     break;
-                default:
+                case Gallery.VIEW_TYPE_TIME:
                     adapter.sortByTime();
                     break;
             }
 
-            sortType.setSelection(type);
+            viewType.setSelection(type);
         }
     }
 
@@ -297,7 +314,7 @@ public class GalleryActivity extends MediaPickerBaseActivity implements GalleryC
      * @param total of item selected
      */
     private void showSelectedToolbar(int total) {
-        sortType.setVisibility(View.GONE);
+        viewType.setVisibility(View.GONE);
         txtSelected.setVisibility(View.VISIBLE);
         confirmSelect.setVisibility(View.VISIBLE);
 
@@ -308,7 +325,7 @@ public class GalleryActivity extends MediaPickerBaseActivity implements GalleryC
      * restore default toolbar
      */
     private void restoreToolbar() {
-        sortType.setVisibility(View.VISIBLE);
+        viewType.setVisibility(View.VISIBLE);
         txtSelected.setVisibility(View.GONE);
         confirmSelect.setVisibility(View.GONE);
     }

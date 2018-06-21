@@ -166,10 +166,12 @@ class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             case Gallery.VIEW_TYPE_FOLDER:
                 sortByFolder();
                 break;
+            case Gallery.VIEW_TYPE_PHOTOS_ONLY:
             case Gallery.VIEW_TYPE_PHOTOS:
                 sortByPhotos();
                 break;
             case Gallery.VIEW_TYPE_VIDEOS:
+            case Gallery.VIEW_TYPE_VIDEOS_ONLY:
                 sortByVideos();
                 break;
             default:
@@ -252,7 +254,7 @@ class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         displayMediaList.clear();
         displayType = Gallery.VIEW_TYPE_PHOTOS;
         for (MediaFile media : mediaData) {
-            if (isPhoto(media.getPath())) {
+            if (isPhoto(media.getMineType())) {
                 displayMediaList.add(media);
             }
         }
@@ -269,7 +271,7 @@ class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         displayMediaList.clear();
         displayType = Gallery.VIEW_TYPE_VIDEOS;
         for (MediaFile media : mediaData) {
-            if (!isPhoto(media.getPath())) {
+            if (!isPhoto(media.getMineType())) {
                 displayMediaList.add(media);
             }
         }
