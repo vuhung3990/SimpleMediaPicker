@@ -24,7 +24,7 @@ public class GalleryRepository implements GalleryContract.Repository {
 
     @Override
     public void onGetAllMediaFile(Event event) {
-        new GetMediaFilesAsync(context.getApplicationContext(), event).execute();
+        new GetMediaFilesAsync(event).execute(context.getApplicationContext());
     }
 
     public interface Event {
@@ -34,14 +34,12 @@ public class GalleryRepository implements GalleryContract.Repository {
     /**
      * get all media files will take some seconds
      */
-    private static class GetMediaFilesAsync extends AsyncTask<Void, Void, List<MediaFile>> {
+    private static class GetMediaFilesAsync extends AsyncTask<Context, Void, List<MediaFile>> {
 
-        private final Context appContext;
         private final String[] projection;
         private final Event event;
 
-        GetMediaFilesAsync(Context appContext, Event event) {
-            this.appContext = appContext;
+        GetMediaFilesAsync(Event event) {
             this.event = event;
 
             projection = new String[]{
@@ -53,7 +51,8 @@ public class GalleryRepository implements GalleryContract.Repository {
         }
 
         @Override
-        protected List<MediaFile> doInBackground(Void... params) {
+        protected List<MediaFile> doInBackground(Context... params) {
+            Context appContext = params[0];
             Cursor mergeCursor = new MergeCursor(new Cursor[]{
                     appContext.getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, projection, null, null, null),
                     appContext.getContentResolver().query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, projection, null, null, null)

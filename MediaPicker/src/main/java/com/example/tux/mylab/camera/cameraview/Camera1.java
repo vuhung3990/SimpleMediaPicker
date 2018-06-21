@@ -346,25 +346,12 @@ class Camera1 extends CameraViewImpl {
 
         // Step 4: Set output file
         outputVideoFile = getOutputMediaFile();
-        if(outputVideoFile == null) return false;
+        if (outputVideoFile == null) return false;
         mMediaRecorder.setOutputFile(outputVideoFile.getAbsolutePath());
 
         // Step 5: Set the preview output
         mMediaRecorder.setPreviewDisplay(mPreview.getSurface());
 
-        // Step 6: Prepare configured MediaRecorder
-        try {
-            mMediaRecorder.prepare();
-            Log.d("camera", "prepare");
-        } catch (IllegalStateException e) {
-            Log.d("camera", "IllegalStateException preparing MediaRecorder: " + e.getMessage());
-            releaseMediaRecorder();
-            return false;
-        } catch (IOException e) {
-            Log.d("camera", "IOException preparing MediaRecorder: " + e.getMessage());
-            releaseMediaRecorder();
-            return false;
-        }
         return true;
     }
 
@@ -391,22 +378,49 @@ class Camera1 extends CameraViewImpl {
     @Override
     void toggleRecordVideo(Context context) {
         if (!isInitialing) {
-        if (isRecordingVideo) {
-            // stop recording and release camera
-            releaseMediaRecorder(); // release the MediaRecorder object
+            if (isRecordingVideo) {
+                // stop recording and release camera
+                releaseMediaRecorder(); // release the MediaRecorder object
 
-            // inform the user that recording has stopped
-            isRecordingVideo = false;
-            // scan file for notify add new video
-            if (outputVideoFile != null)
-                Utils.scanFile(context.getApplicationContext(), outputVideoFile);
-            mCallback.onSaveVideo(outputVideoFile);
-        } else {
-            // initialize video camera
+                // inform the user that recording has stopped
+                isRecordingVideo = false;
+                // scan file for notify add new video
+                if (outputVideoFile != null)
+                    Utils.scanFile(context.getApplicationContext(), outputVideoFile);
+                mCallback.onSaveVideo(outputVideoFile);
+            } else {
+                // initialize video camera
                 isInitialing = true;
-            new MediaPrepareTask().execute();
+
+                if (prepareVideoRecorder()) {
+                    // Camera is available and unlocked, MediaRecorder is prepared,
+                    // now you can start recording
+                    mMediaRecorder.start();
+
+                    isRecordingVideo = true;
+                    new MediaPrepareTask(new MediaPrepareTask.MediaPrepareListener() {
+                        @Override
+                        public void onSuccess() {
+                            isRecordingVideo = true;
+                        }
+
+                        @Override
+                        public void onError() {
+                            releaseMediaRecorder();
+                        }
+
+                        @Override
+                        public void onComplete() {
+                            // inform the user that recording has started
+                            isInitialing = false;
+                        }
+                    }).execute(mMediaRecorder);
+                } else {
+                    // prepare didn't work, release the camera
+                    releaseMediaRecorder();
+                }
+            }
         }
-    }
     }
 
     /**
@@ -467,20 +481,20 @@ class Camera1 extends CameraViewImpl {
         }
         Size size = chooseOptimalSize(sizes);
         // Always re-apply camera parameters
-            // Largest picture size in this ratio
-            final Size pictureSize = mPictureSizes.sizes(mAspectRatio).last();
-            if (mShowingPreview) {
-                mCamera.stopPreview();
-            }
-            mCameraParameters.setPreviewSize(size.getWidth(), size.getHeight());
-            mCameraParameters.setPictureSize(pictureSize.getWidth(), pictureSize.getHeight());
-            mCameraParameters.setRotation(calcCameraRotation(mDisplayOrientation));
-            setAutoFocusInternal(mAutoFocus);
-            setFlashInternal(mFlash);
-            mCamera.setParameters(mCameraParameters);
-            if (mShowingPreview) {
-                mCamera.startPreview();
-            }
+        // Largest picture size in this ratio
+        final Size pictureSize = mPictureSizes.sizes(mAspectRatio).last();
+        if (mShowingPreview) {
+            mCamera.stopPreview();
+        }
+        mCameraParameters.setPreviewSize(size.getWidth(), size.getHeight());
+        mCameraParameters.setPictureSize(pictureSize.getWidth(), pictureSize.getHeight());
+        mCameraParameters.setRotation(calcCameraRotation(mDisplayOrientation));
+        setAutoFocusInternal(mAutoFocus);
+        setFlashInternal(mFlash);
+        mCamera.setParameters(mCameraParameters);
+        if (mShowingPreview) {
+            mCamera.startPreview();
+        }
     }
 
     @SuppressWarnings("SuspiciousNameCombination")
@@ -618,32 +632,48 @@ class Camera1 extends CameraViewImpl {
     /**
      * Asynchronous task for preparing the {@link android.media.MediaRecorder} since it's a long blocking operation.
      */
-    private class MediaPrepareTask extends AsyncTask<Void, Void, Boolean> {
+    private static class MediaPrepareTask extends AsyncTask<MediaRecorder, Void, Boolean> {
+        private final MediaPrepareListener mediaPrepareListener;
+
+        interface MediaPrepareListener {
+            void onSuccess();
+
+            void onError();
+
+            void onComplete();
+        }
+
+        MediaPrepareTask(MediaPrepareListener mediaPrepareListener) {
+            this.mediaPrepareListener = mediaPrepareListener;
+        }
 
         @Override
-        protected Boolean doInBackground(Void... voids) {
-            // initialize video camera
-            if (prepareVideoRecorder()) {
-                // Camera is available and unlocked, MediaRecorder is prepared,
-                // now you can start recording
-                mMediaRecorder.start();
+        protected Boolean doInBackground(MediaRecorder... param) {
+            MediaRecorder mediaRecorder = param[0];
 
-                isRecordingVideo = true;
-            } else {
-                // prepare didn't work, release the camera
-                releaseMediaRecorder();
+            // Step 6: Prepare configured MediaRecorder
+            try {
+                mediaRecorder.prepare();
+                Log.d("camera", "prepare");
+            } catch (IllegalStateException e) {
+                Log.d("camera", "IllegalStateException preparing MediaRecorder: " + e.getMessage());
+                return false;
+            } catch (IOException e) {
+                Log.d("camera", "IOException preparing MediaRecorder: " + e.getMessage());
                 return false;
             }
+
+            // Camera is available and unlocked, MediaRecorder is prepared,
+            // now you can start recording
+            mediaRecorder.start();
             return true;
         }
 
         @Override
         protected void onPostExecute(Boolean result) {
-            if (!result) {
-                Log.e("CameraView", "onPostExecute: " + result);
-            }
-            // inform the user that recording has started
-            isInitialing = false;
+            if (result) mediaPrepareListener.onSuccess();
+            else mediaPrepareListener.onError();
+            mediaPrepareListener.onComplete();
         }
     }
 }
