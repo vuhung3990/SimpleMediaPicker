@@ -207,7 +207,7 @@ class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         });
 
         String currentDate = null;
-        SimpleDateFormat fmt = new SimpleDateFormat("yyyyMMdd", Locale.US);
+        SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
         for (MediaFile media : mediaData) {
             Date date = new Date(media.getTime());
             String formattedDate = fmt.format(date);
