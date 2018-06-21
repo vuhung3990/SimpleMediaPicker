@@ -101,12 +101,12 @@ class Camera1 extends CameraViewImpl {
         // To be safe, you should check that the SDCard is mounted
         // using Environment.getExternalStorageState() before doing this.
 
-        File mediaStorageDir = new File(Environment.getExternalStorageDirectory(), "MyVideos");
+        File mediaStorageDir = new File(Environment.getExternalStorageDirectory(), "DCIM/Camera");
         // This location works best if you want the created images to be shared
         // between applications and persist after your app has been uninstalled.
 
         // Create the storage directory if it does not exist
-        if (!mediaStorageDir.exists()) {
+        if (!mediaStorageDir.exists() || !mediaStorageDir.isDirectory()) {
             if (!mediaStorageDir.mkdirs()) {
                 Log.d("MyCameraApp", "failed to create directory");
                 return null;
@@ -393,14 +393,12 @@ class Camera1 extends CameraViewImpl {
                 isInitialing = true;
 
                 if (prepareVideoRecorder()) {
-                    // Camera is available and unlocked, MediaRecorder is prepared,
-                    // now you can start recording
-                    mMediaRecorder.start();
-
-                    isRecordingVideo = true;
                     new MediaPrepareTask(new MediaPrepareTask.MediaPrepareListener() {
                         @Override
                         public void onSuccess() {
+                            // Camera is available and unlocked, MediaRecorder is prepared,
+                            // now you can start recording
+                            mMediaRecorder.start();
                             isRecordingVideo = true;
                         }
 
@@ -663,9 +661,6 @@ class Camera1 extends CameraViewImpl {
                 return false;
             }
 
-            // Camera is available and unlocked, MediaRecorder is prepared,
-            // now you can start recording
-            mediaRecorder.start();
             return true;
         }
 

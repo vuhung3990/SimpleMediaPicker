@@ -4,23 +4,37 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.IntDef;
 
 /**
  * input builder for gallery<br/>
- * <p>- sort type = time</p>
+ * <p>- view type = time</p>
  * <p>- multi choice = false</p>
  */
 public class Gallery implements Parcelable {
-    public static final int SORT_BY_TIME = 0;
-    public static final int SORT_BY_FOLDER = 1;
-    public static final int SORT_BY_PHOTOS = 2;
-    public static final int SORT_BY_VIDEOS = 3;
+    public static final int VIEW_TYPE_TIME = 0;
+    public static final int VIEW_TYPE_FOLDER = 1;
+    public static final int VIEW_TYPE_PHOTOS = 2;
+    public static final int VIEW_TYPE_PHOTOS_ONLY = 4;
+    public static final int VIEW_TYPE_VIDEOS = 3;
+    public static final int VIEW_TYPE_VIDEOS_ONLY = 5;
+
+    @IntDef({
+            VIEW_TYPE_PHOTOS,
+            VIEW_TYPE_VIDEOS,
+            VIEW_TYPE_TIME,
+            VIEW_TYPE_FOLDER,
+            VIEW_TYPE_PHOTOS_ONLY,
+            VIEW_TYPE_VIDEOS_ONLY
+    })
+    @interface ViewType {
+    }
 
     /**
      * The integer request code originally supplied to startActivityForResult(), allowing you to identify who this result came from.
      */
     public static final int REQUEST_CODE_GALLERY = 55;
-    private final int sortType;
+    private final int viewType;
     /**
      * @see Gallery.Builder#isCropOutput(boolean)
      */
@@ -30,20 +44,27 @@ public class Gallery implements Parcelable {
      */
     private boolean isMultiChoice;
 
-    public int getSortType() {
-        return sortType;
+    @ViewType
+    public int getViewType() {
+        return viewType;
     }
 
+    /**
+     * @return true: allow select multiple files, false: select one
+     */
     public boolean isMultiChoice() {
         return isMultiChoice;
     }
 
+    /**
+     * @return true: crop after take photo
+     */
     public boolean isCropOutput() {
         return isCropOutput;
     }
 
     private Gallery(Builder builder) {
-        sortType = builder.sortType;
+        viewType = builder.viewType;
         isMultiChoice = builder.isMultiChoice;
         isCropOutput = builder.isCropOutput;
     }
@@ -60,23 +81,22 @@ public class Gallery implements Parcelable {
     }
 
     public static final class Builder {
-        private int sortType = Gallery.SORT_BY_TIME;
+        private int viewType = Gallery.VIEW_TYPE_TIME;
         private boolean isMultiChoice = false;
         private boolean isCropOutput;
 
         public Builder() {
-
         }
 
         /**
          * available values
-         * <p>{@link #SORT_BY_FOLDER}</p>
-         * <p>{@link #SORT_BY_PHOTOS}</p>
-         * <p>{@link #SORT_BY_VIDEOS}</p>
-         * <p>{@link #SORT_BY_TIME}</p>
+         * <p>{@link #VIEW_TYPE_FOLDER}</p>
+         * <p>{@link #VIEW_TYPE_PHOTOS}</p>
+         * <p>{@link #VIEW_TYPE_VIDEOS}</p>
+         * <p>{@link #VIEW_TYPE_TIME}</p>
          */
-        public Builder sortType(int val) {
-            sortType = val;
+        public Builder viewType(@ViewType int val) {
+            viewType = val;
             return this;
         }
 
@@ -113,13 +133,13 @@ public class Gallery implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(this.sortType);
+        dest.writeInt(this.viewType);
         dest.writeByte(this.isMultiChoice ? (byte) 1 : (byte) 0);
         dest.writeByte(this.isCropOutput ? (byte) 1 : (byte) 0);
     }
 
     private Gallery(Parcel in) {
-        this.sortType = in.readInt();
+        this.viewType = in.readInt();
         this.isMultiChoice = in.readByte() != 0;
         this.isCropOutput = in.readByte() != 0;
     }

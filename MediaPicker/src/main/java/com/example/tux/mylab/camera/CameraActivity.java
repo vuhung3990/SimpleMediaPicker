@@ -253,7 +253,7 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
     public void openGallery(int stateCamera) {
         new Gallery.Builder()
                 .isMultiChoice(true)
-                .sortType(stateCamera == CameraContract.View.STATE_PHOTO ? Gallery.SORT_BY_PHOTOS : Gallery.SORT_BY_VIDEOS)
+                .viewType(stateCamera == CameraContract.View.STATE_PHOTO ? Gallery.VIEW_TYPE_PHOTOS : Gallery.VIEW_TYPE_VIDEOS)
                 .build()
                 .start(this);
     }

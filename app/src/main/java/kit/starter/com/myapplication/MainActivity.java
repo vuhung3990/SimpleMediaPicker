@@ -33,13 +33,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 new Camera.Builder()
                         .isVideoMode(false)
                         .flashMode(CameraView.FLASH_OFF)
+                        .isCropOutput(false)
+                        .facing(CameraView.FACING_FRONT)
                         .build()
                         .start(this);
                 break;
             case R.id.pick_image:
                 new Gallery.Builder()
                         .isMultiChoice(true)
-                        .sortType(Gallery.SORT_BY_FOLDER)
+                        .viewType(Gallery.VIEW_TYPE_FOLDER)
                         .isCropOutput(false)
                         .build()
                         .start(this);
@@ -47,7 +49,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.pick_video:
                 new Gallery.Builder()
                         .isMultiChoice(false)
-                        .sortType(Gallery.SORT_BY_VIDEOS)
+                        .viewType(Gallery.VIEW_TYPE_VIDEOS)
                         .build()
                         .start(this);
                 break;

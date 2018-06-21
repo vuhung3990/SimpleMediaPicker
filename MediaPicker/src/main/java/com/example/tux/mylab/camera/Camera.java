@@ -129,7 +129,7 @@ public class Camera implements Parcelable {
         /**
          * {@link CameraView#FACING_BACK} back camera, {@link CameraView#FACING_FRONT} front camera
          */
-        public Builder facing(int val) {
+        public Builder facing(@CameraView.Facing int val) {
             facing = val;
             return this;
         }

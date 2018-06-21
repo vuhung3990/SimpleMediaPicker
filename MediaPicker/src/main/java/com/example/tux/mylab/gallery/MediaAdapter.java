@@ -53,9 +53,9 @@ class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
      */
     private final List<BaseItemObject> displayMediaList = new ArrayList<>();
     /**
-     * display type values: {@link Gallery#SORT_BY_TIME}, {@link Gallery#SORT_BY_FOLDER}, {@link Gallery#SORT_BY_PHOTOS}, {@link Gallery#SORT_BY_VIDEOS}
+     * display type values: {@link Gallery#VIEW_TYPE_TIME}, {@link Gallery#VIEW_TYPE_FOLDER}, {@link Gallery#VIEW_TYPE_PHOTOS}, {@link Gallery#VIEW_TYPE_VIDEOS}
      */
-    private int displayType = Gallery.SORT_BY_TIME;
+    private int displayType = Gallery.VIEW_TYPE_TIME;
 
     MediaAdapter(Context context) {
         this.context = context;
@@ -163,13 +163,13 @@ class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private void generateData(int displayType) {
         switch (displayType) {
-            case Gallery.SORT_BY_FOLDER:
+            case Gallery.VIEW_TYPE_FOLDER:
                 sortByFolder();
                 break;
-            case Gallery.SORT_BY_PHOTOS:
+            case Gallery.VIEW_TYPE_PHOTOS:
                 sortByPhotos();
                 break;
-            case Gallery.SORT_BY_VIDEOS:
+            case Gallery.VIEW_TYPE_VIDEOS:
                 sortByVideos();
                 break;
             default:
@@ -191,7 +191,7 @@ class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
      */
     void sortByTime() {
         displayMediaList.clear();
-        displayType = Gallery.SORT_BY_TIME;
+        displayType = Gallery.VIEW_TYPE_TIME;
         Collections.sort(mediaData, new Comparator<MediaFile>() {
             @Override
             public int compare(MediaFile o1, MediaFile o2) {
@@ -223,7 +223,7 @@ class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
      */
     void sortByFolder() {
         displayMediaList.clear();
-        displayType = Gallery.SORT_BY_FOLDER;
+        displayType = Gallery.VIEW_TYPE_FOLDER;
         Collections.sort(mediaData, new Comparator<MediaFile>() {
             @Override
             public int compare(MediaFile o1, MediaFile o2) {
@@ -250,7 +250,7 @@ class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
      */
     void sortByPhotos() {
         displayMediaList.clear();
-        displayType = Gallery.SORT_BY_PHOTOS;
+        displayType = Gallery.VIEW_TYPE_PHOTOS;
         for (MediaFile media : mediaData) {
             if (isPhoto(media.getPath())) {
                 displayMediaList.add(media);
@@ -267,7 +267,7 @@ class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
      */
     void sortByVideos() {
         displayMediaList.clear();
-        displayType = Gallery.SORT_BY_VIDEOS;
+        displayType = Gallery.VIEW_TYPE_VIDEOS;
         for (MediaFile media : mediaData) {
             if (!isPhoto(media.getPath())) {
                 displayMediaList.add(media);

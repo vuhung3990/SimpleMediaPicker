@@ -107,7 +107,7 @@ public class GalleryActivity extends MediaPickerBaseActivity implements GalleryC
     private void config() {
         if (input != null) {
             adapter.setChoiceMode(input.isMultiChoice());
-            changeDisplayType(input.getSortType());
+            changeDisplayType(input.getViewType());
             isCrop = input.isCropOutput();
         } else {
             Log.e("media-picker", "input not valid");
