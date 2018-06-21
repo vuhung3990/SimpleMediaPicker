@@ -34,13 +34,18 @@ public class MediaFile extends BaseItemObject implements Parcelable {
      * date time taken in millisecond from 1970
      */
     private final long time;
+    /**
+     * mine type of file
+     */
+    private final String mineType;
 
-    public MediaFile(String name, String path, String folder, long time) {
+    public MediaFile(String name, String path, String folder, long time, String mineType) {
         super(BaseItemObject.TYPE_ITEM);
         this.name = name;
         this.path = path;
         this.folder = folder;
         this.time = time;
+        this.mineType = mineType;
     }
 
     private MediaFile(Parcel in) {
@@ -49,6 +54,11 @@ public class MediaFile extends BaseItemObject implements Parcelable {
         this.path = in.readString();
         this.folder = in.readString();
         this.time = in.readLong();
+        this.mineType = in.readString();
+    }
+
+    public String getMineType() {
+        return mineType;
     }
 
     public String getName() {
@@ -74,6 +84,7 @@ public class MediaFile extends BaseItemObject implements Parcelable {
                 ", path='" + path + '\'' +
                 ", folder='" + folder + '\'' +
                 ", time=" + time +
+                ", mineType='" + mineType + '\'' +
                 '}';
     }
 
@@ -88,5 +99,6 @@ public class MediaFile extends BaseItemObject implements Parcelable {
         dest.writeString(this.path);
         dest.writeString(this.folder);
         dest.writeLong(this.time);
+        dest.writeString(this.mineType);
     }
 }

@@ -37,6 +37,7 @@ import java.util.Locale;
 
 public class CameraActivity extends MediaPickerBaseActivity implements View.OnClickListener, CameraContract.View {
     private static final int REQUEST_PERMISSION_CAMERA = 77;
+    private static final String IMAGE_TYPE_JPG = "image/jpeg";
     private CameraPresenter presenter;
     private ImageView btnFlashMode;
     private ImageView btnTogglePhotoVideo;
@@ -202,7 +203,7 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
 
             @Override
             public void onVideoSaved(File outputVideoFile) {
-                sendResult(new MediaFile(outputVideoFile.getName(), outputVideoFile.getAbsolutePath(), outputVideoFile.getParentFile().getName(), System.currentTimeMillis()));
+                sendResult(new MediaFile(outputVideoFile.getName(), outputVideoFile.getAbsolutePath(), outputVideoFile.getParentFile().getName(), System.currentTimeMillis(), IMAGE_TYPE_JPG));
                 stopVideoRecordTimer();
             }
         });
@@ -443,6 +444,6 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
      */
     private void setResult(File file) {
         Utils.scanFile(getApplicationContext(), file);
-        sendResult(new MediaFile(file.getName(), file.getAbsolutePath(), file.getParentFile().getName(), System.currentTimeMillis()));
+        sendResult(new MediaFile(file.getName(), file.getAbsolutePath(), file.getParentFile().getName(), System.currentTimeMillis(), IMAGE_TYPE_JPG));
     }
 }

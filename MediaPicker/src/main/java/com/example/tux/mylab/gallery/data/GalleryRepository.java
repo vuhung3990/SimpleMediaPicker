@@ -46,7 +46,8 @@ public class GalleryRepository implements GalleryContract.Repository {
                     MediaStore.Video.Media.TITLE,
                     MediaStore.Video.Media.DATA,
                     MediaStore.Video.Media.BUCKET_DISPLAY_NAME,
-                    MediaStore.Video.Media.DATE_TAKEN
+                    MediaStore.Video.Media.DATE_TAKEN,
+                    MediaStore.Video.Media.MIME_TYPE
             };
         }
 
@@ -58,18 +59,21 @@ public class GalleryRepository implements GalleryContract.Repository {
                     appContext.getContentResolver().query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, projection, null, null, null)
             });
             List<MediaFile> mediaFiles = new ArrayList<>();
+
             if (mergeCursor.moveToFirst()) {
                 int colName = mergeCursor.getColumnIndex(MediaStore.Video.Media.TITLE);
                 int colPath = mergeCursor.getColumnIndex(MediaStore.Video.Media.DATA);
                 int colFolder = mergeCursor.getColumnIndex(MediaStore.Video.Media.BUCKET_DISPLAY_NAME);
                 int colTime = mergeCursor.getColumnIndex(MediaStore.Video.Media.DATE_TAKEN);
+                int colType = mergeCursor.getColumnIndex(MediaStore.Video.Media.MIME_TYPE);
 
                 while (!mergeCursor.isAfterLast()) {
                     MediaFile mf = new MediaFile(
                             mergeCursor.getString(colName),
                             mergeCursor.getString(colPath),
                             mergeCursor.getString(colFolder),
-                            mergeCursor.getLong(colTime)
+                            mergeCursor.getLong(colTime),
+                            mergeCursor.getString(colType)
                     );
                     mediaFiles.add(mf);
                     mergeCursor.moveToNext();

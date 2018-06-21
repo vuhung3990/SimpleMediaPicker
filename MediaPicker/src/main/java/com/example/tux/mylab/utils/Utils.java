@@ -4,6 +4,7 @@ import android.content.Context;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.support.v4.content.FileProvider;
+import android.support.v4.content.MimeTypeFilter;
 
 import java.io.File;
 import java.util.regex.Pattern;
@@ -16,7 +17,6 @@ public class Utils {
      * authority to get file uri using {@link FileProvider}
      */
     private static final String AUTHORITY = "com.tux.file_provider";
-    private static final String IMAGE_PATTERN = "([^\\s]+(\\.(?i)(jpg|png|gif|bmp))$)";
 
     /**
      * notify add new media file
@@ -29,11 +29,11 @@ public class Utils {
     }
 
     /**
-     * @param path file path to check
+     * @param mineType file's mine to check
      * @return true: if file ext is: jpg|png|gif|bmp
      */
-    public static boolean isPhoto(String path) {
-        return Pattern.compile(IMAGE_PATTERN).matcher(path).matches();
+    public static boolean isPhoto(String mineType) {
+        return MimeTypeFilter.matches(mineType, "image/*");
     }
 
     /**
