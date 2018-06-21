@@ -150,7 +150,10 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
     public void refreshCameraView() {
         try {
             pictureFolder = new File(Environment.getExternalStorageDirectory(), "Pictures");
+            //create container if not exist
+            if (!pictureFolder.exists() || !pictureFolder.isDirectory()) pictureFolder.mkdir();
             croppedFileOutput = new File(pictureFolder, "cropped.jpg");
+            //create if not exist
             croppedFileOutput.createNewFile();
         } catch (IOException e) {
             e.printStackTrace();
