@@ -45,6 +45,17 @@ public class GalleryActivity extends MediaPickerBaseActivity implements GalleryC
     private String txtFormat;
     private Gallery input;
     private boolean isCrop;
+    /**
+     * for set option camera
+     *
+     * @see #onClick(View)
+     * @see Camera.Builder#isVideoMode(boolean)
+     */
+    private boolean videoMode;
+    /**
+     * true: don not allow change view type
+     */
+    private boolean isLock;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,7 +133,7 @@ public class GalleryActivity extends MediaPickerBaseActivity implements GalleryC
      * @param viewType to check
      */
     private void lockSelectViewType(int viewType) {
-        boolean isLock = viewType == Gallery.VIEW_TYPE_PHOTOS_ONLY || viewType == Gallery.VIEW_TYPE_VIDEOS_ONLY;
+        isLock = viewType == Gallery.VIEW_TYPE_PHOTOS_ONLY || viewType == Gallery.VIEW_TYPE_VIDEOS_ONLY;
         this.viewType.setEnabled(!isLock);
     }
 
@@ -154,9 +165,10 @@ public class GalleryActivity extends MediaPickerBaseActivity implements GalleryC
             // show camera
             new Camera.Builder()
                     .facing(CameraView.FACING_BACK)
-                    .isVideoMode(false)
+                    .isVideoMode(videoMode)
                     .flashMode(CameraView.FLASH_AUTO)
                     .isCropOutput(isCrop)
+                    .isLock(isLock)
                     .build()
                     .start(this);
             return;
@@ -267,21 +279,25 @@ public class GalleryActivity extends MediaPickerBaseActivity implements GalleryC
             switch (type) {
                 case Gallery.VIEW_TYPE_FOLDER:
                     adapter.sortByFolder();
+                    videoMode = false;
                     break;
                 case Gallery.VIEW_TYPE_PHOTOS:
                 case Gallery.VIEW_TYPE_PHOTOS_ONLY:
                     // case VIEW_TYPE_PHOTOS_ONLY => re-define type to for `viewType.setSelection(type)`
                     type = Gallery.VIEW_TYPE_PHOTOS;
                     adapter.sortByPhotos();
+                    videoMode = false;
                     break;
                 case Gallery.VIEW_TYPE_VIDEOS:
                 case Gallery.VIEW_TYPE_VIDEOS_ONLY:
                     // case VIEW_TYPE_VIDEOS_ONLY => re-define type to for `viewType.setSelection(type)`
                     type = Gallery.VIEW_TYPE_VIDEOS;
                     adapter.sortByVideos();
+                    videoMode = true;
                     break;
                 case Gallery.VIEW_TYPE_TIME:
                     adapter.sortByTime();
+                    videoMode = false;
                     break;
             }
 

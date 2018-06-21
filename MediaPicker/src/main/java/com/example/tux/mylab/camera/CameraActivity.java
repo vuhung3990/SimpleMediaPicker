@@ -118,9 +118,21 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
             isCropOutput = input.isCropOutput();
             setFlashMode(input.getFlashMode());
             if (input.isVideoMode()) presenter.toggleVideoPhoto();
+
+            lockSelection(input.isLock());
         } else {
             Log.e("media-picker", "input not valid");
             finish();
+        }
+    }
+
+    /**
+     * invisible open gallery and change camera mode if param true
+     */
+    private void lockSelection(boolean lock) {
+        if (lock) {
+            btnTogglePhotoVideo.setVisibility(View.GONE);
+            btnOpenGallery.setVisibility(View.GONE);
         }
     }
 
