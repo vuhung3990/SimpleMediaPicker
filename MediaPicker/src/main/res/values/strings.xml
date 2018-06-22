@@ -7,4 +7,5 @@
     <string name="message_request_read_external">Bạn có muốn cấp quyền đọc file?</string>
     <string name="message_no_permission_require">Không có quyền truy cập file.</string>
     <string name="image_description">image</string>
+    <string name="max_duration">/%1$s:%2$s</string>
 </resources>

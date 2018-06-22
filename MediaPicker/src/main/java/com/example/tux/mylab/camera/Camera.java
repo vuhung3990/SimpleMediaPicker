@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.IntRange;
 import android.support.v4.app.Fragment;
 
 import com.example.tux.mylab.camera.cameraview.CameraView;
@@ -40,10 +41,12 @@ public class Camera implements Parcelable {
     private final int facing;
     private final boolean isVideoMode;
     private final boolean fixAspectRatio;
+    private int maxDuration;
 
     private Camera(Builder builder) {
         flashMode = builder.flashMode;
         facing = builder.facing;
+        maxDuration = builder.maxDuration;
         isVideoMode = builder.isVideoMode;
         isCropOutput = builder.isCropOutput;
         isLock = builder.isLock;
@@ -53,6 +56,7 @@ public class Camera implements Parcelable {
     private Camera(Parcel in) {
         this.flashMode = in.readInt();
         this.facing = in.readInt();
+        this.maxDuration = in.readInt();
         this.isVideoMode = in.readByte() != 0;
         this.isCropOutput = in.readByte() != 0;
         this.isLock = in.readByte() != 0;
@@ -132,10 +136,18 @@ public class Camera implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeInt(this.flashMode);
         dest.writeInt(this.facing);
+        dest.writeInt(this.maxDuration);
         dest.writeByte(this.isVideoMode ? (byte) 1 : (byte) 0);
         dest.writeByte(this.isCropOutput ? (byte) 1 : (byte) 0);
         dest.writeByte(this.isLock ? (byte) 1 : (byte) 0);
         dest.writeByte(this.fixAspectRatio ? (byte) 1 : (byte) 0);
+    }
+
+    /**
+     * @see Builder#maxDuration(int)
+     */
+    public int getMaxDuration() {
+        return maxDuration;
     }
 
     /**
@@ -148,6 +160,7 @@ public class Camera implements Parcelable {
         private boolean isCropOutput;
         private boolean isLock;
         private boolean fixAspectRatio;
+        private int maxDuration;
 
         public Builder() {
         }
@@ -213,6 +226,14 @@ public class Camera implements Parcelable {
          */
         public Builder fixAspectRatio(boolean fixAspectRatio) {
             this.fixAspectRatio = fixAspectRatio;
+            return this;
+        }
+
+        /**
+         * max duration allowed when record video (min=10_000), will ignore if {@link #videoMode(boolean)} = false
+         */
+        public Builder maxDuration(@IntRange(from = 10000) int maxDuration) {
+            this.maxDuration = maxDuration;
             return this;
         }
     }

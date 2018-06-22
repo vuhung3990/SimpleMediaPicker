@@ -2,6 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.tux.mylab">
 
+    <uses-sdk
+        android:maxSdkVersion="27"
+        android:minSdkVersion="14" />
+
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.CAMERA" />
 

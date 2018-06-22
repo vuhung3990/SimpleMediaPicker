@@ -10,7 +10,7 @@
     <dimen name="camera_item_padding">5dp</dimen>
     <dimen name="camera_margin_default">8dp</dimen>
     <dimen name="camera_action_size">38dp</dimen>
-    <dimen name="text_size_video_record_timer">24sp</dimen>
+    <dimen name="text_size_video_record_timer">18sp</dimen>
     <dimen name="text_size_dialog">14sp</dimen>
     <dimen name="gallery_item_padding">2dp</dimen>
     <dimen name="crop_min_size">150dp</dimen>

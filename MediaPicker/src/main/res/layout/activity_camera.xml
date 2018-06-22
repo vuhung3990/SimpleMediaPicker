@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                                             xmlns:app="http://schemas.android.com/apk/res-auto"
-                                             xmlns:tools="http://schemas.android.com/tools"
-                                             android:layout_width="match_parent"
-                                             android:layout_height="match_parent"
-                                             tools:context="com.example.tux.mylab.camera.CameraActivity">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.tux.mylab.camera.CameraActivity">
 
     <FrameLayout
         android:id="@+id/camera_view"
@@ -13,7 +13,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
         android:id="@+id/flash_mode"
@@ -25,7 +25,7 @@
         app:layout_constraintLeft_toRightOf="@+id/switch_camera"
         app:layout_constraintRight_toLeftOf="@+id/imgClose"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_flash_auto_white_24dp"/>
+        app:srcCompat="@drawable/ic_flash_auto_white_24dp" />
 
     <ImageView
         android:id="@+id/take_record"
@@ -40,7 +40,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:srcCompat="@drawable/ic_capture_white_48dp"/>
+        app:srcCompat="@drawable/ic_capture_white_48dp" />
 
     <ImageView
         android:id="@+id/toggle_video_photo"
@@ -51,7 +51,7 @@
         app:layout_constraintBottom_toBottomOf="@+id/take_record"
         app:layout_constraintLeft_toRightOf="@+id/take_record"
         app:layout_constraintRight_toRightOf="parent"
-        app:srcCompat="@drawable/ic_record_video_white_48dp"/>
+        app:srcCompat="@drawable/ic_record_video_white_48dp" />
 
     <ImageView
         android:id="@+id/open_gallery"
@@ -63,7 +63,7 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toLeftOf="@+id/take_record"
-        app:srcCompat="@drawable/ic_galerry_white_48dp"/>
+        app:srcCompat="@drawable/ic_galerry_white_48dp" />
 
     <ImageView
         android:id="@+id/imgClose"
@@ -74,7 +74,7 @@
         app:layout_constraintBottom_toBottomOf="@+id/flash_mode"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="@+id/flash_mode"
-        app:srcCompat="@drawable/ic_close_white_48dp"/>
+        app:srcCompat="@drawable/ic_close_white_48dp" />
 
     <ImageView
         android:id="@+id/switch_camera"
@@ -86,7 +86,7 @@
         app:layout_constraintBottom_toBottomOf="@+id/flash_mode"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="@+id/flash_mode"
-        app:srcCompat="@drawable/ic_font_back_camera"/>
+        app:srcCompat="@drawable/ic_font_back_camera" />
 
     <Chronometer
         android:id="@+id/video_record_timer"
@@ -95,8 +95,25 @@
         android:textColor="@android:color/holo_red_light"
         android:textSize="@dimen/text_size_video_record_timer"
         android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@id/take_record"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        tools:layout_editor_absoluteY="0dp"/>
+        app:layout_constraintBottom_toTopOf="@+id/take_record"
+        app:layout_constraintEnd_toStartOf="@+id/max_record_time"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:visibility="visible" />
+
+    <TextView
+        android:id="@+id/max_record_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@android:color/holo_red_light"
+        android:textSize="@dimen/text_size_video_record_timer"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/video_record_timer"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/video_record_timer"
+        tools:text=" / 03:15"
+        tools:visibility="visible" />
+
 </android.support.constraint.ConstraintLayout>

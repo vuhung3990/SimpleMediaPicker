@@ -59,6 +59,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 new Camera.Builder()
                         .facing(CameraView.FACING_FRONT)
                         .videoMode(true)
+                        .maxDuration(20000)
                         .flashMode(CameraView.FLASH_ON)
                         .build()
                         .start(this);

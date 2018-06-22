@@ -17,6 +17,7 @@ import android.view.View;
 import android.widget.Chronometer;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.example.tux.mylab.MediaPickerBaseActivity;
 import com.example.tux.mylab.R;
@@ -34,8 +35,13 @@ import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 public class CameraActivity extends MediaPickerBaseActivity implements View.OnClickListener, CameraContract.View {
+    /**
+     * default limit  = 3 minutes
+     */
+    private static final int DEFAULT_LIMIT_RECORD = 3 * 60 * 1000;
     private static final int REQUEST_PERMISSION_CAMERA = 77;
     private static final String IMAGE_TYPE_JPG = "image/jpeg";
     private CameraPresenter presenter;
@@ -67,6 +73,9 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
      */
     private boolean isCropOutput;
     private boolean isFixAspectRatio;
+    private int recordInMillisSeconds;
+    private int maxDuration;
+    private TextView maxRecordTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,6 +106,7 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
 
         // Chronometer video timer
         videoRecordTimer = findViewById(R.id.video_record_timer);
+        maxRecordTime = findViewById(R.id.max_record_time);
 
         // camera container
         cameraContainer = findViewById(R.id.camera_view);
@@ -121,6 +131,7 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
             if (input.isVideoMode()) presenter.toggleVideoPhoto();
             isFixAspectRatio = input.isFixAspectRatio();
             lockSelection(input.isLock());
+            maxDuration = input.getMaxDuration();
         } else {
             Log.e("media-picker", "input not valid");
             finish();
@@ -261,6 +272,7 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
 
         videoRecordTimer.stop();
         videoRecordTimer.setVisibility(View.GONE);
+        maxRecordTime.setVisibility(View.GONE);
     }
 
     @Override
@@ -353,9 +365,22 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
         btnTogglePhotoVideo.setVisibility(View.GONE);
         btnOpenGallery.setVisibility(View.GONE);
 
+        maxRecordTime.setVisibility(View.VISIBLE);
+        String minutes = String.format(Locale.US, "%02d", TimeUnit.MILLISECONDS.toMinutes(maxDuration));
+        String seconds = String.format(Locale.US, "%02d", TimeUnit.MILLISECONDS.toSeconds(maxDuration));
+        maxRecordTime.setText(getString(R.string.max_duration, minutes, seconds));
+
         videoRecordTimer.setVisibility(View.VISIBLE);
         videoRecordTimer.setBase(SystemClock.elapsedRealtime());
         videoRecordTimer.start();
+        recordInMillisSeconds = 0;
+        videoRecordTimer.setOnChronometerTickListener(new Chronometer.OnChronometerTickListener() {
+            @Override
+            public void onChronometerTick(Chronometer chronometer) {
+                recordInMillisSeconds += 1000;
+                if (recordInMillisSeconds >= maxDuration) mCameraView.toggleRecordVideo();
+            }
+        });
     }
 
     @Override
