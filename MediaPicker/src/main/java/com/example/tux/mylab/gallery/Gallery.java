@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.IntDef;
+import android.support.v4.app.Fragment;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -86,6 +87,17 @@ public class Gallery implements Parcelable {
         Intent intent = new Intent(activity, GalleryActivity.class);
         intent.putExtra("input", this);
         activity.startActivityForResult(intent, REQUEST_CODE_GALLERY);
+    }
+
+    /**
+     * start media picker
+     *
+     * @param fragment current activity
+     */
+    public void start(Fragment fragment) {
+        Intent intent = new Intent(fragment.getContext(), GalleryActivity.class);
+        intent.putExtra("input", this);
+        fragment.startActivityForResult(intent, REQUEST_CODE_GALLERY);
     }
 
     @Override

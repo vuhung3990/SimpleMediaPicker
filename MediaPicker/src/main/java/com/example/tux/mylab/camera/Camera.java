@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.v4.app.Fragment;
 
 import com.example.tux.mylab.camera.cameraview.CameraView;
 
@@ -64,6 +65,17 @@ public class Camera implements Parcelable {
         Intent intent = new Intent(activity, CameraActivity.class);
         intent.putExtra("input", this);
         activity.startActivityForResult(intent, REQUEST_CODE_CAMERA);
+    }
+
+    /**
+     * start media picker
+     *
+     * @param fragment current activity
+     */
+    public void start(Fragment fragment) {
+        Intent intent = new Intent(fragment.getContext(), CameraActivity.class);
+        intent.putExtra("input", this);
+        fragment.startActivityForResult(intent, REQUEST_CODE_CAMERA);
     }
 
     /**
