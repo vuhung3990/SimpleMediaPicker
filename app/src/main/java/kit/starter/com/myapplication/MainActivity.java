@@ -31,24 +31,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch (v.getId()) {
             case R.id.take_photo:
                 new Camera.Builder()
-                        .isVideoMode(false)
+                        .videoMode(false)
                         .flashMode(CameraView.FLASH_OFF)
-                        .isCropOutput(false)
+                        .cropOutput(true)
+                        .fixAspectRatio(true)
                         .facing(CameraView.FACING_FRONT)
                         .build()
                         .start(this);
                 break;
             case R.id.pick_image:
                 new Gallery.Builder()
-                        .isMultiChoice(true)
+                        .multiChoice(true)
                         .viewType(Gallery.VIEW_TYPE_PHOTOS_ONLY)
-                        .isCropOutput(false)
+                        .cropOutput(true)
+                        .fixAspectRatio(false)
                         .build()
                         .start(this);
                 break;
             case R.id.pick_video:
                 new Gallery.Builder()
-                        .isMultiChoice(false)
+                        .multiChoice(false)
                         .viewType(Gallery.VIEW_TYPE_VIDEOS)
                         .build()
                         .start(this);
@@ -56,7 +58,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.record_video:
                 new Camera.Builder()
                         .facing(CameraView.FACING_FRONT)
-                        .isVideoMode(true)
+                        .videoMode(true)
                         .flashMode(CameraView.FLASH_ON)
                         .build()
                         .start(this);

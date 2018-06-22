@@ -58,14 +58,15 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
      */
     private File pictureFolder;
     /**
-     * @see Camera.Builder#isCropOutput(boolean)
+     * @see Camera.Builder#cropOutput(boolean)
      */
     private File croppedFileOutput;
     /**
-     * @see Camera.Builder#isCropOutput(boolean)
+     * @see Camera.Builder#cropOutput(boolean)
      * @see #croppedFileOutput
      */
     private boolean isCropOutput;
+    private boolean isFixAspectRatio;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -118,7 +119,7 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
             isCropOutput = input.isCropOutput();
             setFlashMode(input.getFlashMode());
             if (input.isVideoMode()) presenter.toggleVideoPhoto();
-
+            isFixAspectRatio = input.isFixAspectRatio();
             lockSelection(input.isLock());
         } else {
             Log.e("media-picker", "input not valid");
@@ -241,7 +242,7 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
                 .setAllowRotation(false)
                 .setMultiTouchEnabled(false)
                 .setAutoZoomEnabled(false)
-                .setFixAspectRatio(true)
+                .setFixAspectRatio(isFixAspectRatio)
                 .setOutputUri(cropUri)
                 .setMinCropWindowSize(cropMinSize, cropMinSize)
                 .setCropMenuCropButtonIcon(R.drawable.ic_crop_white_24dp)
@@ -265,7 +266,7 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
     @Override
     public void openGallery(int stateCamera) {
         new Gallery.Builder()
-                .isMultiChoice(true)
+                .multiChoice(true)
                 .viewType(stateCamera == CameraContract.View.STATE_PHOTO ? Gallery.VIEW_TYPE_PHOTOS : Gallery.VIEW_TYPE_VIDEOS)
                 .build()
                 .start(this);

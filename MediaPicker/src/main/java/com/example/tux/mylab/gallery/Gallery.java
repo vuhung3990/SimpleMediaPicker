@@ -39,24 +39,27 @@ public class Gallery implements Parcelable {
     };
     private final int viewType;
     /**
-     * @see Gallery.Builder#isCropOutput(boolean)
+     * @see Gallery.Builder#cropOutput(boolean)
      */
-    private final boolean isCropOutput;
+    private final boolean cropOutput;
     /**
-     * @see Gallery.Builder#isMultiChoice(boolean)
+     * @see Gallery.Builder#multiChoice(boolean)
      */
-    private final boolean isMultiChoice;
+    private final boolean multiChoice;
+    private boolean fixAspectRatio;
 
     private Gallery(Builder builder) {
         viewType = builder.viewType;
-        isMultiChoice = builder.isMultiChoice;
-        isCropOutput = builder.isCropOutput;
+        multiChoice = builder.multiChoice;
+        cropOutput = builder.cropOutput;
+        fixAspectRatio = builder.fixAspectRatio;
     }
 
     private Gallery(Parcel in) {
         this.viewType = in.readInt();
-        this.isMultiChoice = in.readByte() != 0;
-        this.isCropOutput = in.readByte() != 0;
+        this.multiChoice = in.readByte() != 0;
+        this.cropOutput = in.readByte() != 0;
+        this.fixAspectRatio = in.readByte() != 0;
     }
 
     @ViewType
@@ -67,15 +70,15 @@ public class Gallery implements Parcelable {
     /**
      * @return true: allow select multiple files, false: select one
      */
-    public boolean isMultiChoice() {
-        return isMultiChoice;
+    public boolean multiChoice() {
+        return multiChoice;
     }
 
     /**
      * @return true: crop after take photo
      */
     public boolean isCropOutput() {
-        return isCropOutput;
+        return cropOutput;
     }
 
     /**
@@ -108,8 +111,16 @@ public class Gallery implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeInt(this.viewType);
-        dest.writeByte(this.isMultiChoice ? (byte) 1 : (byte) 0);
-        dest.writeByte(this.isCropOutput ? (byte) 1 : (byte) 0);
+        dest.writeByte(this.multiChoice ? (byte) 1 : (byte) 0);
+        dest.writeByte(this.cropOutput ? (byte) 1 : (byte) 0);
+        dest.writeByte(this.fixAspectRatio ? (byte) 1 : (byte) 0);
+    }
+
+    /**
+     * @see Builder#fixAspectRatio(boolean)
+     */
+    public boolean isFixAspectRatio() {
+        return fixAspectRatio;
     }
 
     @IntDef({
@@ -126,8 +137,9 @@ public class Gallery implements Parcelable {
 
     public static final class Builder {
         private int viewType = Gallery.VIEW_TYPE_TIME;
-        private boolean isMultiChoice = false;
-        private boolean isCropOutput;
+        private boolean multiChoice = false;
+        private boolean cropOutput;
+        private boolean fixAspectRatio;
 
         public Builder() {
         }
@@ -147,16 +159,16 @@ public class Gallery implements Parcelable {
         /**
          * true: enable multi choice, false: single choice
          */
-        public Builder isMultiChoice(boolean val) {
-            isMultiChoice = val;
+        public Builder multiChoice(boolean val) {
+            multiChoice = val;
             return this;
         }
 
         /**
-         * true: crop after take photo
+         * true: crop after take photo, ignore when {@link #viewType(int)} = {@link #VIEW_TYPE_VIDEOS} or {@link #VIEW_TYPE_VIDEOS_ONLY}
          */
-        public Builder isCropOutput(boolean val) {
-            isCropOutput = val;
+        public Builder cropOutput(boolean val) {
+            cropOutput = val;
             return this;
         }
 
@@ -167,6 +179,14 @@ public class Gallery implements Parcelable {
          */
         public Gallery build() {
             return new Gallery(this);
+        }
+
+        /**
+         * fix Aspect Ratio when crop image, will ignore if {@link #cropOutput(boolean)} = false
+         */
+        public Builder fixAspectRatio(boolean fixAspectRatio) {
+            this.fixAspectRatio = fixAspectRatio;
+            return this;
         }
     }
 }

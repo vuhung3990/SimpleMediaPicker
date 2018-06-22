@@ -12,7 +12,7 @@ import com.example.tux.mylab.camera.cameraview.CameraView;
  * input builder for camera<br/>
  * <p>- flash mode = FLASH_AUTO</p>
  * <p>- facing = FACING_BACK</p>
- * <p>- isVideoMode = false</p>
+ * <p>- videoMode = false</p>
  */
 public class Camera implements Parcelable {
     public static final Parcelable.Creator<Camera> CREATOR = new Parcelable.Creator<Camera>() {
@@ -39,6 +39,7 @@ public class Camera implements Parcelable {
     private final int flashMode;
     private final int facing;
     private final boolean isVideoMode;
+    private final boolean fixAspectRatio;
 
     private Camera(Builder builder) {
         flashMode = builder.flashMode;
@@ -46,6 +47,7 @@ public class Camera implements Parcelable {
         isVideoMode = builder.isVideoMode;
         isCropOutput = builder.isCropOutput;
         isLock = builder.isLock;
+        fixAspectRatio = builder.fixAspectRatio;
     }
 
     private Camera(Parcel in) {
@@ -54,6 +56,7 @@ public class Camera implements Parcelable {
         this.isVideoMode = in.readByte() != 0;
         this.isCropOutput = in.readByte() != 0;
         this.isLock = in.readByte() != 0;
+        this.fixAspectRatio = in.readByte() != 0;
     }
 
     /**
@@ -93,14 +96,14 @@ public class Camera implements Parcelable {
     }
 
     /**
-     * @see Builder#isVideoMode(boolean)
+     * @see Builder#videoMode(boolean)
      */
     public boolean isVideoMode() {
         return isVideoMode;
     }
 
     /**
-     * @see Builder#isCropOutput(boolean)
+     * @see Builder#cropOutput(boolean)
      */
     public boolean isCropOutput() {
         return isCropOutput;
@@ -111,6 +114,13 @@ public class Camera implements Parcelable {
      */
     public boolean isLock() {
         return isLock;
+    }
+
+    /**
+     * @see Builder#fixAspectRatio(boolean)
+     */
+    public boolean isFixAspectRatio() {
+        return fixAspectRatio;
     }
 
     @Override
@@ -125,6 +135,7 @@ public class Camera implements Parcelable {
         dest.writeByte(this.isVideoMode ? (byte) 1 : (byte) 0);
         dest.writeByte(this.isCropOutput ? (byte) 1 : (byte) 0);
         dest.writeByte(this.isLock ? (byte) 1 : (byte) 0);
+        dest.writeByte(this.fixAspectRatio ? (byte) 1 : (byte) 0);
     }
 
     /**
@@ -136,6 +147,7 @@ public class Camera implements Parcelable {
         private boolean isVideoMode;
         private boolean isCropOutput;
         private boolean isLock;
+        private boolean fixAspectRatio;
 
         public Builder() {
         }
@@ -164,7 +176,7 @@ public class Camera implements Parcelable {
         /**
          * @return true: for video mode, false: capture photo mode
          */
-        public Builder isVideoMode(boolean val) {
+        public Builder videoMode(boolean val) {
             isVideoMode = val;
             return this;
         }
@@ -179,10 +191,11 @@ public class Camera implements Parcelable {
         }
 
         /**
+         * crop output after take photo only work when {@link #videoMode(boolean)} = false
+         *
          * @param isCropOutput true: crop
-         * @return crop output after take photo
          */
-        public Builder isCropOutput(boolean isCropOutput) {
+        public Builder cropOutput(boolean isCropOutput) {
             this.isCropOutput = isCropOutput;
             return this;
         }
@@ -190,8 +203,16 @@ public class Camera implements Parcelable {
         /**
          * @return true: don not allow change camera mode and gallery
          */
-        public Builder isLock(boolean isLock) {
+        public Builder lock(boolean isLock) {
             this.isLock = isLock;
+            return this;
+        }
+
+        /**
+         * fix Aspect Ratio when crop image, will ignore if {@link #cropOutput(boolean)} = false
+         */
+        public Builder fixAspectRatio(boolean fixAspectRatio) {
+            this.fixAspectRatio = fixAspectRatio;
             return this;
         }
     }

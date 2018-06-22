@@ -44,18 +44,19 @@ public class GalleryActivity extends MediaPickerBaseActivity implements GalleryC
     private TextView confirmSelect;
     private String txtFormat;
     private Gallery input;
-    private boolean isCrop;
+    private boolean cropOutput;
     /**
      * for set option camera
      *
      * @see #onClick(View)
-     * @see Camera.Builder#isVideoMode(boolean)
+     * @see Camera.Builder#videoMode(boolean)
      */
     private boolean videoMode;
     /**
      * true: don not allow change view type
      */
     private boolean isLock;
+    private boolean fixAspectRatio;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,10 +118,11 @@ public class GalleryActivity extends MediaPickerBaseActivity implements GalleryC
      */
     private void config() {
         if (input != null) {
-            adapter.setChoiceMode(input.isMultiChoice());
+            adapter.setChoiceMode(input.multiChoice());
             changeDisplayType(input.getViewType());
             lockSelectViewType(input.getViewType());
-            isCrop = input.isCropOutput();
+            fixAspectRatio = input.isFixAspectRatio();
+            cropOutput = input.isCropOutput();
         } else {
             Log.e("media-picker", "input not valid");
             finish();
@@ -165,10 +167,11 @@ public class GalleryActivity extends MediaPickerBaseActivity implements GalleryC
             // show camera
             new Camera.Builder()
                     .facing(CameraView.FACING_BACK)
-                    .isVideoMode(videoMode)
+                    .videoMode(videoMode)
                     .flashMode(CameraView.FLASH_AUTO)
-                    .isCropOutput(isCrop)
-                    .isLock(isLock)
+                    .cropOutput(cropOutput)
+                    .fixAspectRatio(fixAspectRatio)
+                    .lock(isLock)
                     .build()
                     .start(this);
             return;
