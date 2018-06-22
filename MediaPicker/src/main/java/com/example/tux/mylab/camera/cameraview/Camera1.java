@@ -633,14 +633,6 @@ class Camera1 extends CameraViewImpl {
     private static class MediaPrepareTask extends AsyncTask<MediaRecorder, Void, Boolean> {
         private final MediaPrepareListener mediaPrepareListener;
 
-        interface MediaPrepareListener {
-            void onSuccess();
-
-            void onError();
-
-            void onComplete();
-        }
-
         MediaPrepareTask(MediaPrepareListener mediaPrepareListener) {
             this.mediaPrepareListener = mediaPrepareListener;
         }
@@ -669,6 +661,14 @@ class Camera1 extends CameraViewImpl {
             if (result) mediaPrepareListener.onSuccess();
             else mediaPrepareListener.onError();
             mediaPrepareListener.onComplete();
+        }
+
+        interface MediaPrepareListener {
+            void onSuccess();
+
+            void onError();
+
+            void onComplete();
         }
     }
 }

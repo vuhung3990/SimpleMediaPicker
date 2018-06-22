@@ -17,13 +17,13 @@ public abstract class MediaPickerBaseActivity extends AppCompatActivity {
      */
     public static final String RESULT_KEY = "data";
     /**
-     * true: send bundle cancel and exit, false: return gallery
-     */
-    protected boolean isCancelIntermediate = false;
-    /**
      * key og flag  {@link #isCancelIntermediate} in bundle
      */
     protected static final String FLAG_CANCEL_INTERMEDIATE = "FLAG_CANCEL_INTERMEDIATE";
+    /**
+     * true: send bundle cancel and exit, false: return gallery
+     */
+    protected boolean isCancelIntermediate = false;
 
     /**
      * cancel for camera, gallery

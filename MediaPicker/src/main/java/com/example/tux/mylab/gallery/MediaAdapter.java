@@ -39,20 +39,20 @@ class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             .error(R.drawable.ic_broken_image_blue_grey_900_48dp);
 
     private final Context context;
+    private final ArraySet<Integer> tickedPositions = new ArraySet<>();
+    /**
+     * NOTE: do not update this list, it's generated list by {@link #mediaData}
+     */
+    private final List<BaseItemObject> displayMediaList = new ArrayList<>();
     private MyEvent myEvent;
     /**
      * true: multi choice, false: single choice
      */
     private boolean isEnableMultiChoice = false;
-    private final ArraySet<Integer> tickedPositions = new ArraySet<>();
     /**
      * origin data (update data) => generate display data
      */
     private List<MediaFile> mediaData = new ArrayList<>();
-    /**
-     * NOTE: do not update this list, it's generated list by {@link #mediaData}
-     */
-    private final List<BaseItemObject> displayMediaList = new ArrayList<>();
     /**
      * display type values: {@link Gallery#VIEW_TYPE_TIME}, {@link Gallery#VIEW_TYPE_FOLDER}, {@link Gallery#VIEW_TYPE_PHOTOS}, {@link Gallery#VIEW_TYPE_VIDEOS}
      */

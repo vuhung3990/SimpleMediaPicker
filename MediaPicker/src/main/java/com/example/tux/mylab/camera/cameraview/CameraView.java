@@ -57,13 +57,13 @@ public class CameraView extends FrameLayout {
      */
     public static final int FLASH_ON = Constants.FLASH_ON;
     /**
-     * Constant emission of light during preview, auto-focus and snapshot.
-     */
-    private static final int FLASH_TORCH = Constants.FLASH_TORCH;
-    /**
      * Flash will be fired automatically when required.
      */
     public static final int FLASH_AUTO = Constants.FLASH_AUTO;
+    /**
+     * Constant emission of light during preview, auto-focus and snapshot.
+     */
+    private static final int FLASH_TORCH = Constants.FLASH_TORCH;
     /**
      * Flash will be fired in red-eye reduction mode.
      */
