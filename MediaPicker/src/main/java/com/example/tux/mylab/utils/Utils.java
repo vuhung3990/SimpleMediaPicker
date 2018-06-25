@@ -13,11 +13,6 @@ import java.io.File;
  */
 public class Utils {
     /**
-     * authority to get file uri using {@link FileProvider}
-     */
-    private static final String AUTHORITY = "com.tux.file_provider";
-
-    /**
      * notify add new media file
      *
      * @param appContext application context for avoid leak
@@ -40,6 +35,13 @@ public class Utils {
      * @return uri from file use {@link FileProvider}
      */
     public static Uri getFileUri(Context context, File file) {
-        return FileProvider.getUriForFile(context, AUTHORITY, file);
+        return FileProvider.getUriForFile(context, getAuthority(context), file);
+    }
+
+    /**
+     * authority to get file uri using {@link FileProvider}
+     */
+    private static String getAuthority(Context context) {
+        return context.getPackageName() + ".file_provider";
     }
 }
