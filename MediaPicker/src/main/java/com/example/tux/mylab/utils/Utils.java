@@ -12,6 +12,8 @@ import java.io.File;
  * Created by dev22 on 5/16/17.
  */
 public class Utils {
+    public static final String IMAGE_TYPE_JPG = "image/jpeg";
+    public static final String VIDEO_TYPE_MP4 = "video/mp4";
     /**
      * notify add new media file
      *

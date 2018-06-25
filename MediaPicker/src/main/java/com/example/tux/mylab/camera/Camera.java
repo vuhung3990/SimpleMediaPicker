@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.IntRange;
+import android.support.annotation.Keep;
 import android.support.v4.app.Fragment;
 
 import com.example.tux.mylab.camera.cameraview.CameraView;
@@ -15,6 +16,7 @@ import com.example.tux.mylab.camera.cameraview.CameraView;
  * <p>- facing = FACING_BACK</p>
  * <p>- videoMode = false</p>
  */
+@Keep
 public class Camera implements Parcelable {
     public static final Parcelable.Creator<Camera> CREATOR = new Parcelable.Creator<Camera>() {
         @Override
@@ -41,7 +43,7 @@ public class Camera implements Parcelable {
     private final int facing;
     private final boolean isVideoMode;
     private final boolean fixAspectRatio;
-    private int maxDuration;
+    private final int maxDuration;
 
     private Camera(Builder builder) {
         flashMode = builder.flashMode;
@@ -153,14 +155,19 @@ public class Camera implements Parcelable {
     /**
      * {@code Camera} builder static inner class.
      */
+    @Keep
     public static final class Builder {
+        /**
+         * default limit  = 3 minutes
+         */
+        private static final int DEFAULT_LIMIT_RECORD = 3 * 60 * 1000;
         private int flashMode;
         private int facing;
         private boolean isVideoMode;
         private boolean isCropOutput;
         private boolean isLock;
         private boolean fixAspectRatio;
-        private int maxDuration;
+        private int maxDuration = DEFAULT_LIMIT_RECORD;
 
         public Builder() {
         }

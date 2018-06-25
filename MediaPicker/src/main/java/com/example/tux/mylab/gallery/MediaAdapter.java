@@ -347,7 +347,7 @@ class ItemHolder extends RecyclerView.ViewHolder {
     final ImageView thumb;
     final TextView text;
     final AppCompatCheckBox tick;
-    public ImageView videoIcon;
+    public final ImageView videoIcon;
 
     ItemHolder(View itemView) {
         super(itemView);

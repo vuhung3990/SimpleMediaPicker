@@ -26,7 +26,10 @@ import com.example.tux.mylab.camera.Camera;
 import com.example.tux.mylab.camera.cameraview.CameraView;
 import com.example.tux.mylab.gallery.data.GalleryRepository;
 import com.example.tux.mylab.gallery.data.MediaFile;
+import com.example.tux.mylab.utils.Utils;
+import com.theartofdev.edmodo.cropper.CropImage;
 
+import java.io.File;
 import java.util.List;
 
 public class GalleryActivity extends MediaPickerBaseActivity implements GalleryContract.View, View.OnClickListener, AdapterView.OnItemSelectedListener, MediaAdapter.MyEvent {
@@ -187,10 +190,22 @@ public class GalleryActivity extends MediaPickerBaseActivity implements GalleryC
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // from camera
         if (resultCode == RESULT_OK && requestCode == Camera.REQUEST_CODE_CAMERA) {
             MediaFile file = (MediaFile) data.getParcelableArrayExtra(MediaPickerBaseActivity.RESULT_KEY)[0];
             sendResult(file);
         }
+        // from crop activity
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+            if (resultCode == RESULT_OK) {
+                setResult(croppedFileOutput);
+            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+                Exception error = result.getError();
+                error.printStackTrace();
+            }
+        }
+        // from permission setting
         if (requestCode == OPEN_SETTING) {
             if (!isHaveReadPermission()) {
                 noHaveRequirePermission();
@@ -315,7 +330,16 @@ public class GalleryActivity extends MediaPickerBaseActivity implements GalleryC
     @Override
     public void OnItemClick(int position) {
         // single choice => send result intermediate 
-        if (!adapter.isEnableMultiChoice()) sendResult(adapter.getItem(position));
+        if (!adapter.isEnableMultiChoice()) {
+            MediaFile item = adapter.getItem(position);
+            // crop = true, item is photo
+            if (cropOutput && Utils.isPhoto(item.getMineType())) {
+                File selectedFile = new File(item.getPath());
+                cropImage(selectedFile, croppedFileOutput, fixAspectRatio);
+            } else {
+                sendResult(item);
+            }
+        }
     }
 
     @Override

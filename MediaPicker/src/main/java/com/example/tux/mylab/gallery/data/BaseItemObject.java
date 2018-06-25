@@ -1,9 +1,11 @@
 package com.example.tux.mylab.gallery.data;
 
+import android.support.annotation.Keep;
+
 /**
  * Created by dev22 on 5/16/17.
  */
-
+@Keep
 public class BaseItemObject {
     public static final int TYPE_HEADER = 0;
     static final int TYPE_ITEM = 1;

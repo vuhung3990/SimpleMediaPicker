@@ -3,10 +3,7 @@ package com.example.tux.mylab.camera;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.SystemClock;
@@ -26,7 +23,6 @@ import com.example.tux.mylab.gallery.Gallery;
 import com.example.tux.mylab.gallery.data.MediaFile;
 import com.example.tux.mylab.utils.Utils;
 import com.theartofdev.edmodo.cropper.CropImage;
-import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -38,12 +34,7 @@ import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 public class CameraActivity extends MediaPickerBaseActivity implements View.OnClickListener, CameraContract.View {
-    /**
-     * default limit  = 3 minutes
-     */
-    private static final int DEFAULT_LIMIT_RECORD = 3 * 60 * 1000;
     private static final int REQUEST_PERMISSION_CAMERA = 77;
-    private static final String IMAGE_TYPE_JPG = "image/jpeg";
     private CameraPresenter presenter;
     private ImageView btnFlashMode;
     private ImageView btnTogglePhotoVideo;
@@ -56,20 +47,8 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
     private Chronometer videoRecordTimer;
     private ImageView btnOpenGallery;
     /**
-     * minimum size to crop
-     */
-    private int cropMinSize;
-    /**
-     * Pictures/ folder to save photo and cropped photo
-     */
-    private File pictureFolder;
-    /**
      * @see Camera.Builder#cropOutput(boolean)
-     */
-    private File croppedFileOutput;
-    /**
-     * @see Camera.Builder#cropOutput(boolean)
-     * @see #croppedFileOutput
+     * @see MediaPickerBaseActivity#croppedFileOutput
      */
     private boolean isCropOutput;
     private boolean isFixAspectRatio;
@@ -110,9 +89,6 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
 
         // camera container
         cameraContainer = findViewById(R.id.camera_view);
-
-        // crop config
-        cropMinSize = getResources().getDimensionPixelSize(R.dimen.crop_min_size);
 
         presenter = new CameraPresenter(this);
         setCancelFlag();
@@ -170,20 +146,8 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
      * add camera view into container
      * reason: refresh camera view for avoid flash issue
      */
-    @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
     public void refreshCameraView() {
-        try {
-            pictureFolder = new File(Environment.getExternalStorageDirectory(), "Pictures");
-            //create container if not exist
-            if (!pictureFolder.exists() || !pictureFolder.isDirectory()) pictureFolder.mkdir();
-            croppedFileOutput = new File(pictureFolder, "cropped.jpg");
-            //create if not exist
-            croppedFileOutput.createNewFile();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
         mCameraView = new CameraView(this);
         mCameraView.setAutoFocus(true);
         mCameraView.setFacing(facingMode);
@@ -218,7 +182,7 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
 
                         // option crop
                         if (isCropOutput)
-                            cropImage(file, croppedFileOutput);
+                            cropImage(file, croppedFileOutput, isFixAspectRatio);
                         else
                             setResult(file);
                     }
@@ -227,7 +191,7 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
 
             @Override
             public void onVideoSaved(File outputVideoFile) {
-                sendResult(new MediaFile(outputVideoFile.getName(), outputVideoFile.getAbsolutePath(), outputVideoFile.getParentFile().getName(), System.currentTimeMillis(), IMAGE_TYPE_JPG));
+                sendResult(new MediaFile(outputVideoFile.getName(), outputVideoFile.getAbsolutePath(), outputVideoFile.getParentFile().getName(), System.currentTimeMillis(), Utils.VIDEO_TYPE_MP4));
                 stopVideoRecordTimer();
             }
         });
@@ -235,29 +199,6 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
         cameraContainer.removeAllViews();
         cameraContainer.addView(mCameraView);
         mCameraView.start();
-    }
-
-    /**
-     * crop image using {@link com.theartofdev.edmodo.cropper.CropImageActivity}
-     *
-     * @param inputFile  image file to crop
-     * @param outputFile cropped file output
-     */
-    private void cropImage(File inputFile, File outputFile) {
-        Uri cropUri = Utils.getFileUri(this, outputFile);
-        Uri imageUri = Utils.getFileUri(this, inputFile);
-        CropImage.activity(imageUri)
-                .setGuidelines(CropImageView.Guidelines.ON)
-                .setAllowFlipping(false)
-                .setOutputCompressFormat(Bitmap.CompressFormat.JPEG)
-                .setAllowRotation(false)
-                .setMultiTouchEnabled(false)
-                .setAutoZoomEnabled(false)
-                .setFixAspectRatio(isFixAspectRatio)
-                .setOutputUri(cropUri)
-                .setMinCropWindowSize(cropMinSize, cropMinSize)
-                .setCropMenuCropButtonIcon(R.drawable.ic_crop_white_24dp)
-                .start(this);
     }
 
     /**
@@ -473,15 +414,5 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
                 error.printStackTrace();
             }
         }
-    }
-
-    /**
-     * after take photo or crop, send result back {@link #sendResult(MediaFile...)}
-     *
-     * @param file result to send back
-     */
-    private void setResult(File file) {
-        Utils.scanFile(getApplicationContext(), file);
-        sendResult(new MediaFile(file.getName(), file.getAbsolutePath(), file.getParentFile().getName(), System.currentTimeMillis(), IMAGE_TYPE_JPG));
     }
 }

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.IntDef;
+import android.support.annotation.Keep;
 import android.support.v4.app.Fragment;
 
 import java.lang.annotation.Retention;
@@ -15,6 +16,7 @@ import java.lang.annotation.RetentionPolicy;
  * <p>- view type = time</p>
  * <p>- multi choice = false</p>
  */
+@Keep
 public class Gallery implements Parcelable {
     public static final int VIEW_TYPE_TIME = 0;
     public static final int VIEW_TYPE_FOLDER = 1;
@@ -46,7 +48,7 @@ public class Gallery implements Parcelable {
      * @see Gallery.Builder#multiChoice(boolean)
      */
     private final boolean multiChoice;
-    private boolean fixAspectRatio;
+    private final boolean fixAspectRatio;
 
     private Gallery(Builder builder) {
         viewType = builder.viewType;
@@ -135,6 +137,7 @@ public class Gallery implements Parcelable {
     @interface ViewType {
     }
 
+    @Keep
     public static final class Builder {
         private int viewType = Gallery.VIEW_TYPE_TIME;
         private boolean multiChoice = false;
@@ -150,6 +153,8 @@ public class Gallery implements Parcelable {
          * <p>{@link #VIEW_TYPE_PHOTOS}</p>
          * <p>{@link #VIEW_TYPE_VIDEOS}</p>
          * <p>{@link #VIEW_TYPE_TIME}</p>
+         * <p>{@link #VIEW_TYPE_PHOTOS_ONLY}</p>
+         * <p>{@link #VIEW_TYPE_VIDEOS_ONLY}</p>
          */
         public Builder viewType(@ViewType int val) {
             viewType = val;
@@ -165,7 +170,10 @@ public class Gallery implements Parcelable {
         }
 
         /**
-         * true: crop after take photo, ignore when {@link #viewType(int)} = {@link #VIEW_TYPE_VIDEOS} or {@link #VIEW_TYPE_VIDEOS_ONLY}
+         * true: crop after pick or take photo
+         * <p>NOTE crop after pick image only work:</p>
+         * <p>- {@link #multiChoice(boolean)} = false</p>
+         * <p>- selected item is photo</p>
          */
         public Builder cropOutput(boolean val) {
             cropOutput = val;
