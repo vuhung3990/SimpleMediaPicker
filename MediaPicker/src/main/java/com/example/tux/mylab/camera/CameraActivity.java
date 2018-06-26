@@ -307,8 +307,8 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
         btnOpenGallery.setVisibility(View.GONE);
 
         maxRecordTime.setVisibility(View.VISIBLE);
-        String minutes = String.format(Locale.US, "%02d", TimeUnit.MILLISECONDS.toMinutes(maxDuration));
-        String seconds = String.format(Locale.US, "%02d", TimeUnit.MILLISECONDS.toSeconds(maxDuration));
+        long minutes = TimeUnit.MILLISECONDS.toMinutes(maxDuration) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(maxDuration));
+        long seconds = TimeUnit.MILLISECONDS.toSeconds(maxDuration) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(maxDuration));
         maxRecordTime.setText(getString(R.string.max_duration, minutes, seconds));
 
         videoRecordTimer.setVisibility(View.VISIBLE);

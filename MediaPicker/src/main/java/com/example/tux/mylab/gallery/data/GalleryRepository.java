@@ -24,7 +24,7 @@ public class GalleryRepository implements GalleryContract.Repository {
 
     @Override
     public void onGetAllMediaFile(Event event) {
-        new GetMediaFilesAsync(event).execute(context.getApplicationContext());
+        new GetMediaFilesAsync(event).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, context.getApplicationContext());
     }
 
     public interface Event {
