@@ -67,9 +67,9 @@ class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         RecyclerView.ViewHolder holder;
         if (viewType == TYPE_HEADER) {
-            holder = new HeaderHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.gallery_header, parent, false));
+            holder = new HeaderHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.gallery_header_265, parent, false));
         } else {
-            holder = new ItemHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.gallery_item, parent, false));
+            holder = new ItemHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.gallery_item_265, parent, false));
         }
 
         return holder;

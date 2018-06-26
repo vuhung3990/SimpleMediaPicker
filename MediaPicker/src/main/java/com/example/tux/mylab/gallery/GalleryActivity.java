@@ -64,7 +64,7 @@ public class GalleryActivity extends MediaPickerBaseActivity implements GalleryC
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_gallery);
+        setContentView(R.layout.activity_gallery_265);
         getInputBundle();
 
         presenter = new GalleryPresenter(this, new GalleryRepository(this));

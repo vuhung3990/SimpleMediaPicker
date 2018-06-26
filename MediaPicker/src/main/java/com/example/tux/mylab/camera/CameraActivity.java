@@ -59,7 +59,7 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_camera);
+        setContentView(R.layout.activity_camera_265);
         getInputBundle();
 
         //btn to close the application

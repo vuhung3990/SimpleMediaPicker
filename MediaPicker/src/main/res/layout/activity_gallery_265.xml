@@ -62,7 +62,7 @@
         </RelativeLayout>
     </android.support.design.widget.AppBarLayout>
 
-    <include layout="@layout/content_gallery" />
+    <include layout="@layout/content_gallery_265" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
