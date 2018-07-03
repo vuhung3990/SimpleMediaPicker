@@ -99,7 +99,7 @@ public class GalleryActivity extends MediaPickerBaseActivity implements GalleryC
         fab.setOnClickListener(this);
 
         // change sort type
-        viewType = findViewById(R.id.sort_type);
+        viewType = findViewById(R.id.view_type);
         viewType.setOnItemSelectedListener(this);
 
         // selected item

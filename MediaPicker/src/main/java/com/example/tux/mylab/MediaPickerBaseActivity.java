@@ -60,7 +60,9 @@ public abstract class MediaPickerBaseActivity extends AppCompatActivity {
             pictureFolder = new File(Environment.getExternalStorageDirectory(), "Pictures");
             //create container if not exist
             if (!pictureFolder.exists() || !pictureFolder.isDirectory()) pictureFolder.mkdir();
-            croppedFileOutput = new File(pictureFolder, "cropped.jpg");
+            // generate file name
+            String croppedFileName = System.currentTimeMillis() + ".jpg";
+            croppedFileOutput = new File(pictureFolder, croppedFileName);
             //create if not exist
             croppedFileOutput.createNewFile();
         } catch (IOException e) {

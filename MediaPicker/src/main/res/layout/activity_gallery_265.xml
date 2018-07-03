@@ -28,14 +28,15 @@
                 android:scaleType="fitXY"
                 app:srcCompat="@drawable/ic_arrow_back_white_18dp" />
 
-            <Spinner
-                android:id="@+id/sort_type"
+            <android.support.v7.widget.AppCompatSpinner
+                android:id="@+id/view_type"
                 style="@style/AppTheme.PopupOverlay"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:layout_toEndOf="@+id/back"
                 android:layout_toRightOf="@+id/back"
+                android:spinnerMode="dropdown"
                 android:entries="@array/sort_type" />
 
             <TextView
