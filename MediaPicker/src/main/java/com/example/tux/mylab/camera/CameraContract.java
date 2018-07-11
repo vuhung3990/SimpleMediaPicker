@@ -5,100 +5,105 @@ package com.example.tux.mylab.camera;
  */
 
 interface CameraContract {
-    interface View {
-        /**
-         * @see #changeIconPhotoVideo(int)
-         */
-        int STATE_PHOTO = 0;
-        /**
-         * @see #changeIconPhotoVideo(int)
-         */
-        int STATE_VIDEO = 1;
 
-        /**
-         * @return true: granted, false: denied
-         */
-        boolean isHaveRequirePermissions();
+  interface View {
 
-        /**
-         * request permission when not granted: camera, audio for record video, write external storage for save media file
-         */
-        void requestRequirePermission();
+    /**
+     * @see #changeIconPhotoVideo(int)
+     */
+    int STATE_PHOTO = 0;
+    /**
+     * @see #changeIconPhotoVideo(int)
+     */
+    int STATE_VIDEO = 1;
 
-        /**
-         * @return true: if this device has a camera, else otherwise
-         */
-        boolean hasCameraFeature();
+    /**
+     * @return true: granted, false: denied
+     */
+    boolean isHaveRequirePermissions();
 
-        /**
-         * capture image
-         */
-        void captureImage();
+    /**
+     * request permission when not granted: camera, audio for record video, write external storage
+     * for save media file
+     */
+    void requestRequirePermission();
 
-        /**
-         * record video
-         */
-        void recordVideo();
+    /**
+     * @return true: if this device has a camera, else otherwise
+     */
+    boolean hasCameraFeature();
 
-        /**
-         * change icon when change camera from take photo -> record video or record -> take
-         *
-         * @param state_camera {@link CameraContract.View#STATE_PHOTO}, {@link CameraContract.View#STATE_VIDEO}
-         */
-        void changeIconPhotoVideo(int state_camera);
+    /**
+     * capture image
+     */
+    void captureImage();
 
-        /**
-         * show front camera
-         */
-        void showFrontCamera();
+    /**
+     * record video
+     */
+    void recordVideo();
 
-        /**
-         * show camera back
-         */
-        void showBackCamera();
+    /**
+     * change icon when change camera from take photo -> record video or record -> take
+     *
+     * @param state_camera {@link CameraContract.View#STATE_PHOTO}, {@link
+     * CameraContract.View#STATE_VIDEO}
+     */
+    void changeIconPhotoVideo(int state_camera);
 
-        /**
-         * create new instance of camera view
-         */
-        void refreshCameraView();
+    /**
+     * show front camera
+     */
+    void showFrontCamera();
 
-        /**
-         * open gallery
-         *
-         * @param stateCamera photo|video
-         */
-        void openGallery(int stateCamera);
-    }
+    /**
+     * show camera back
+     */
+    void showBackCamera();
 
-    interface Presenter {
-        /**
-         * request permission for camera
-         */
-        void grantedCameraPermission();
+    /**
+     * create new instance of camera view
+     */
+    void refreshCameraView();
 
-        /**
-         * camera permission denied by user
-         */
-        void cameraPermissionDenied();
+    /**
+     * open gallery
+     *
+     * @param stateCamera photo|video
+     */
+    void openGallery(int stateCamera);
+  }
 
-        /**
-         * save photo or video when have permission
-         */
-        void saveMedia();
+  interface Presenter {
 
-        /**
-         * switch camera font/back
-         */
-        void switchCamera();
+    /**
+     * request permission for camera
+     */
+    void grantedCameraPermission();
 
-        /**
-         * handle when click change camera mode : video | photo
-         */
-        void toggleVideoPhoto();
+    /**
+     * camera permission denied by user
+     */
+    void cameraPermissionDenied();
 
-        /**
-         * open gallery on each case: photo, video
-         */
-        void openGallery();
-    }
+    /**
+     * save photo or video when have permission
+     */
+    void saveMedia();
+
+    /**
+     * switch camera font/back
+     */
+    void switchCamera();
+
+    /**
+     * handle when click change camera mode : video | photo
+     */
+    void toggleVideoPhoto();
+
+    /**
+     * open gallery on each case: photo, video
+     */
+    void openGallery();
+  }
 }

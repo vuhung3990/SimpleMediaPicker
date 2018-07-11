@@ -26,54 +26,55 @@ import android.view.View;
  */
 abstract class PreviewImpl {
 
-    private Callback mCallback;
-    private int mWidth;
-    private int mHeight;
+  private Callback mCallback;
+  private int mWidth;
+  private int mHeight;
 
-    void setCallback(Callback callback) {
-        mCallback = callback;
-    }
+  void setCallback(Callback callback) {
+    mCallback = callback;
+  }
 
-    abstract Surface getSurface();
+  abstract Surface getSurface();
 
-    abstract View getView();
+  abstract View getView();
 
-    abstract Class getOutputClass();
+  abstract Class getOutputClass();
 
-    abstract void setDisplayOrientation(int displayOrientation);
+  abstract void setDisplayOrientation(int displayOrientation);
 
-    abstract boolean isReady();
+  abstract boolean isReady();
 
-    void dispatchSurfaceChanged() {
-        mCallback.onSurfaceChanged();
-    }
+  void dispatchSurfaceChanged() {
+    mCallback.onSurfaceChanged();
+  }
 
-    SurfaceHolder getSurfaceHolder() {
-        return null;
-    }
+  SurfaceHolder getSurfaceHolder() {
+    return null;
+  }
 
-    Object getSurfaceTexture() {
-        return null;
-    }
+  Object getSurfaceTexture() {
+    return null;
+  }
 
-    void setBufferSize(int width, int height) {
-    }
+  void setBufferSize(int width, int height) {
+  }
 
-    void setSize(int width, int height) {
-        mWidth = width;
-        mHeight = height;
-    }
+  void setSize(int width, int height) {
+    mWidth = width;
+    mHeight = height;
+  }
 
-    int getWidth() {
-        return mWidth;
-    }
+  int getWidth() {
+    return mWidth;
+  }
 
-    int getHeight() {
-        return mHeight;
-    }
+  int getHeight() {
+    return mHeight;
+  }
 
-    interface Callback {
-        void onSurfaceChanged();
-    }
+  interface Callback {
+
+    void onSurfaceChanged();
+  }
 
 }

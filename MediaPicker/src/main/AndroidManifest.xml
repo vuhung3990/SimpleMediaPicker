@@ -1,41 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.tux.mylab">
+  package="com.example.tux.mylab">
 
-    <uses-sdk
-        android:maxSdkVersion="27"
-        android:minSdkVersion="14" />
+  <uses-sdk
+    android:maxSdkVersion="27"
+    android:minSdkVersion="14"/>
 
-    <uses-permission android:name="android.permission.RECORD_AUDIO" />
-    <uses-permission android:name="android.permission.CAMERA" />
+  <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+  <uses-permission android:name="android.permission.CAMERA"/>
 
-    <uses-feature android:name="android.hardware.camera.autofocus" />
-    <uses-feature android:name="android.hardware.camera" />
+  <uses-feature android:name="android.hardware.camera.autofocus"/>
+  <uses-feature android:name="android.hardware.camera"/>
 
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+  <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+  <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
-    <application>
-        <activity
-            android:name=".gallery.GalleryActivity"
-            android:label="@string/title_activity_gallery"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".camera.CameraActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
-            android:theme="@style/Base.Theme.AppCompat" />
+  <application>
+    <activity
+      android:label="@string/title_activity_gallery"
+      android:name=".gallery.GalleryActivity"
+      android:theme="@style/AppTheme.NoActionBar"/>
+    <activity
+      android:name=".camera.CameraActivity"
+      android:theme="@style/AppTheme.NoActionBar"/>
+    <activity
+      android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
+      android:theme="@style/Base.Theme.AppCompat"/>
 
-        <provider
-            android:name="android.support.v4.content.FileProvider"
-            android:authorities="${applicationId}.file_provider"
-            android:exported="false"
-            android:grantUriPermissions="true">
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/provider_paths" />
-        </provider>
-    </application>
+    <provider
+      android:authorities="${applicationId}.file_provider"
+      android:exported="false"
+      android:grantUriPermissions="true"
+      android:name="android.support.v4.content.FileProvider">
+      <meta-data
+        android:name="android.support.FILE_PROVIDER_PATHS"
+        android:resource="@xml/provider_paths"/>
+    </provider>
+  </application>
 
 </manifest>

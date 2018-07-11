@@ -18,85 +18,85 @@ package com.example.tux.mylab.camera.cameraview;
 
 import android.content.Context;
 import android.view.View;
-
 import java.io.File;
 import java.util.Set;
 
 abstract class CameraViewImpl {
-    final Callback mCallback;
-    final PreviewImpl mPreview;
-    /**
-     * @see #isRecordingVideo()
-     */
-    boolean isRecordingVideo = false;
 
-    CameraViewImpl(Callback callback, PreviewImpl preview) {
-        mCallback = callback;
-        mPreview = preview;
-    }
+  final Callback mCallback;
+  final PreviewImpl mPreview;
+  /**
+   * @see #isRecordingVideo()
+   */
+  boolean isRecordingVideo = false;
 
-    /**
-     * @return true: record video in progress, else otherwise
-     */
-    public boolean isRecordingVideo() {
-        return isRecordingVideo;
-    }
+  CameraViewImpl(Callback callback, PreviewImpl preview) {
+    mCallback = callback;
+    mPreview = preview;
+  }
 
-    View getView() {
-        return mPreview.getView();
-    }
+  /**
+   * @return true: record video in progress, else otherwise
+   */
+  public boolean isRecordingVideo() {
+    return isRecordingVideo;
+  }
 
-    /**
-     * @return {@code true} if the implementation was able to start the camera session.
-     */
-    abstract boolean start();
+  View getView() {
+    return mPreview.getView();
+  }
 
-    abstract void stop();
+  /**
+   * @return {@code true} if the implementation was able to start the camera session.
+   */
+  abstract boolean start();
 
-    abstract boolean isCameraOpened();
+  abstract void stop();
 
-    abstract int getFacing();
+  abstract boolean isCameraOpened();
 
-    abstract void setFacing(int facing);
+  abstract int getFacing();
 
-    abstract Set<AspectRatio> getSupportedAspectRatios();
+  abstract void setFacing(int facing);
 
-    /**
-     * @return {@code true} if the aspect ratio was changed.
-     */
-    abstract boolean setAspectRatio(AspectRatio ratio);
+  abstract Set<AspectRatio> getSupportedAspectRatios();
 
-    abstract AspectRatio getAspectRatio();
+  /**
+   * @return {@code true} if the aspect ratio was changed.
+   */
+  abstract boolean setAspectRatio(AspectRatio ratio);
 
-    abstract boolean getAutoFocus();
+  abstract AspectRatio getAspectRatio();
 
-    abstract void setAutoFocus(boolean autoFocus);
+  abstract boolean getAutoFocus();
 
-    abstract int getFlash();
+  abstract void setAutoFocus(boolean autoFocus);
 
-    abstract void setFlash(int flash);
+  abstract int getFlash();
 
-    abstract void takePicture();
+  abstract void setFlash(int flash);
 
-    abstract void setDisplayOrientation(int displayOrientation);
+  abstract void takePicture();
 
-    /**
-     * start|stop record video
-     *
-     * @param context required for notify media added
-     */
-    abstract void toggleRecordVideo(Context context);
+  abstract void setDisplayOrientation(int displayOrientation);
 
-    interface Callback {
+  /**
+   * start|stop record video
+   *
+   * @param context required for notify media added
+   */
+  abstract void toggleRecordVideo(Context context);
 
-        void onCameraOpened();
+  interface Callback {
 
-        void onCameraClosed();
+    void onCameraOpened();
 
-        void onPictureTaken(byte[] data);
+    void onCameraClosed();
 
-        void onSaveVideo(File outputVideoFile);
+    void onPictureTaken(byte[] data);
 
-    }
+    void onSaveVideo(File outputVideoFile);
+
+  }
 
 }

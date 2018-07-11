@@ -7,14 +7,15 @@ import com.example.tux.mylab.gallery.data.BaseItemObject;
  */
 
 class GalleryHeader extends BaseItemObject {
-    private final String header;
 
-    GalleryHeader(String header) {
-        super(BaseItemObject.TYPE_HEADER);
-        this.header = header;
-    }
+  private final String header;
 
-    public String getHeader() {
-        return header;
-    }
+  GalleryHeader(String header) {
+    super(BaseItemObject.TYPE_HEADER);
+    this.header = header;
+  }
+
+  public String getHeader() {
+    return header;
+  }
 }

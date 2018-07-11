@@ -23,66 +23,65 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
-
 import com.example.tux.mylab.R;
 
 class SurfaceViewPreview extends PreviewImpl {
 
-    private final SurfaceView mSurfaceView;
+  private final SurfaceView mSurfaceView;
 
-    SurfaceViewPreview(Context context, ViewGroup parent) {
-        final View view = View.inflate(context, R.layout.surface_view_265, parent);
-        mSurfaceView = view.findViewById(R.id.surface_view);
-        final SurfaceHolder holder = mSurfaceView.getHolder();
-        //noinspection deprecation
-        holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
-        holder.addCallback(new SurfaceHolder.Callback() {
-            @Override
-            public void surfaceCreated(SurfaceHolder h) {
-            }
+  SurfaceViewPreview(Context context, ViewGroup parent) {
+    final View view = View.inflate(context, R.layout.surface_view_265, parent);
+    mSurfaceView = view.findViewById(R.id.surface_view);
+    final SurfaceHolder holder = mSurfaceView.getHolder();
+    //noinspection deprecation
+    holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+    holder.addCallback(new SurfaceHolder.Callback() {
+      @Override
+      public void surfaceCreated(SurfaceHolder h) {
+      }
 
-            @Override
-            public void surfaceChanged(SurfaceHolder h, int format, int width, int height) {
-                setSize(width, height);
-                if (!ViewCompat.isInLayout(mSurfaceView)) {
-                    dispatchSurfaceChanged();
-                }
-            }
+      @Override
+      public void surfaceChanged(SurfaceHolder h, int format, int width, int height) {
+        setSize(width, height);
+        if (!ViewCompat.isInLayout(mSurfaceView)) {
+          dispatchSurfaceChanged();
+        }
+      }
 
-            @Override
-            public void surfaceDestroyed(SurfaceHolder h) {
-                setSize(0, 0);
-            }
-        });
-    }
+      @Override
+      public void surfaceDestroyed(SurfaceHolder h) {
+        setSize(0, 0);
+      }
+    });
+  }
 
-    @Override
-    Surface getSurface() {
-        return getSurfaceHolder().getSurface();
-    }
+  @Override
+  Surface getSurface() {
+    return getSurfaceHolder().getSurface();
+  }
 
-    @Override
-    SurfaceHolder getSurfaceHolder() {
-        return mSurfaceView.getHolder();
-    }
+  @Override
+  SurfaceHolder getSurfaceHolder() {
+    return mSurfaceView.getHolder();
+  }
 
-    @Override
-    View getView() {
-        return mSurfaceView;
-    }
+  @Override
+  View getView() {
+    return mSurfaceView;
+  }
 
-    @Override
-    Class getOutputClass() {
-        return SurfaceHolder.class;
-    }
+  @Override
+  Class getOutputClass() {
+    return SurfaceHolder.class;
+  }
 
-    @Override
-    void setDisplayOrientation(int displayOrientation) {
-    }
+  @Override
+  void setDisplayOrientation(int displayOrientation) {
+  }
 
-    @Override
-    boolean isReady() {
-        return getWidth() != 0 && getHeight() != 0;
-    }
+  @Override
+  boolean isReady() {
+    return getWidth() != 0 && getHeight() != 0;
+  }
 
 }
