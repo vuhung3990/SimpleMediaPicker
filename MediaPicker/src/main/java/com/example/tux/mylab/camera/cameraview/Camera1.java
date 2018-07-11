@@ -417,7 +417,7 @@ class Camera1 extends CameraViewImpl {
               // inform the user that recording has started
               isInitialing = false;
             }
-          }).execute(mMediaRecorder);
+          }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, mMediaRecorder);
         } else {
           // prepare didn't work, release the camera
           releaseMediaRecorder();
