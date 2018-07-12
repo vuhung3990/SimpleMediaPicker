@@ -5,13 +5,13 @@
     <item name="windowNoTitle">true</item>
 
     <!--toolbar-->
-    <item name="colorPrimary">@color/primary</item>
+    <item name="colorPrimary">@color/primary256</item>
     <!--status bar-->
-    <item name="colorPrimaryDark">@color/primaryDark</item>
+    <item name="colorPrimaryDark">@color/primaryDark256</item>
     <!--checked item, float button-->
-    <item name="colorAccent">@color/accent</item>
+    <item name="colorAccent">@color/accent256</item>
     <!--un check item-->
-    <item name="android:textColorSecondary">@color/accent</item>
+    <item name="android:textColorSecondary">@color/accent256</item>
   </style>
 
   <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
