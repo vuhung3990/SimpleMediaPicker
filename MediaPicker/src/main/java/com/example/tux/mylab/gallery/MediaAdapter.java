@@ -4,10 +4,13 @@ import static com.example.tux.mylab.gallery.data.BaseItemObject.TYPE_HEADER;
 import static com.example.tux.mylab.utils.Utils.isPhoto;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.util.ArraySet;
 import android.support.v7.widget.AppCompatCheckBox;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +18,11 @@ import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.Target;
 import com.example.tux.mylab.R;
 import com.example.tux.mylab.gallery.data.BaseItemObject;
 import com.example.tux.mylab.gallery.data.MediaFile;
@@ -57,6 +64,12 @@ class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
    * Gallery#VIEW_TYPE_PHOTOS}, {@link Gallery#VIEW_TYPE_VIDEOS}
    */
   private int displayType = Gallery.VIEW_TYPE_TIME;
+  /**
+   * store error file to exclude
+   *
+   * @see com.example.tux.mylab.gallery.data.ExcludeDatabase#batchInsertExcludeMedia(List)
+   */
+  private ArraySet<MediaFile> excludedFiles = new ArraySet<>();
 
   MediaAdapter(Context context) {
     this.context = context;
@@ -92,22 +105,28 @@ class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
           .load(mediaFile.getPath())
           .apply(defaultOptions)
           // if have many invalid image it's will notify multiple times => should use error image instead
+          .listener(new RequestListener<Drawable>() {
+            @Override
+            public boolean onLoadFailed(@Nullable GlideException e, Object model,
+                Target<Drawable> target, boolean isFirstResource) {
+              Log.d("TAG", "onLoadFailed: " + mediaFile.getPath());
 
-//                    .listener(new RequestListener<Drawable>() {
-//                        @Override
-//                        public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-//                            // don't show invalid image file, example: aa.jpg but it not image
-//                            mediaData.remove(mediaFile);
-//                            displayMediaList.remove(mediaFile);
-//                            notifyItemRemoved(itemPosition);
-//                            return false;
-//                        }
-//
-//                        @Override
-//                        public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-//                            return false;
-//                        }
-//                    })
+              // don't show invalid image file, example: aa.jpg but it not image
+              mediaData.remove(mediaFile);
+              // save into exclude set
+              excludedFiles.add(mediaFile);
+              // remove in display list and notify
+              displayMediaList.remove(mediaFile);
+              notifyDataSetChanged();
+              return false;
+            }
+
+            @Override
+            public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target,
+                DataSource dataSource, boolean isFirstResource) {
+              return false;
+            }
+          })
           .into(itemHolder.thumb);
 
       itemHolder.text.setText(mediaFile.getName());
@@ -338,6 +357,13 @@ class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
       }
     }
     return mediaFiles;
+  }
+
+  /**
+   * @return list exclude media
+   */
+  public List<MediaFile> getExcludeList() {
+    return new ArrayList<>(excludedFiles);
   }
 
   interface MyEvent {

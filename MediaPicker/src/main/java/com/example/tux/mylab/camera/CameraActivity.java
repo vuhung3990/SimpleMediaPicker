@@ -195,9 +195,13 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
 
       @Override
       public void onVideoSaved(File outputVideoFile) {
-        sendResult(new MediaFile(outputVideoFile.getName(), outputVideoFile.getAbsolutePath(),
+        MediaFile mediaFile = new MediaFile(
+            outputVideoFile.getName(),
+            outputVideoFile.getAbsolutePath(),
             outputVideoFile.getParentFile().getName(), System.currentTimeMillis(),
-            Utils.VIDEO_TYPE_MP4));
+            Utils.VIDEO_TYPE_MP4, outputVideoFile.lastModified()
+        );
+        sendResult(mediaFile);
         stopVideoRecordTimer();
       }
     });

@@ -104,8 +104,15 @@ public abstract class MediaPickerBaseActivity extends AppCompatActivity {
    */
   protected void setResult(File file) {
     Utils.scanFile(getApplicationContext(), file);
-    sendResult(new MediaFile(file.getName(), file.getAbsolutePath(), file.getParentFile().getName(),
-        System.currentTimeMillis(), Utils.IMAGE_TYPE_JPG));
+    MediaFile mediaFile = new MediaFile(
+        file.getName(),
+        file.getAbsolutePath(),
+        file.getParentFile().getName(),
+        System.currentTimeMillis(),
+        Utils.IMAGE_TYPE_JPG,
+        file.lastModified()
+    );
+    sendResult(mediaFile);
   }
 
   @Override

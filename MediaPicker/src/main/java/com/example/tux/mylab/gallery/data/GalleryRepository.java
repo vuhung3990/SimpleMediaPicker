@@ -4,7 +4,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.MergeCursor;
 import android.os.AsyncTask;
-import android.provider.MediaStore;
+import android.provider.MediaStore.Images;
+import android.provider.MediaStore.Video.Media;
 import com.example.tux.mylab.gallery.GalleryContract;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,19 +17,31 @@ import java.util.List;
 public class GalleryRepository implements GalleryContract.Repository {
 
   private final Context context;
+  private final ExcludeDatabase excludeDb;
 
   public GalleryRepository(Context context) {
     this.context = context;
+    excludeDb = new ExcludeDatabase(context.getApplicationContext());
   }
 
   @Override
   public void onGetAllMediaFile(Event event) {
-    new GetMediaFilesAsync(event)
+    new GetMediaFilesAsync(event, excludeDb)
         .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, context.getApplicationContext());
+  }
+
+  /**
+   * save exclude files into db
+   */
+  public void saveExcludeFiles(List<MediaFile> excludeList) {
+    excludeDb.batchInsertExcludeMedia(excludeList);
   }
 
   public interface Event {
 
+    /**
+     * get media and filter exclude files success
+     */
     void onSuccess(List<MediaFile> mediaFiles);
   }
 
@@ -37,18 +50,21 @@ public class GalleryRepository implements GalleryContract.Repository {
    */
   private static class GetMediaFilesAsync extends AsyncTask<Context, Void, List<MediaFile>> {
 
-    private final String[] projection;
+    private final String[] projections;
     private final Event event;
+    private final ExcludeDatabase excludeDb;
 
-    GetMediaFilesAsync(Event event) {
+    GetMediaFilesAsync(Event event, ExcludeDatabase excludeDb) {
       this.event = event;
+      this.excludeDb = excludeDb;
 
-      projection = new String[]{
-          MediaStore.Video.Media.TITLE,
-          MediaStore.Video.Media.DATA,
-          MediaStore.Video.Media.BUCKET_DISPLAY_NAME,
-          MediaStore.Video.Media.DATE_TAKEN,
-          MediaStore.Video.Media.MIME_TYPE
+      projections = new String[]{
+          Media.TITLE,
+          Media.DATA,
+          Media.BUCKET_DISPLAY_NAME,
+          Media.DATE_TAKEN,
+          Media.MIME_TYPE,
+          Media.DATE_MODIFIED
       };
     }
 
@@ -56,19 +72,19 @@ public class GalleryRepository implements GalleryContract.Repository {
     protected List<MediaFile> doInBackground(Context... params) {
       Context appContext = params[0];
       Cursor mergeCursor = new MergeCursor(new Cursor[]{
-          appContext.getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-              projection, null, null, null),
-          appContext.getContentResolver().query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
-              projection, null, null, null)
+          appContext.getContentResolver().query(Images.Media.EXTERNAL_CONTENT_URI,
+              projections, null, null, null),
+          appContext.getContentResolver().query(Media.EXTERNAL_CONTENT_URI,
+              projections, null, null, null)
       });
       List<MediaFile> mediaFiles = new ArrayList<>();
-
       if (mergeCursor.moveToFirst()) {
-        int colName = mergeCursor.getColumnIndex(MediaStore.Video.Media.TITLE);
-        int colPath = mergeCursor.getColumnIndex(MediaStore.Video.Media.DATA);
-        int colFolder = mergeCursor.getColumnIndex(MediaStore.Video.Media.BUCKET_DISPLAY_NAME);
-        int colTime = mergeCursor.getColumnIndex(MediaStore.Video.Media.DATE_TAKEN);
-        int colType = mergeCursor.getColumnIndex(MediaStore.Video.Media.MIME_TYPE);
+        int colName = mergeCursor.getColumnIndex(Media.TITLE);
+        int colPath = mergeCursor.getColumnIndex(Media.DATA);
+        int colFolder = mergeCursor.getColumnIndex(Media.BUCKET_DISPLAY_NAME);
+        int colTime = mergeCursor.getColumnIndex(Media.DATE_TAKEN);
+        int colType = mergeCursor.getColumnIndex(Media.MIME_TYPE);
+        int colModified = mergeCursor.getColumnIndex(Media.DATE_MODIFIED);
 
         while (!mergeCursor.isAfterLast()) {
           MediaFile mf = new MediaFile(
@@ -76,14 +92,16 @@ public class GalleryRepository implements GalleryContract.Repository {
               mergeCursor.getString(colPath),
               mergeCursor.getString(colFolder),
               mergeCursor.getLong(colTime),
-              mergeCursor.getString(colType)
+              mergeCursor.getString(colType),
+              mergeCursor.getLong(colModified)
           );
           mediaFiles.add(mf);
           mergeCursor.moveToNext();
         }
         mergeCursor.close();
       }
-      return mediaFiles;
+
+      return excludeDb.removeExcludedMedia(mediaFiles);
     }
 
     @Override
