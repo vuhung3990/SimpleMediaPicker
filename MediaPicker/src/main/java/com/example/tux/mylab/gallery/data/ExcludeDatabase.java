@@ -76,7 +76,6 @@ public class ExcludeDatabase extends SQLiteOpenHelper {
       cursor.close();
     }
 
-    db.close();
     return mediaFiles;
   }
 
@@ -96,6 +95,5 @@ public class ExcludeDatabase extends SQLiteOpenHelper {
 
     db.setTransactionSuccessful();
     db.endTransaction();
-    db.close();
   }
 }
