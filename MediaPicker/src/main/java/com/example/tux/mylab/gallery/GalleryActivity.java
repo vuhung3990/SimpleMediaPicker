@@ -23,6 +23,8 @@ import com.example.tux.mylab.MediaPickerBaseActivity;
 import com.example.tux.mylab.R;
 import com.example.tux.mylab.camera.Camera;
 import com.example.tux.mylab.camera.cameraview.CameraView;
+import com.example.tux.mylab.gallery.GalleryContract.Repository;
+import com.example.tux.mylab.gallery.data.ExcludeDatabase;
 import com.example.tux.mylab.gallery.data.GalleryRepository;
 import com.example.tux.mylab.gallery.data.MediaFile;
 import com.example.tux.mylab.utils.Utils;
@@ -59,6 +61,7 @@ public class GalleryActivity extends MediaPickerBaseActivity implements GalleryC
    */
   private boolean isLock;
   private boolean fixAspectRatio;
+  private GalleryRepository repo;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -66,7 +69,8 @@ public class GalleryActivity extends MediaPickerBaseActivity implements GalleryC
     setContentView(R.layout.activity_gallery_265);
     getInputBundle();
 
-    presenter = new GalleryPresenter(this, new GalleryRepository(this));
+    repo = new GalleryRepository(this);
+    presenter = new GalleryPresenter(this, repo);
 
     // setup recycle view
     RecyclerView mediaList = findViewById(R.id.media_list);
@@ -160,6 +164,22 @@ public class GalleryActivity extends MediaPickerBaseActivity implements GalleryC
   protected void onPause() {
     super.onPause();
     presenter.onPause();
+  }
+
+  @Override
+  protected void onDestroy() {
+    // save exclude files
+    saveExcludeFile();
+
+    super.onDestroy();
+  }
+
+  /**
+   * save exclude files list in adapter
+   */
+  private void saveExcludeFile() {
+    List<MediaFile> excludeList = adapter.getExcludeList();
+    repo.saveExcludeFiles(excludeList);
   }
 
   @Override

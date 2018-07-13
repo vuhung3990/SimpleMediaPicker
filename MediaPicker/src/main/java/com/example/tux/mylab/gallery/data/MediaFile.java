@@ -36,17 +36,23 @@ public class MediaFile extends BaseItemObject implements Parcelable {
    */
   private final long time;
   /**
+   * last modified in Unix time
+   */
+  private final long modifiedTime;
+  /**
    * mine type of file
    */
   private final String mineType;
 
-  public MediaFile(String name, String path, String folder, long time, String mineType) {
+  public MediaFile(String name, String path, String folder, long time, String mineType,
+      long modifiedTime) {
     super(BaseItemObject.TYPE_ITEM);
     this.name = name;
     this.path = path;
     this.folder = folder;
     this.time = time;
     this.mineType = mineType;
+    this.modifiedTime = modifiedTime;
   }
 
   private MediaFile(Parcel in) {
@@ -55,7 +61,32 @@ public class MediaFile extends BaseItemObject implements Parcelable {
     this.path = in.readString();
     this.folder = in.readString();
     this.time = in.readLong();
+    this.modifiedTime = in.readLong();
     this.mineType = in.readString();
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
+    MediaFile mediaFile = (MediaFile) o;
+
+    if (modifiedTime != mediaFile.modifiedTime) {
+      return false;
+    }
+    return path.equals(mediaFile.path);
+  }
+
+  @Override
+  public int hashCode() {
+    int result = path.hashCode();
+    result = 31 * result + (int) (modifiedTime ^ (modifiedTime >>> 32));
+    return result;
   }
 
   public String getMineType() {
@@ -78,6 +109,10 @@ public class MediaFile extends BaseItemObject implements Parcelable {
     return time;
   }
 
+  public long getModifiedTime() {
+    return modifiedTime;
+  }
+
   @Override
   public String toString() {
     return "MediaFile{" +
@@ -85,6 +120,7 @@ public class MediaFile extends BaseItemObject implements Parcelable {
         ", path='" + path + '\'' +
         ", folder='" + folder + '\'' +
         ", time=" + time +
+        ", time=" + modifiedTime +
         ", mineType='" + mineType + '\'' +
         '}';
   }
@@ -100,6 +136,7 @@ public class MediaFile extends BaseItemObject implements Parcelable {
     dest.writeString(this.path);
     dest.writeString(this.folder);
     dest.writeLong(this.time);
+    dest.writeLong(this.modifiedTime);
     dest.writeString(this.mineType);
   }
 }
