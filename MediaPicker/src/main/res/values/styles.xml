@@ -25,4 +25,11 @@
     <item name="autoFocus">true</item>
     <item name="flash">auto</item>
   </style>
+
+  <style name="Spinner">
+    <!--change disabled text spinner-->
+    <item name="android:textColor">@color/white256</item>
+    <!--hide drop down spinner-->
+    <item name="backgroundTint">@android:color/transparent</item>
+  </style>
 </resources>

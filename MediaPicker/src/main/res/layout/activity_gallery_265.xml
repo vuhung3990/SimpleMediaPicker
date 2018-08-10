@@ -37,7 +37,8 @@
         android:layout_toEndOf="@+id/back"
         android:layout_toRightOf="@+id/back"
         android:entries="@array/sort_type"
-        android:spinnerMode="dropdown"/>
+        android:spinnerMode="dropdown"
+        android:theme="@style/Spinner"/>
 
       <TextView
         android:id="@+id/txt_selected"
