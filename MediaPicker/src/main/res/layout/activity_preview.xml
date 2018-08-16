@@ -21,7 +21,7 @@
     android:id="@+id/view"
     android:layout_width="0dp"
     android:layout_height="@dimen/preview_overlay"
-    android:background="@color/colorBackgroundTextGallery"
+    android:background="@color/backgroundTextGallery256"
     app:layout_constraintBottom_toBottomOf="parent"
     app:layout_constraintEnd_toEndOf="parent"
     app:layout_constraintStart_toStartOf="parent"/>
