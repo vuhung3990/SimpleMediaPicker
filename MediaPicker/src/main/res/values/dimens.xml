@@ -15,4 +15,6 @@
   <dimen name="gallery_item_padding">2dp</dimen>
   <dimen name="crop_min_size">150dp</dimen>
   <dimen name="gallery_item_video_size">48dp</dimen>
+  <dimen name="preview_overlay">100dp</dimen>
+  <dimen name="preview_margin">25dp</dimen>
 </resources>

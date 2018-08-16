@@ -14,6 +14,7 @@
 
   <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
   <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+  <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
 
   <application>
     <activity
@@ -36,6 +37,10 @@
         android:name="android.support.FILE_PROVIDER_PATHS"
         android:resource="@xml/provider_paths"/>
     </provider>
+
+    <activity
+      android:name=".camera.PreviewVideo"
+      android:theme="@style/Fullscreen"/>
   </application>
 
 </manifest>
