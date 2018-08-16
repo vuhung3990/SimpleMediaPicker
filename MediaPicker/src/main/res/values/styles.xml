@@ -32,4 +32,12 @@
     <!--hide drop down spinner-->
     <item name="backgroundTint">@android:color/transparent</item>
   </style>
+
+  <style name="Fullscreen" parent="AppTheme.NoActionBar">
+    <item name="android:windowNoTitle">true</item>
+    <item name="android:windowActionBar">false</item>
+    <item name="android:windowFullscreen">true</item>
+    <item name="android:windowContentOverlay">@null</item>
+    <item name="android:windowAnimationStyle">@null</item>
+  </style>
 </resources>

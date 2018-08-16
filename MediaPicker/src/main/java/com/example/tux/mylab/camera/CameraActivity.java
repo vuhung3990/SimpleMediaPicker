@@ -9,6 +9,7 @@ import android.os.HandlerThread;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Chronometer;
@@ -201,8 +202,11 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
             outputVideoFile.getParentFile().getName(), System.currentTimeMillis(),
             Utils.VIDEO_TYPE_MP4, outputVideoFile.lastModified()
         );
-        sendResult(mediaFile);
         stopVideoRecordTimer();
+
+        // TODO: 8/16/18 show: reset, preview, cancel, accept
+        // sendResult(mediaFile);
+        PreviewVideo.start(CameraActivity.this, mediaFile);
       }
     });
 
@@ -218,8 +222,8 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
    */
   private void stopVideoRecordTimer() {
     // show open gallery and toggle video/photo mode
-    btnTogglePhotoVideo.setVisibility(View.VISIBLE);
-    btnOpenGallery.setVisibility(View.VISIBLE);
+    // btnTogglePhotoVideo.setVisibility(View.VISIBLE);
+    // btnOpenGallery.setVisibility(View.VISIBLE);
 
     videoRecordTimer.stop();
     videoRecordTimer.setVisibility(View.GONE);
@@ -433,6 +437,7 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
   @Override
   protected void onActivityResult(int requestCode, int resultCode, Intent data) {
     super.onActivityResult(requestCode, resultCode, data);
+    // after crop image
     if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
       CropImage.ActivityResult result = CropImage.getActivityResult(data);
       if (resultCode == RESULT_OK) {
@@ -440,6 +445,15 @@ public class CameraActivity extends MediaPickerBaseActivity implements View.OnCl
       } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
         Exception error = result.getError();
         error.printStackTrace();
+      }
+    }
+
+    // after preview video and accept
+    if (requestCode == PreviewVideo.PREVIEW_VIDEO_REQUEST_CODE) {
+      String path = data.getStringExtra(PreviewVideo.PREVIEW_VIDEO_PATH);
+      if (resultCode == RESULT_OK && !TextUtils.isEmpty(path)) {
+        File file = new File(path);
+        setResult(file);
       }
     }
   }

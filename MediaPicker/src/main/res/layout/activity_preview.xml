@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:id="@+id/frameLayout"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  tools:context=".camera.PreviewVideo">
+
+  <VideoView
+    android:id="@+id/preview_video"
+    android:layout_width="0dp"
+    android:layout_height="0dp"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent"/>
+
+  <View
+    android:id="@+id/view"
+    android:layout_width="0dp"
+    android:layout_height="@dimen/preview_overlay"
+    android:background="@color/colorBackgroundTextGallery"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"/>
+
+  <ImageView
+    android:id="@+id/play"
+    android:layout_width="@dimen/gallery_item_video_size"
+    android:layout_height="@dimen/gallery_item_video_size"
+    android:contentDescription="@string/image_description"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="@+id/preview_video"
+    app:srcCompat="@drawable/ic_play_circle_outline_white_48dp"/>
+
+  <ImageView
+    android:id="@+id/close"
+    android:layout_width="@dimen/gallery_item_video_size"
+    android:layout_height="@dimen/gallery_item_video_size"
+    android:layout_margin="@dimen/preview_margin"
+    android:contentDescription="@string/image_description"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:srcCompat="@drawable/ic_close_white_48dp"/>
+
+  <ImageView
+    android:id="@+id/done"
+    android:layout_width="@dimen/gallery_item_video_size"
+    android:layout_height="@dimen/gallery_item_video_size"
+    android:layout_margin="@dimen/preview_margin"
+    android:contentDescription="@string/image_description"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:srcCompat="@drawable/ic_done_white_48dp"/>
+</android.support.constraint.ConstraintLayout>
